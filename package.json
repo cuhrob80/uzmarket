@@ -1,0 +1,25 @@
+{
+  "name": "uzmarket",
+  "version": "0.1.0",
+  "private": true,
+  "engines": { "node": ">=24 <25", "npm": ">=11 <12" },
+  "packageManager": "npm@11.4.2",
+  "workspaces": ["frontend", "backend"],
+  "scripts": {
+    "dev:frontend": "npm run dev --workspace=frontend",
+    "dev:backend": "npm run dev --workspace=backend",
+    "typecheck": "npm run typecheck --workspaces --if-present",
+    "lint": "npm run lint --workspaces --if-present",
+    "test": "npm run test --workspace=backend",
+    "build": "npm run build --workspaces --if-present",
+    "audit": "npm audit --audit-level=high",
+    "db:up": "docker compose --env-file database/docker/.env -f database/docker/compose.yml up -d --wait",
+    "db:down": "docker compose --env-file database/docker/.env -f database/docker/compose.yml down",
+    "db:logs": "docker compose --env-file database/docker/.env -f database/docker/compose.yml logs -f postgres",
+    "migration:create": "npm run migration:create --workspace=backend --",
+    "migration:generate": "npm run migration:generate --workspace=backend --",
+    "migration:show": "npm run migration:show --workspace=backend",
+    "migration:run": "npm run migration:run --workspace=backend",
+    "migration:revert": "npm run migration:revert --workspace=backend"
+  }
+}

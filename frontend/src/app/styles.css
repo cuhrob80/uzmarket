@@ -1,0 +1,9 @@
+:root { color-scheme: light; font-family: Arial, Helvetica, sans-serif; background: #f5f7fa; color: #172033; }
+* { box-sizing: border-box; }
+body { margin: 0; }
+main { display: grid; min-height: 100vh; place-items: center; padding: 24px; }
+section { width: min(100%, 420px); padding: 40px; border: 1px solid #dfe4ec; border-radius: 16px; background: #fff; box-shadow: 0 12px 32px rgb(23 32 51 / 8%); }
+h1 { margin: 0 0 20px; font-size: 2rem; }
+p { margin: 0; font-size: 1.125rem; }
+.connected { color: #08783e; }
+.unavailable { color: #b42318; }
