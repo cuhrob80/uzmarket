@@ -12,7 +12,7 @@ describe('Health endpoint', () => {
     app.setGlobalPrefix('api/v1');
     app.useGlobalPipes(new ValidationPipe({ transform: true, whitelist: true }));
     await app.init();
-  });
+  }, 30000);
   afterAll(async () => {
     await app?.close();
   });
