@@ -21,12 +21,11 @@ jobs:
     env:
       NODE_ENV: test
       PORT: 3001
-      DATABASE_HOST: localhost
-      DATABASE_PORT: 5432
-      DATABASE_NAME: uzmarket_test
-      DATABASE_USER: uzmarket
-      DATABASE_PASSWORD: uzmarket_test
-      FRONTEND_URL: http://localhost:3000
+      TEST_DATABASE_HOST: localhost
+      TEST_DATABASE_PORT: 5432
+      TEST_DATABASE_NAME: uzmarket_test
+      TEST_DATABASE_USER: uzmarket
+      TEST_DATABASE_PASSWORD: uzmarket_test
       API_URL: http://localhost:3001
     steps:
       - uses: actions/checkout@v4
