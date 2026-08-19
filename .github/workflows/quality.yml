@@ -1,0 +1,39 @@
+name: Quality
+on:
+  pull_request:
+  push:
+    branches: [main]
+concurrency:
+  group: quality-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  quality:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    services:
+      postgres:
+        image: postgres:17-alpine
+        env: { POSTGRES_DB: uzmarket_test, POSTGRES_USER: uzmarket, POSTGRES_PASSWORD: uzmarket_test }
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd "pg_isready -U uzmarket -d uzmarket_test"
+          --health-interval 5s --health-timeout 5s --health-retries 10
+    env:
+      NODE_ENV: test
+      PORT: 3001
+      TEST_DATABASE_HOST: localhost
+      TEST_DATABASE_PORT: 5432
+      TEST_DATABASE_NAME: uzmarket_test
+      TEST_DATABASE_USER: uzmarket
+      TEST_DATABASE_PASSWORD: uzmarket_test
+      API_URL: http://localhost:3001
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 24, cache: npm }
+      - run: npm ci
+      - run: npm run typecheck
+      - run: npm run lint
+      - run: npm test
+      - run: npm run build
+      - run: npm run audit
