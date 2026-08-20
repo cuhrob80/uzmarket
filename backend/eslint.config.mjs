@@ -11,7 +11,7 @@ export default tseslint.config(
     languageOptions: { sourceType: 'commonjs', globals: globals.node },
   },
   {
-    files: ['test/health.e2e-spec.ts'],
+    files: ['test/*.e2e-spec.ts'],
     rules: { '@typescript-eslint/no-require-imports': 'off' },
   },
 );

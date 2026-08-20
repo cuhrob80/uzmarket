@@ -4,6 +4,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { type Environment, validateEnvironment } from './config/environment';
 import { createTypeOrmOptions } from './database/database.config';
 import { HealthModule } from './health/health.module';
+import { ListingsModule } from './listings/listings.module';
 
 @Module({ imports: [
   ConfigModule.forRoot({ cache: true, isGlobal: true, validate: validateEnvironment }),
@@ -12,5 +13,6 @@ import { HealthModule } from './health/health.module';
     useFactory: (config: ConfigService<Environment, true>) => createTypeOrmOptions(config),
   }),
   HealthModule,
+  ListingsModule,
 ] })
 export class AppModule {}
