@@ -31,6 +31,7 @@ describe('Listings API', () => {
         email: `seller-${Date.now()}@example.com`,
         phone: null,
         displayName: 'E2E Seller',
+        passwordHash: 'not-used-by-listings-e2e',
       }),
     );
 

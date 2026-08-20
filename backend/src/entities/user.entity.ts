@@ -22,6 +22,9 @@ export class User {
   @Column({ name: 'display_name' })
   displayName!: string;
 
+  @Column({ name: 'password_hash', select: false })
+  passwordHash!: string;
+
   @CreateDateColumn({ name: 'created_at', type: 'timestamptz' })
   createdAt!: Date;
 

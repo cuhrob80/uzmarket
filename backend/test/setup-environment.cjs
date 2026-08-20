@@ -6,3 +6,5 @@ process.env.DATABASE_NAME = process.env.TEST_DATABASE_NAME ?? 'uzmarket';
 process.env.DATABASE_USER = process.env.TEST_DATABASE_USER ?? 'uzmarket';
 process.env.DATABASE_PASSWORD = process.env.TEST_DATABASE_PASSWORD ?? 'uzmarket_local';
 process.env.FRONTEND_URL = 'http://localhost:3000';
+process.env.JWT_SECRET = 'test-jwt-secret-for-e2e';
+process.env.JWT_EXPIRES_IN = '900';
