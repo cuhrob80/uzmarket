@@ -34,6 +34,16 @@ jobs:
       - run: npm ci
       - run: npm run typecheck
       - run: npm run lint
+      - run: npm run migration:run
+        env:
+          NODE_ENV: test
+          PORT: 3001
+          DATABASE_HOST: localhost
+          DATABASE_PORT: 5432
+          DATABASE_NAME: uzmarket_test
+          DATABASE_USER: uzmarket
+          DATABASE_PASSWORD: uzmarket_test
+          FRONTEND_URL: http://localhost:3000
       - run: npm test
       - run: npm run build
       - run: npm run audit
