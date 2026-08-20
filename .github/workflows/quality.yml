@@ -44,6 +44,8 @@ jobs:
           DATABASE_USER: uzmarket
           DATABASE_PASSWORD: uzmarket_test
           FRONTEND_URL: http://localhost:3000
+          JWT_SECRET: test-jwt-secret-for-ci
+          JWT_EXPIRES_IN: 900
       - run: npm test
       - run: npm run build
       - run: npm run audit
