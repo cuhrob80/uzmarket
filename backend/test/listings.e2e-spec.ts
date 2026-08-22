@@ -1,6 +1,7 @@
 import type { INestApplication } from '@nestjs/common';
 import { ValidationPipe } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
+import { JwtService } from '@nestjs/jwt';
 import { DataSource } from 'typeorm';
 import request = require('supertest');
 import { AppModule } from '../src/app.module';
@@ -12,6 +13,7 @@ describe('Listings API', () => {
   let seller: User;
   let category: Category;
   let createdListingId: string | undefined;
+  let accessToken: string;
 
   beforeAll(async () => {
     const module = await Test.createTestingModule({ imports: [AppModule] }).compile();
@@ -43,6 +45,12 @@ describe('Listings API', () => {
         isActive: true,
       }),
     );
+
+    const jwtService = app.get(JwtService);
+    accessToken = await jwtService.signAsync({
+      sub: seller.id,
+      email: seller.email,
+    });
   }, 30000);
 
   afterAll(async () => {
@@ -61,13 +69,27 @@ describe('Listings API', () => {
     await app?.close();
   });
 
-  it('creates a listing', async () => {
+  it('rejects listing creation without authentication', async () => {
+    if (!app) throw new Error('Test application did not start');
+
+    await request(app.getHttpServer())
+      .post('/api/v1/listings')
+      .send({
+        categoryId: category.id,
+        title: 'Unauthorized Listing',
+        description: 'Should not be created',
+        price: '1000.00',
+      })
+      .expect(401);
+  });
+
+  it('creates a listing for the authenticated user', async () => {
     if (!app) throw new Error('Test application did not start');
 
     const response = await request(app.getHttpServer())
       .post('/api/v1/listings')
+      .set('Authorization', `Bearer ${accessToken}`)
       .send({
-        sellerId: seller.id,
         categoryId: category.id,
         title: 'E2E Listing',
         description: 'Marketplace listing created by e2e test',
@@ -105,7 +127,15 @@ describe('Listings API', () => {
       sellerId: seller.id,
       categoryId: category.id,
       title: 'E2E Listing',
+      seller: {
+        id: seller.id,
+        displayName: seller.displayName,
+      },
     });
+
+    expect(response.body.seller.email).toBeUndefined();
+    expect(response.body.seller.phone).toBeUndefined();
+    expect(response.body.seller.passwordHash).toBeUndefined();
   });
 
   it('lists and filters listings', async () => {
