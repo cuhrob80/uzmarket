@@ -4,6 +4,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { type Environment, validateEnvironment } from './config/environment';
 import { createTypeOrmOptions } from './database/database.config';
 import { AuthModule } from './auth/auth.module';
+import { CategoriesModule } from './categories/categories.module';
 import { HealthModule } from './health/health.module';
 import { ListingsModule } from './listings/listings.module';
 
@@ -15,6 +16,7 @@ import { ListingsModule } from './listings/listings.module';
   }),
   HealthModule,
   ListingsModule,
+  CategoriesModule,
   AuthModule,
 ] })
 export class AppModule {}
