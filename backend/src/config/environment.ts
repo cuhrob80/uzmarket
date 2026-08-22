@@ -11,6 +11,8 @@ export class Environment {
   @IsNotEmpty() DATABASE_USER!: string;
   @IsNotEmpty() DATABASE_PASSWORD!: string;
   @IsUrl({ require_tld: false, protocols: ['http', 'https'] }) FRONTEND_URL!: string;
+  @IsNotEmpty() JWT_SECRET!: string;
+  @IsInt() @Min(60) JWT_EXPIRES_IN!: number;
 }
 export function validateEnvironment(configuration: Record<string, unknown>): Environment {
   const environment = plainToInstance(Environment, configuration, { enableImplicitConversion: true });
