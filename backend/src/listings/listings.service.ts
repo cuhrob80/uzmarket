@@ -4,6 +4,7 @@ import { ILike, type FindOptionsWhere, Repository } from 'typeorm';
 import { Category, Listing, User } from '../entities';
 import { CreateListingDto } from './dto/create-listing.dto';
 import { ListListingsQueryDto } from './dto/list-listings-query.dto';
+import type { ListingResponseDto } from './dto/listing-response.dto';
 
 @Injectable()
 export class ListingsService {
@@ -16,9 +17,9 @@ export class ListingsService {
     private readonly categoriesRepository: Repository<Category>,
   ) {}
 
-  async create(dto: CreateListingDto): Promise<Listing> {
+  async create(dto: CreateListingDto, sellerId: string): Promise<Listing> {
     const [seller, category] = await Promise.all([
-      this.usersRepository.findOne({ where: { id: dto.sellerId } }),
+      this.usersRepository.findOne({ where: { id: sellerId } }),
       this.categoriesRepository.findOne({ where: { id: dto.categoryId } }),
     ]);
 
@@ -31,7 +32,7 @@ export class ListingsService {
     }
 
     const listing = this.listingsRepository.create({
-      sellerId: dto.sellerId,
+      sellerId,
       categoryId: dto.categoryId,
       title: dto.title,
       description: dto.description,
@@ -44,7 +45,7 @@ export class ListingsService {
     return this.listingsRepository.save(listing);
   }
 
-  async findOne(id: string): Promise<Listing> {
+  async findOne(id: string): Promise<ListingResponseDto> {
     const listing = await this.listingsRepository.findOne({
       where: { id },
       relations: {
@@ -58,11 +59,11 @@ export class ListingsService {
       throw new NotFoundException('Listing not found');
     }
 
-    return listing;
+    return this.toResponse(listing);
   }
 
   async findAll(query: ListListingsQueryDto): Promise<{
-    items: Listing[];
+    items: ListingResponseDto[];
     page: number;
     limit: number;
     total: number;
@@ -96,10 +97,40 @@ export class ListingsService {
     });
 
     return {
-      items,
+      items: items.map((item) => this.toResponse(item)),
       page: query.page,
       limit: query.limit,
       total,
+    };
+  }
+
+  private toResponse(listing: Listing): ListingResponseDto {
+    return {
+      id: listing.id,
+      sellerId: listing.sellerId,
+      categoryId: listing.categoryId,
+      title: listing.title,
+      description: listing.description,
+      price: listing.price,
+      currency: listing.currency,
+      status: listing.status,
+      location: listing.location,
+      createdAt: listing.createdAt,
+      updatedAt: listing.updatedAt,
+      seller: {
+        id: listing.seller.id,
+        displayName: listing.seller.displayName,
+      },
+      category: {
+        id: listing.category.id,
+        name: listing.category.name,
+        slug: listing.category.slug,
+      },
+      images: listing.images.map((image) => ({
+        id: image.id,
+        url: image.url,
+        sortOrder: image.sortOrder,
+      })),
     };
   }
 }

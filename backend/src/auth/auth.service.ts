@@ -42,16 +42,29 @@ export class AuthService {
 
     const passwordHash = await bcrypt.hash(dto.password, 12);
 
-    const user = await this.usersRepository.save(
-      this.usersRepository.create({
-        email,
-        passwordHash,
-        displayName: dto.displayName.trim(),
-        phone: dto.phone?.trim() || null,
-      }),
-    );
+    try {
+      const user = await this.usersRepository.save(
+        this.usersRepository.create({
+          email,
+          passwordHash,
+          displayName: dto.displayName.trim(),
+          phone: dto.phone?.trim() || null,
+        }),
+      );
 
-    return this.createAuthResponse(user);
+      return this.createAuthResponse(user);
+    } catch (error: unknown) {
+      if (
+        typeof error === 'object' &&
+        error !== null &&
+        'code' in error &&
+        error.code === '23505'
+      ) {
+        throw new ConflictException('Email is already registered');
+      }
+
+      throw error;
+    }
   }
 
   async login(dto: LoginDto): Promise<AuthResponse> {

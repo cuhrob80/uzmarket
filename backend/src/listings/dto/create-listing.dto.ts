@@ -12,9 +12,6 @@ import { ListingStatus } from '../../entities';
 
 export class CreateListingDto {
   @IsUUID()
-  sellerId!: string;
-
-  @IsUUID()
   categoryId!: string;
 
   @IsString()
