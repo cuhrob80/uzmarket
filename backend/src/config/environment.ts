@@ -1,5 +1,5 @@
 import { plainToInstance } from 'class-transformer';
-import { IsEnum, IsInt, IsNotEmpty, IsUrl, Max, Min, validateSync } from 'class-validator';
+import { IsEnum, IsInt, IsNotEmpty, IsOptional, IsString, IsUrl, Max, Min, validateSync } from 'class-validator';
 
 export enum NodeEnvironment { Development = 'development', Production = 'production', Test = 'test' }
 export class Environment {
@@ -13,6 +13,14 @@ export class Environment {
   @IsUrl({ require_tld: false, protocols: ['http', 'https'] }) FRONTEND_URL!: string;
   @IsNotEmpty() JWT_SECRET!: string;
   @IsInt() @Min(60) JWT_EXPIRES_IN!: number;
+
+  @IsOptional()
+  @IsString()
+  STORAGE_LOCAL_PATH?: string;
+
+  @IsOptional()
+  @IsUrl({ require_tld: false, protocols: ['http', 'https'] })
+  STORAGE_PUBLIC_URL?: string;
 }
 export function validateEnvironment(configuration: Record<string, unknown>): Environment {
   const environment = plainToInstance(Environment, configuration, { enableImplicitConversion: true });
