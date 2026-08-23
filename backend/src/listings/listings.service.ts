@@ -4,7 +4,9 @@ import { ILike, type FindOptionsWhere, Repository } from 'typeorm';
 import { Category, Listing, ListingStatus, User } from '../entities';
 import { CreateListingDto } from './dto/create-listing.dto';
 import { ListListingsQueryDto } from './dto/list-listings-query.dto';
+import { ListMineListingsQueryDto } from './dto/list-mine-listings-query.dto';
 import type { ListingResponseDto } from './dto/listing-response.dto';
+import { UpdateListingDto } from './dto/update-listing.dto';
 
 @Injectable()
 export class ListingsService {
@@ -45,9 +47,89 @@ export class ListingsService {
     return this.listingsRepository.save(listing);
   }
 
+  async update(
+    id: string,
+    dto: UpdateListingDto,
+    sellerId: string,
+  ): Promise<ListingResponseDto> {
+    const listing = await this.findOwnedListing(id, sellerId);
+
+    if (
+      listing.status !== ListingStatus.Draft &&
+      listing.status !== ListingStatus.Active
+    ) {
+      throw new BadRequestException('Listing cannot be edited in its current status');
+    }
+
+    if (dto.categoryId && dto.categoryId !== listing.categoryId) {
+      const category = await this.categoriesRepository.findOne({
+        where: { id: dto.categoryId, isActive: true },
+      });
+
+      if (!category) {
+        throw new BadRequestException('Category does not exist');
+      }
+    }
+
+    this.listingsRepository.merge(listing, dto);
+    await this.listingsRepository.save(listing);
+
+    return this.findResponseById(listing.id);
+  }
+
+  async publish(id: string, sellerId: string): Promise<ListingResponseDto> {
+    const listing = await this.findOwnedListing(id, sellerId);
+
+    if (listing.status !== ListingStatus.Draft) {
+      throw new BadRequestException('Only draft listings can be published');
+    }
+
+    const category = await this.categoriesRepository.findOne({
+      where: { id: listing.categoryId, isActive: true },
+    });
+
+    if (!category) {
+      throw new BadRequestException('Category does not exist');
+    }
+
+    listing.status = ListingStatus.Active;
+    await this.listingsRepository.save(listing);
+
+    return this.findResponseById(listing.id);
+  }
+
+  async markSold(id: string, sellerId: string): Promise<ListingResponseDto> {
+    const listing = await this.findOwnedListing(id, sellerId);
+
+    if (listing.status !== ListingStatus.Active) {
+      throw new BadRequestException('Only active listings can be marked as sold');
+    }
+
+    listing.status = ListingStatus.Sold;
+    await this.listingsRepository.save(listing);
+
+    return this.findResponseById(listing.id);
+  }
+
+  async archive(id: string, sellerId: string): Promise<ListingResponseDto> {
+    const listing = await this.findOwnedListing(id, sellerId);
+
+    if (
+      listing.status !== ListingStatus.Draft &&
+      listing.status !== ListingStatus.Active
+    ) {
+      throw new BadRequestException('Listing cannot be archived in its current status');
+    }
+
+    listing.status = ListingStatus.Archived;
+    await this.listingsRepository.save(listing);
+
+    return this.findResponseById(listing.id);
+  }
+
   async findOne(id: string): Promise<ListingResponseDto> {
     const listing = await this.listingsRepository.findOne({
-      where: { id },
+      where: { id, status: ListingStatus.Active },
       relations: {
         seller: true,
         category: true,
@@ -68,7 +150,52 @@ export class ListingsService {
     limit: number;
     total: number;
   }> {
-    const where: FindOptionsWhere<Listing> = {};
+    const where: FindOptionsWhere<Listing> = {
+      status: ListingStatus.Active,
+    };
+
+    if (query.categoryId) {
+      where.categoryId = query.categoryId;
+    }
+
+    if (query.search) {
+      where.title = ILike(`%${query.search}%`);
+    }
+
+    const [items, total] = await this.listingsRepository.findAndCount({
+      where,
+      relations: {
+        seller: true,
+        category: true,
+        images: true,
+      },
+      order: {
+        createdAt: 'DESC',
+      },
+      skip: (query.page - 1) * query.limit,
+      take: query.limit,
+    });
+
+    return {
+      items: items.map((item) => this.toResponse(item)),
+      page: query.page,
+      limit: query.limit,
+      total,
+    };
+  }
+
+  async findMine(
+    sellerId: string,
+    query: ListMineListingsQueryDto,
+  ): Promise<{
+    items: ListingResponseDto[];
+    page: number;
+    limit: number;
+    total: number;
+  }> {
+    const where: FindOptionsWhere<Listing> = {
+      sellerId,
+    };
 
     if (query.categoryId) {
       where.categoryId = query.categoryId;
@@ -102,6 +229,35 @@ export class ListingsService {
       limit: query.limit,
       total,
     };
+  }
+
+  private async findResponseById(id: string): Promise<ListingResponseDto> {
+    const listing = await this.listingsRepository.findOne({
+      where: { id },
+      relations: {
+        seller: true,
+        category: true,
+        images: true,
+      },
+    });
+
+    if (!listing) {
+      throw new NotFoundException('Listing not found');
+    }
+
+    return this.toResponse(listing);
+  }
+
+  private async findOwnedListing(id: string, sellerId: string): Promise<Listing> {
+    const listing = await this.listingsRepository.findOne({
+      where: { id, sellerId },
+    });
+
+    if (!listing) {
+      throw new NotFoundException('Listing not found');
+    }
+
+    return listing;
   }
 
   private toResponse(listing: Listing): ListingResponseDto {
