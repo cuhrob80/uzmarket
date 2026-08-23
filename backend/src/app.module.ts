@@ -7,6 +7,7 @@ import { AuthModule } from './auth/auth.module';
 import { CategoriesModule } from './categories/categories.module';
 import { HealthModule } from './health/health.module';
 import { ListingsModule } from './listings/listings.module';
+import { StorageModule } from './storage/storage.module';
 
 @Module({ imports: [
   ConfigModule.forRoot({ cache: true, isGlobal: true, validate: validateEnvironment }),
@@ -18,5 +19,6 @@ import { ListingsModule } from './listings/listings.module';
   ListingsModule,
   CategoriesModule,
   AuthModule,
+  StorageModule,
 ] })
 export class AppModule {}

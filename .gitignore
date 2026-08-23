@@ -146,3 +146,6 @@ vite.config.ts.timestamp-*
 .DS_Store
 .idea/
 .vscode/
+
+# Local media storage
+backend/storage/
