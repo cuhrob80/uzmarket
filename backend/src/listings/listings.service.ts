@@ -1,7 +1,7 @@
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { ILike, type FindOptionsWhere, Repository } from 'typeorm';
-import { Category, Listing, User } from '../entities';
+import { Category, Listing, ListingStatus, User } from '../entities';
 import { CreateListingDto } from './dto/create-listing.dto';
 import { ListListingsQueryDto } from './dto/list-listings-query.dto';
 import type { ListingResponseDto } from './dto/listing-response.dto';
@@ -20,7 +20,7 @@ export class ListingsService {
   async create(dto: CreateListingDto, sellerId: string): Promise<Listing> {
     const [seller, category] = await Promise.all([
       this.usersRepository.findOne({ where: { id: sellerId } }),
-      this.categoriesRepository.findOne({ where: { id: dto.categoryId } }),
+      this.categoriesRepository.findOne({ where: { id: dto.categoryId, isActive: true } }),
     ]);
 
     if (!seller) {
@@ -38,7 +38,7 @@ export class ListingsService {
       description: dto.description,
       price: dto.price,
       currency: dto.currency ?? 'UZS',
-      status: dto.status,
+      status: ListingStatus.Draft,
       location: dto.location ?? null,
     });
 

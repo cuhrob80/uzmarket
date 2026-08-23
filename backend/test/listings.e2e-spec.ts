@@ -12,6 +12,7 @@ describe('Listings API', () => {
   let dataSource: DataSource;
   let seller: User;
   let category: Category;
+  let inactiveCategory: Category;
   let createdListingId: string | undefined;
   let accessToken: string;
 
@@ -46,6 +47,15 @@ describe('Listings API', () => {
       }),
     );
 
+    inactiveCategory = await categoriesRepository.save(
+      categoriesRepository.create({
+        name: 'E2E Inactive Category',
+        slug: `e2e-inactive-listings-${Date.now()}`,
+        parentId: null,
+        isActive: false,
+      }),
+    );
+
     const jwtService = app.get(JwtService);
     accessToken = await jwtService.signAsync({
       sub: seller.id,
@@ -56,6 +66,10 @@ describe('Listings API', () => {
   afterAll(async () => {
     if (createdListingId) {
       await dataSource.getRepository(Listing).delete({ id: createdListingId });
+    }
+
+    if (inactiveCategory?.id) {
+      await dataSource.getRepository(Category).delete({ id: inactiveCategory.id });
     }
 
     if (category?.id) {
@@ -112,6 +126,41 @@ describe('Listings API', () => {
 
     expect(typeof response.body.id).toBe('string');
     createdListingId = response.body.id;
+  });
+
+  it('ignores client-provided status and creates a draft', async () => {
+    if (!app) throw new Error('Test application did not start');
+
+    const response = await request(app.getHttpServer())
+      .post('/api/v1/listings')
+      .set('Authorization', `Bearer ${accessToken}`)
+      .send({
+        categoryId: category.id,
+        title: 'Forced Active Listing',
+        description: 'Client attempts to force active status',
+        price: '200000.00',
+        status: 'active',
+      })
+      .expect(201);
+
+    expect(response.body.status).toBe('draft');
+
+    await dataSource.getRepository(Listing).delete({ id: response.body.id });
+  });
+
+  it('rejects listing creation in an inactive category', async () => {
+    if (!app) throw new Error('Test application did not start');
+
+    await request(app.getHttpServer())
+      .post('/api/v1/listings')
+      .set('Authorization', `Bearer ${accessToken}`)
+      .send({
+        categoryId: inactiveCategory.id,
+        title: 'Inactive Category Listing',
+        description: 'Should not be created',
+        price: '300000.00',
+      })
+      .expect(400);
   });
 
   it('gets a listing by id', async () => {
