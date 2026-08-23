@@ -1,5 +1,4 @@
 import {
-  IsEnum,
   IsOptional,
   IsString,
   IsUUID,
@@ -8,8 +7,6 @@ import {
   MaxLength,
   MinLength,
 } from 'class-validator';
-import { ListingStatus } from '../../entities';
-
 export class CreateListingDto {
   @IsUUID()
   categoryId!: string;
@@ -32,10 +29,6 @@ export class CreateListingDto {
   @IsString()
   @Length(3, 3)
   currency?: string;
-
-  @IsOptional()
-  @IsEnum(ListingStatus)
-  status?: ListingStatus;
 
   @IsOptional()
   @IsString()
