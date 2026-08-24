@@ -27,11 +27,13 @@
     "class-transformer": "0.5.1",
     "class-validator": "0.14.2",
     "dotenv": "17.2.1",
+    "multer": "^2.2.0",
     "passport": "^0.7.0",
     "passport-jwt": "^4.0.1",
     "pg": "8.16.3",
     "reflect-metadata": "0.2.2",
     "rxjs": "7.8.2",
+    "sharp": "^0.35.3",
     "typeorm": "^0.3.31"
   },
   "devDependencies": {
@@ -40,6 +42,7 @@
     "@nestjs/testing": "^11.2.1",
     "@types/bcrypt": "^6.0.0",
     "@types/jest": "29.5.14",
+    "@types/multer": "^2.2.0",
     "@types/node": "24.3.0",
     "@types/passport-jwt": "^4.0.1",
     "@types/supertest": "6.0.3",

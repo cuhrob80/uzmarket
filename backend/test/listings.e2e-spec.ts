@@ -1,11 +1,15 @@
+import { access } from 'node:fs/promises';
+import { resolve } from 'node:path';
 import type { INestApplication } from '@nestjs/common';
 import { ValidationPipe } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
 import { JwtService } from '@nestjs/jwt';
 import { DataSource } from 'typeorm';
+import sharp from 'sharp';
 import request = require('supertest');
 import { AppModule } from '../src/app.module';
-import { Category, Listing, ListingStatus, User } from '../src/entities';
+import { Category, Listing, ListingImage, ListingStatus, User } from '../src/entities';
+import { STORAGE_PROVIDER, type StorageProvider } from '../src/storage/storage.types';
 
 describe('Listings API', () => {
   let app: INestApplication | undefined;
@@ -81,6 +85,20 @@ describe('Listings API', () => {
 
   afterAll(async () => {
     if (createdListingId) {
+      const images = await dataSource.getRepository(ListingImage).find({
+        where: { listingId: createdListingId },
+      });
+
+      const storage = app?.get<StorageProvider>(STORAGE_PROVIDER);
+
+      if (storage) {
+        for (const image of images) {
+          if (image.storageKey) {
+            await storage.deleteObject(image.storageKey);
+          }
+        }
+      }
+
       await dataSource.getRepository(Listing).delete({ id: createdListingId });
     }
 
@@ -240,6 +258,537 @@ describe('Listings API', () => {
       status: ListingStatus.Draft,
       description: 'Updated safely',
     });
+  });
+
+  it('rejects image upload without authentication', async () => {
+    if (!app) throw new Error('Test application did not start');
+    if (!createdListingId) throw new Error('Listing was not created');
+
+    const image = await sharp({
+      create: {
+        width: 800,
+        height: 600,
+        channels: 3,
+        background: { r: 100, g: 100, b: 100 },
+      },
+    })
+      .jpeg()
+      .toBuffer();
+
+    await request(app.getHttpServer())
+      .post(`/api/v1/listings/${createdListingId}/images`)
+      .attach('file', image, {
+        filename: 'test.jpg',
+        contentType: 'image/jpeg',
+      })
+      .expect(401);
+  });
+
+  it('returns 404 when another user uploads an image to the listing', async () => {
+    if (!app) throw new Error('Test application did not start');
+    if (!createdListingId) throw new Error('Listing was not created');
+
+    const image = await sharp({
+      create: {
+        width: 800,
+        height: 600,
+        channels: 3,
+        background: { r: 90, g: 90, b: 90 },
+      },
+    })
+      .jpeg()
+      .toBuffer();
+
+    await request(app.getHttpServer())
+      .post(`/api/v1/listings/${createdListingId}/images`)
+      .set('Authorization', `Bearer ${otherAccessToken}`)
+      .attach('file', image, {
+        filename: 'foreign.jpg',
+        contentType: 'image/jpeg',
+      })
+      .expect(404);
+  });
+
+  it('rejects image upload without a file', async () => {
+    if (!app) throw new Error('Test application did not start');
+    if (!createdListingId) throw new Error('Listing was not created');
+
+    await request(app.getHttpServer())
+      .post(`/api/v1/listings/${createdListingId}/images`)
+      .set('Authorization', `Bearer ${accessToken}`)
+      .expect(400);
+  });
+
+  it('rejects invalid image content', async () => {
+    if (!app) throw new Error('Test application did not start');
+    if (!createdListingId) throw new Error('Listing was not created');
+
+    await request(app.getHttpServer())
+      .post(`/api/v1/listings/${createdListingId}/images`)
+      .set('Authorization', `Bearer ${accessToken}`)
+      .attach('file', Buffer.from('not-an-image'), {
+        filename: 'fake.jpg',
+        contentType: 'image/jpeg',
+      })
+      .expect(400);
+  });
+
+  it('uploads an image and stores a WebP image record', async () => {
+    if (!app) throw new Error('Test application did not start');
+    if (!createdListingId) throw new Error('Listing was not created');
+
+    const image = await sharp({
+      create: {
+        width: 1600,
+        height: 1200,
+        channels: 3,
+        background: { r: 20, g: 40, b: 60 },
+      },
+    })
+      .jpeg()
+      .toBuffer();
+
+    const response = await request(app.getHttpServer())
+      .post(`/api/v1/listings/${createdListingId}/images`)
+      .set('Authorization', `Bearer ${accessToken}`)
+      .attach('file', image, {
+        filename: 'listing.jpg',
+        contentType: 'image/jpeg',
+      })
+      .expect(201);
+
+    expect(response.body).toEqual({
+      id: expect.any(String),
+      url: expect.any(String),
+      sortOrder: 0,
+    });
+
+    expect(response.body.storageKey).toBeUndefined();
+    expect(response.body.mimeType).toBeUndefined();
+    expect(response.body.fileSizeBytes).toBeUndefined();
+
+    const storedImage = await dataSource.getRepository(ListingImage).findOneByOrFail({
+      id: response.body.id,
+    });
+
+    expect(storedImage.listingId).toBe(createdListingId);
+    expect(storedImage.mimeType).toBe('image/webp');
+    expect(storedImage.storageKey).toMatch(
+      new RegExp(`^listings/${createdListingId}/.+\\.webp$`),
+    );
+    expect(storedImage.width).toBe(1600);
+    expect(storedImage.height).toBe(1200);
+    expect(storedImage.sortOrder).toBe(0);
+  });
+
+  it('limits a listing to 10 images', async () => {
+    if (!app) throw new Error('Test application did not start');
+    if (!createdListingId) throw new Error('Listing was not created');
+
+    const image = await sharp({
+      create: {
+        width: 800,
+        height: 600,
+        channels: 3,
+        background: { r: 50, g: 70, b: 90 },
+      },
+    })
+      .jpeg()
+      .toBuffer();
+
+    for (let sortOrder = 1; sortOrder < 10; sortOrder += 1) {
+      const response = await request(app.getHttpServer())
+        .post(`/api/v1/listings/${createdListingId}/images`)
+        .set('Authorization', `Bearer ${accessToken}`)
+        .attach('file', image, {
+          filename: `listing-${sortOrder}.jpg`,
+          contentType: 'image/jpeg',
+        })
+        .expect(201);
+
+      expect(response.body.sortOrder).toBe(sortOrder);
+    }
+
+    await request(app.getHttpServer())
+      .post(`/api/v1/listings/${createdListingId}/images`)
+      .set('Authorization', `Bearer ${accessToken}`)
+      .attach('file', image, {
+        filename: 'eleventh.jpg',
+        contentType: 'image/jpeg',
+      })
+      .expect(400);
+
+    const count = await dataSource.getRepository(ListingImage).count({
+      where: { listingId: createdListingId },
+    });
+
+    expect(count).toBe(10);
+  });
+
+  it('rejects image deletion without authentication', async () => {
+    if (!app) throw new Error('Test application did not start');
+    if (!createdListingId) throw new Error('Listing was not created');
+
+    const image = await dataSource.getRepository(ListingImage).findOneOrFail({
+      where: { listingId: createdListingId },
+      order: { sortOrder: 'ASC' },
+    });
+
+    await request(app.getHttpServer())
+      .delete(`/api/v1/listings/${createdListingId}/images/${image.id}`)
+      .expect(401);
+  });
+
+  it('returns 404 when another user tries to delete an image', async () => {
+    if (!app) throw new Error('Test application did not start');
+    if (!createdListingId) throw new Error('Listing was not created');
+
+    const imagesRepository = dataSource.getRepository(ListingImage);
+    const image = await imagesRepository.findOneOrFail({
+      where: { listingId: createdListingId },
+      order: { sortOrder: 'ASC' },
+    });
+
+    await request(app.getHttpServer())
+      .delete(`/api/v1/listings/${createdListingId}/images/${image.id}`)
+      .set('Authorization', `Bearer ${otherAccessToken}`)
+      .expect(404);
+
+    const unchanged = await imagesRepository.findOneBy({ id: image.id });
+    expect(unchanged).not.toBeNull();
+  });
+
+  it('returns 404 when the image does not belong to the listing', async () => {
+    if (!app) throw new Error('Test application did not start');
+    if (!createdListingId) throw new Error('Listing was not created');
+
+    const listingsRepository = dataSource.getRepository(Listing);
+    const imagesRepository = dataSource.getRepository(ListingImage);
+
+    const otherListing = await listingsRepository.save(
+      listingsRepository.create({
+        sellerId: seller.id,
+        categoryId: category.id,
+        title: 'Other Listing For Image Delete',
+        description: 'Used to verify image ownership',
+        price: '100000.00',
+        currency: 'UZS',
+        status: ListingStatus.Draft,
+        location: null,
+      }),
+    );
+
+    const image = await imagesRepository.findOneOrFail({
+      where: { listingId: createdListingId },
+      order: { sortOrder: 'ASC' },
+    });
+
+    try {
+      await request(app.getHttpServer())
+        .delete(`/api/v1/listings/${otherListing.id}/images/${image.id}`)
+        .set('Authorization', `Bearer ${accessToken}`)
+        .expect(404);
+
+      const unchanged = await imagesRepository.findOneBy({ id: image.id });
+      expect(unchanged).not.toBeNull();
+    } finally {
+      await listingsRepository.delete({ id: otherListing.id });
+    }
+  });
+
+  it('allows the owner to delete an image and compacts sort order', async () => {
+    if (!app) throw new Error('Test application did not start');
+    if (!createdListingId) throw new Error('Listing was not created');
+
+    const imagesRepository = dataSource.getRepository(ListingImage);
+
+    const before = await imagesRepository.find({
+      where: { listingId: createdListingId },
+      order: { sortOrder: 'ASC' },
+    });
+
+    expect(before).toHaveLength(10);
+
+    const imageToDelete = before[4];
+    const deletedImageId = imageToDelete.id;
+    const deletedStorageKey = imageToDelete.storageKey;
+
+    expect(deletedStorageKey).not.toBeNull();
+
+    const deletedFilePath = resolve(
+      process.env.STORAGE_LOCAL_PATH ?? './storage',
+      deletedStorageKey!,
+    );
+
+    await expect(access(deletedFilePath)).resolves.toBeUndefined();
+
+    await request(app.getHttpServer())
+      .delete(
+        `/api/v1/listings/${createdListingId}/images/${deletedImageId}`,
+      )
+      .set('Authorization', `Bearer ${accessToken}`)
+      .expect(204);
+
+    const deletedImage = await imagesRepository.findOneBy({
+      id: deletedImageId,
+    });
+
+    expect(deletedImage).toBeNull();
+
+    await expect(access(deletedFilePath)).rejects.toThrow();
+
+    const after = await imagesRepository.find({
+      where: { listingId: createdListingId },
+      order: { sortOrder: 'ASC' },
+    });
+
+    expect(after).toHaveLength(9);
+    expect(after.map((image) => image.sortOrder)).toEqual([
+      0, 1, 2, 3, 4, 5, 6, 7, 8,
+    ]);
+
+    expect(after.some((image) => image.storageKey === deletedStorageKey)).toBe(
+      false,
+    );
+  });
+
+  it('allows the owner to reorder listing images', async () => {
+    if (!app) throw new Error('Test application did not start');
+
+    const listingsRepository = dataSource.getRepository(Listing);
+    const imagesRepository = dataSource.getRepository(ListingImage);
+
+    const listing = await listingsRepository.save(
+      listingsRepository.create({
+        sellerId: seller.id,
+        categoryId: category.id,
+        title: 'Image Reorder Listing',
+        description: 'Listing used to test image ordering',
+        price: '100000.00',
+        currency: 'UZS',
+        status: ListingStatus.Draft,
+        location: null,
+      }),
+    );
+
+    const images = await imagesRepository.save([
+      imagesRepository.create({
+        listingId: listing.id,
+        url: 'http://localhost/media/reorder-1.webp',
+        sortOrder: 0,
+      }),
+      imagesRepository.create({
+        listingId: listing.id,
+        url: 'http://localhost/media/reorder-2.webp',
+        sortOrder: 1,
+      }),
+      imagesRepository.create({
+        listingId: listing.id,
+        url: 'http://localhost/media/reorder-3.webp',
+        sortOrder: 2,
+      }),
+    ]);
+
+    try {
+      const desiredOrder = [
+        images[2].id,
+        images[0].id,
+        images[1].id,
+      ];
+
+      const response = await request(app.getHttpServer())
+        .patch(`/api/v1/listings/${listing.id}/images/order`)
+        .set('Authorization', `Bearer ${accessToken}`)
+        .send({
+          imageIds: desiredOrder,
+        })
+        .expect(200);
+
+      expect(response.body.map((image: { id: string }) => image.id)).toEqual(
+        desiredOrder,
+      );
+
+      expect(
+        response.body.map((image: { sortOrder: number }) => image.sortOrder),
+      ).toEqual([0, 1, 2]);
+
+      const stored = await imagesRepository.find({
+        where: { listingId: listing.id },
+        order: { sortOrder: 'ASC' },
+      });
+
+      expect(stored.map((image) => image.id)).toEqual(desiredOrder);
+      expect(stored[0].id).toBe(images[2].id);
+      expect(stored[0].sortOrder).toBe(0);
+    } finally {
+      await listingsRepository.delete({ id: listing.id });
+    }
+  });
+
+  it('protects listing image reorder from invalid requests', async () => {
+    if (!app) throw new Error('Test application did not start');
+
+    const listingsRepository = dataSource.getRepository(Listing);
+    const imagesRepository = dataSource.getRepository(ListingImage);
+
+    const listing = await listingsRepository.save(
+      listingsRepository.create({
+        sellerId: seller.id,
+        categoryId: category.id,
+        title: 'Protected Image Reorder Listing',
+        description: 'Listing used to test reorder protection',
+        price: '100000.00',
+        currency: 'UZS',
+        status: ListingStatus.Draft,
+        location: null,
+      }),
+    );
+
+    const otherListing = await listingsRepository.save(
+      listingsRepository.create({
+        sellerId: seller.id,
+        categoryId: category.id,
+        title: 'Other Image Listing',
+        description: 'Provides an image belonging to another listing',
+        price: '100000.00',
+        currency: 'UZS',
+        status: ListingStatus.Draft,
+        location: null,
+      }),
+    );
+
+    const images = await imagesRepository.save([
+      imagesRepository.create({
+        listingId: listing.id,
+        url: 'http://localhost/media/protected-reorder-1.webp',
+        sortOrder: 0,
+      }),
+      imagesRepository.create({
+        listingId: listing.id,
+        url: 'http://localhost/media/protected-reorder-2.webp',
+        sortOrder: 1,
+      }),
+    ]);
+
+    const foreignImage = await imagesRepository.save(
+      imagesRepository.create({
+        listingId: otherListing.id,
+        url: 'http://localhost/media/foreign-reorder.webp',
+        sortOrder: 0,
+      }),
+    );
+
+    try {
+      await request(app.getHttpServer())
+        .patch(`/api/v1/listings/${listing.id}/images/order`)
+        .set('Authorization', `Bearer ${otherAccessToken}`)
+        .send({
+          imageIds: [images[1].id, images[0].id],
+        })
+        .expect(404);
+
+      await request(app.getHttpServer())
+        .patch(`/api/v1/listings/${listing.id}/images/order`)
+        .set('Authorization', `Bearer ${accessToken}`)
+        .send({
+          imageIds: [images[0].id],
+        })
+        .expect(400);
+
+      await request(app.getHttpServer())
+        .patch(`/api/v1/listings/${listing.id}/images/order`)
+        .set('Authorization', `Bearer ${accessToken}`)
+        .send({
+          imageIds: [images[0].id, images[0].id],
+        })
+        .expect(400);
+
+      await request(app.getHttpServer())
+        .patch(`/api/v1/listings/${listing.id}/images/order`)
+        .set('Authorization', `Bearer ${accessToken}`)
+        .send({
+          imageIds: [images[0].id, foreignImage.id],
+        })
+        .expect(400);
+
+      const unchanged = await imagesRepository.find({
+        where: { listingId: listing.id },
+        order: { sortOrder: 'ASC' },
+      });
+
+      expect(unchanged.map((image) => image.id)).toEqual([
+        images[0].id,
+        images[1].id,
+      ]);
+    } finally {
+      await listingsRepository.delete({ id: listing.id });
+      await listingsRepository.delete({ id: otherListing.id });
+    }
+  });
+
+  it('protects and returns one owner listing for editing', async () => {
+    if (!app) throw new Error('Test application did not start');
+
+    const listingsRepository = dataSource.getRepository(Listing);
+    const imagesRepository = dataSource.getRepository(ListingImage);
+
+    const listing = await listingsRepository.save(
+      listingsRepository.create({
+        sellerId: seller.id,
+        categoryId: category.id,
+        title: 'Owner Editable Draft',
+        description: 'Draft used for owner detail endpoint',
+        price: '125000.00',
+        currency: 'UZS',
+        status: ListingStatus.Draft,
+        location: 'Tashkent',
+      }),
+    );
+
+    await imagesRepository.save([
+      imagesRepository.create({
+        listingId: listing.id,
+        url: 'http://localhost/media/owner-detail-2.webp',
+        sortOrder: 1,
+      }),
+      imagesRepository.create({
+        listingId: listing.id,
+        url: 'http://localhost/media/owner-detail-1.webp',
+        sortOrder: 0,
+      }),
+    ]);
+
+    try {
+      await request(app.getHttpServer())
+        .get(`/api/v1/listings/mine/${listing.id}`)
+        .expect(401);
+
+      await request(app.getHttpServer())
+        .get(`/api/v1/listings/mine/${listing.id}`)
+        .set('Authorization', `Bearer ${otherAccessToken}`)
+        .expect(404);
+
+      const response = await request(app.getHttpServer())
+        .get(`/api/v1/listings/mine/${listing.id}`)
+        .set('Authorization', `Bearer ${accessToken}`)
+        .expect(200);
+
+      expect(response.body).toMatchObject({
+        id: listing.id,
+        sellerId: seller.id,
+        categoryId: category.id,
+        title: 'Owner Editable Draft',
+        status: ListingStatus.Draft,
+      });
+
+      expect(
+        response.body.images.map(
+          (image: { sortOrder: number }) => image.sortOrder,
+        ),
+      ).toEqual([0, 1]);
+    } finally {
+      await listingsRepository.delete({ id: listing.id });
+    }
   });
 
   it('allows the owner to publish a draft listing', async () => {
