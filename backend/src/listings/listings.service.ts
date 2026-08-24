@@ -184,6 +184,29 @@ export class ListingsService {
     };
   }
 
+  async findMineOne(
+    id: string,
+    sellerId: string,
+  ): Promise<ListingResponseDto> {
+    const listing = await this.listingsRepository.findOne({
+      where: {
+        id,
+        sellerId,
+      },
+      relations: {
+        seller: true,
+        category: true,
+        images: true,
+      },
+    });
+
+    if (!listing) {
+      throw new NotFoundException('Listing not found');
+    }
+
+    return this.toResponse(listing);
+  }
+
   async findMine(
     sellerId: string,
     query: ListMineListingsQueryDto,
@@ -282,11 +305,13 @@ export class ListingsService {
         name: listing.category.name,
         slug: listing.category.slug,
       },
-      images: listing.images.map((image) => ({
-        id: image.id,
-        url: image.url,
-        sortOrder: image.sortOrder,
-      })),
+      images: [...listing.images]
+        .sort((a, b) => a.sortOrder - b.sortOrder)
+        .map((image) => ({
+          id: image.id,
+          url: image.url,
+          sortOrder: image.sortOrder,
+        })),
     };
   }
 }
