@@ -1,7 +1,7 @@
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { ILike, type FindOptionsWhere, Repository } from 'typeorm';
-import { Category, Listing, ListingStatus, User } from '../entities';
+import { Category, Listing, ListingImage, ListingStatus, User } from '../entities';
 import { CreateListingDto } from './dto/create-listing.dto';
 import { ListListingsQueryDto } from './dto/list-listings-query.dto';
 import { ListMineListingsQueryDto } from './dto/list-mine-listings-query.dto';
@@ -90,6 +90,24 @@ export class ListingsService {
 
     if (!category) {
       throw new BadRequestException('Category does not exist');
+    }
+
+    if (Number(listing.price) <= 0) {
+      throw new BadRequestException(
+        'Listing price must be greater than zero before publishing',
+      );
+    }
+
+    const imageCount = await this.listingsRepository.manager
+      .getRepository(ListingImage)
+      .count({
+        where: { listingId: listing.id },
+      });
+
+    if (imageCount < 1) {
+      throw new BadRequestException(
+        'Listing must have at least one image before publishing',
+      );
     }
 
     listing.status = ListingStatus.Active;

@@ -791,10 +791,12 @@ describe('Listings API', () => {
     }
   });
 
-  it('allows the owner to publish a draft listing', async () => {
+  it('allows the owner to publish a ready draft listing', async () => {
     if (!app) throw new Error('Test application did not start');
 
     const listingsRepository = dataSource.getRepository(Listing);
+    const imagesRepository = dataSource.getRepository(ListingImage);
+
     const listing = await listingsRepository.save(
       listingsRepository.create({
         sellerId: seller.id,
@@ -805,6 +807,19 @@ describe('Listings API', () => {
         currency: 'UZS',
         status: ListingStatus.Draft,
         location: 'Tashkent',
+      }),
+    );
+
+    await imagesRepository.save(
+      imagesRepository.create({
+        listingId: listing.id,
+        url: `/uploads/test/${listing.id}.webp`,
+        storageKey: null,
+        mimeType: 'image/webp',
+        width: 800,
+        height: 600,
+        fileSizeBytes: '1000',
+        sortOrder: 0,
       }),
     );
 
@@ -819,6 +834,88 @@ describe('Listings API', () => {
         sellerId: seller.id,
         status: ListingStatus.Active,
       });
+    } finally {
+      await listingsRepository.delete({ id: listing.id });
+    }
+  });
+
+  it('rejects publishing a draft without images', async () => {
+    if (!app) throw new Error('Test application did not start');
+
+    const listingsRepository = dataSource.getRepository(Listing);
+
+    const listing = await listingsRepository.save(
+      listingsRepository.create({
+        sellerId: seller.id,
+        categoryId: category.id,
+        title: 'Draft Without Images',
+        description: 'Draft listing without images',
+        price: '400000.00',
+        currency: 'UZS',
+        status: ListingStatus.Draft,
+        location: 'Tashkent',
+      }),
+    );
+
+    try {
+      await request(app.getHttpServer())
+        .post(`/api/v1/listings/${listing.id}/publish`)
+        .set('Authorization', `Bearer ${accessToken}`)
+        .expect(400);
+
+      const storedListing = await listingsRepository.findOneByOrFail({
+        id: listing.id,
+      });
+
+      expect(storedListing.status).toBe(ListingStatus.Draft);
+    } finally {
+      await listingsRepository.delete({ id: listing.id });
+    }
+  });
+
+  it('rejects publishing a draft with zero price', async () => {
+    if (!app) throw new Error('Test application did not start');
+
+    const listingsRepository = dataSource.getRepository(Listing);
+    const imagesRepository = dataSource.getRepository(ListingImage);
+
+    const listing = await listingsRepository.save(
+      listingsRepository.create({
+        sellerId: seller.id,
+        categoryId: category.id,
+        title: 'Zero Price Draft',
+        description: 'Draft listing with zero price',
+        price: '0.00',
+        currency: 'UZS',
+        status: ListingStatus.Draft,
+        location: 'Tashkent',
+      }),
+    );
+
+    await imagesRepository.save(
+      imagesRepository.create({
+        listingId: listing.id,
+        url: `/uploads/test/${listing.id}.webp`,
+        storageKey: null,
+        mimeType: 'image/webp',
+        width: 800,
+        height: 600,
+        fileSizeBytes: '1000',
+        sortOrder: 0,
+      }),
+    );
+
+    try {
+      await request(app.getHttpServer())
+        .post(`/api/v1/listings/${listing.id}/publish`)
+        .set('Authorization', `Bearer ${accessToken}`)
+        .expect(400);
+
+      const storedListing = await listingsRepository.findOneByOrFail({
+        id: listing.id,
+      });
+
+      expect(storedListing.status).toBe(ListingStatus.Draft);
     } finally {
       await listingsRepository.delete({ id: listing.id });
     }
