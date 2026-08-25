@@ -72,5 +72,7 @@ export async function createListingAction(
     };
   }
 
-  redirect(`/my-listings?created=${encodeURIComponent(listingId)}`);
+  redirect(
+    `/create-listing/${encodeURIComponent(listingId)}/photos`,
+  );
 }
