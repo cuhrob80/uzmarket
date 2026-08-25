@@ -525,3 +525,93 @@ p { margin: 0; font-size: 1.125rem; }
 .listing-photo-actions .photo-delete-button {
   margin-top: 0;
 }
+
+/* Public listing page */
+
+.public-listing-page {
+  min-height: 100vh;
+  padding: 32px 24px 64px;
+}
+
+.public-listing-container {
+  width: min(100%, 1200px);
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: minmax(0, 2fr) minmax(300px, 1fr);
+  gap: 32px;
+  align-items: start;
+}
+
+.public-listing-gallery {
+  display: grid;
+  gap: 16px;
+}
+
+.public-listing-gallery img {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 4 / 3;
+  object-fit: cover;
+  border-radius: 16px;
+}
+
+.public-listing-details {
+  min-width: 0;
+}
+
+.public-listing-category {
+  margin: 0 0 8px;
+  color: #687386;
+}
+
+.public-listing-details h1 {
+  margin: 0 0 16px;
+  overflow-wrap: anywhere;
+}
+
+.public-listing-price {
+  margin: 0 0 16px;
+  font-size: 28px;
+  font-weight: 700;
+}
+
+.public-listing-location {
+  margin: 0 0 24px;
+  color: #687386;
+}
+
+.public-listing-description,
+.public-listing-seller {
+  margin-top: 32px;
+}
+
+.public-listing-description h2,
+.public-listing-seller h2 {
+  margin: 0 0 12px;
+}
+
+.public-listing-description p,
+.public-listing-seller p {
+  margin: 0;
+}
+
+.public-listing-description p {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+@media (max-width: 800px) {
+  .public-listing-page {
+    padding: 20px 16px 48px;
+  }
+
+  .public-listing-container {
+    grid-template-columns: 1fr;
+    gap: 24px;
+  }
+
+  .public-listing-price {
+    font-size: 24px;
+  }
+}
