@@ -216,3 +216,105 @@ p { margin: 0; font-size: 1.125rem; }
     margin-top: 8px;
   }
 }
+
+.create-listing-page {
+  display: block;
+  min-height: 100vh;
+  padding: 40px 24px;
+}
+
+.create-listing-container {
+  width: min(100%, 720px);
+  margin: 0 auto;
+  padding: 32px;
+}
+
+.create-listing-header {
+  margin-bottom: 28px;
+}
+
+.create-listing-header h1 {
+  margin-bottom: 8px;
+}
+
+.create-listing-header p {
+  color: #687386;
+  font-size: 1rem;
+  line-height: 1.5;
+}
+
+.create-listing-form {
+  display: grid;
+  gap: 20px;
+}
+
+.create-listing-form label {
+  display: grid;
+  gap: 8px;
+  font-weight: 600;
+}
+
+.create-listing-form input,
+.create-listing-form textarea,
+.create-listing-form select {
+  width: 100%;
+  padding: 12px 14px;
+  border: 1px solid #cfd6e0;
+  border-radius: 10px;
+  background: #fff;
+  color: #172033;
+  font: inherit;
+}
+
+.create-listing-form textarea {
+  resize: vertical;
+}
+
+.create-listing-form input:focus,
+.create-listing-form textarea:focus,
+.create-listing-form select:focus {
+  outline: 2px solid #172033;
+  outline-offset: 2px;
+}
+
+.price-fields {
+  display: grid;
+  grid-template-columns: minmax(0, 2fr) minmax(140px, 1fr);
+  gap: 16px;
+}
+
+.create-listing-form button {
+  padding: 14px 20px;
+  border: 0;
+  border-radius: 10px;
+  background: #172033;
+  color: #fff;
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.create-listing-form button:disabled {
+  cursor: wait;
+  opacity: 0.65;
+}
+
+.create-listing-hint {
+  color: #687386;
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
+
+@media (max-width: 640px) {
+  .create-listing-page {
+    padding: 16px;
+  }
+
+  .create-listing-container {
+    padding: 20px;
+  }
+
+  .price-fields {
+    grid-template-columns: 1fr;
+  }
+}
