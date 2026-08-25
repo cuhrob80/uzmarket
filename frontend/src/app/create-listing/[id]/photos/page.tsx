@@ -115,6 +115,16 @@ export default async function ListingPhotosPage({
           <a href="/my-listings">
             Сохранить и продолжить позже
           </a>
+
+          {images.length > 0 ? (
+            <a
+              href={`/create-listing/${encodeURIComponent(
+                listing.id,
+              )}/review`}
+            >
+              Продолжить
+            </a>
+          ) : null}
         </div>
       </section>
     </main>

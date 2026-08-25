@@ -279,3 +279,35 @@ export async function reorderListingImages(
 
   return (await response.json()) as Listing['images'];
 }
+
+export async function publishListing(
+  listingId: string,
+): Promise<Listing> {
+  const token = await getAccessToken();
+
+  if (!token) {
+    throw new ApiError(401, 'Authentication required');
+  }
+
+  const response = await fetch(
+    createApiUrl(
+      `/api/v1/listings/${encodeURIComponent(listingId)}/publish`,
+    ),
+    {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+      cache: 'no-store',
+    },
+  );
+
+  if (!response.ok) {
+    throw new ApiError(
+      response.status,
+      await getErrorMessage(response),
+    );
+  }
+
+  return (await response.json()) as Listing;
+}
