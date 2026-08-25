@@ -333,3 +333,53 @@ export async function getListing(
 
   return (await response.json()) as Listing;
 }
+
+export interface GetListingsOptions {
+  page?: number;
+  limit?: number;
+  categoryId?: string;
+  search?: string;
+}
+
+export async function getListings(
+  options: GetListingsOptions = {},
+): Promise<ListingsPage> {
+  const url = createApiUrl('/api/v1/listings');
+
+  url.searchParams.set(
+    'page',
+    String(options.page ?? 1),
+  );
+
+  url.searchParams.set(
+    'limit',
+    String(options.limit ?? 20),
+  );
+
+  if (options.categoryId) {
+    url.searchParams.set(
+      'categoryId',
+      options.categoryId,
+    );
+  }
+
+  if (options.search?.trim()) {
+    url.searchParams.set(
+      'search',
+      options.search.trim(),
+    );
+  }
+
+  const response = await fetch(url, {
+    cache: 'no-store',
+  });
+
+  if (!response.ok) {
+    throw new ApiError(
+      response.status,
+      await getErrorMessage(response),
+    );
+  }
+
+  return (await response.json()) as ListingsPage;
+}
