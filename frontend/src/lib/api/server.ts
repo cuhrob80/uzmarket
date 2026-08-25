@@ -2,7 +2,13 @@ import 'server-only';
 
 import { cookies } from 'next/headers';
 import { createApiUrl } from './config';
-import type { AuthResponse, ListingsPage } from '@/types/listing';
+import type {
+  AuthResponse,
+  Category,
+  CreateListingInput,
+  Listing,
+  ListingsPage,
+} from '@/types/listing';
 
 export const AUTH_COOKIE_NAME = 'uzmarket_access_token';
 
@@ -112,4 +118,42 @@ export async function getMyListings(
   }
 
   return (await response.json()) as ListingsPage;
+}
+
+export async function createListing(
+  input: CreateListingInput,
+): Promise<Listing> {
+  const token = await getAccessToken();
+
+  if (!token) {
+    throw new ApiError(401, 'Authentication required');
+  }
+
+  const response = await fetch(createApiUrl('/api/v1/listings'), {
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${token}`,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(input),
+    cache: 'no-store',
+  });
+
+  if (!response.ok) {
+    throw new ApiError(response.status, await getErrorMessage(response));
+  }
+
+  return (await response.json()) as Listing;
+}
+
+export async function getCategories(): Promise<Category[]> {
+  const response = await fetch(createApiUrl('/api/v1/categories'), {
+    cache: 'no-store',
+  });
+
+  if (!response.ok) {
+    throw new ApiError(response.status, await getErrorMessage(response));
+  }
+
+  return (await response.json()) as Category[];
 }

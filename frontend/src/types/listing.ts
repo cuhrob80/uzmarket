@@ -54,3 +54,20 @@ export interface AuthResponse {
   accessToken: string;
   user: AuthUser;
 }
+
+export interface CreateListingInput {
+  categoryId: string;
+  title: string;
+  description: string;
+  price: string;
+  currency: ListingCurrency;
+  location?: string;
+}
+
+export interface Category {
+  id: string;
+  name: string;
+  slug: string;
+  parentId: string | null;
+  isActive: boolean;
+}

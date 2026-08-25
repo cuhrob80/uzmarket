@@ -2,7 +2,6 @@ import {
   IsOptional,
   IsString,
   IsUUID,
-  Length,
   Matches,
   MaxLength,
   MinLength,
@@ -27,7 +26,7 @@ export class CreateListingDto {
 
   @IsOptional()
   @IsString()
-  @Length(3, 3)
+  @Matches(/^(UZS|USD)$/)
   currency?: string;
 
   @IsOptional()
