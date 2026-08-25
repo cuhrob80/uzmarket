@@ -311,3 +311,25 @@ export async function publishListing(
 
   return (await response.json()) as Listing;
 }
+
+export async function getListing(
+  listingId: string,
+): Promise<Listing> {
+  const response = await fetch(
+    createApiUrl(
+      `/api/v1/listings/${encodeURIComponent(listingId)}`,
+    ),
+    {
+      cache: 'no-store',
+    },
+  );
+
+  if (!response.ok) {
+    throw new ApiError(
+      response.status,
+      await getErrorMessage(response),
+    );
+  }
+
+  return (await response.json()) as Listing;
+}
