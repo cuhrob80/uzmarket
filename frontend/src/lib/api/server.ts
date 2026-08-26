@@ -339,6 +339,10 @@ export interface GetListingsOptions {
   limit?: number;
   categoryId?: string;
   search?: string;
+  minPrice?: number;
+  maxPrice?: number;
+  currency?: 'UZS' | 'USD';
+  location?: string;
 }
 
 export async function getListings(
@@ -367,6 +371,34 @@ export async function getListings(
     url.searchParams.set(
       'search',
       options.search.trim(),
+    );
+  }
+
+  if (options.minPrice !== undefined) {
+    url.searchParams.set(
+      'minPrice',
+      String(options.minPrice),
+    );
+  }
+
+  if (options.maxPrice !== undefined) {
+    url.searchParams.set(
+      'maxPrice',
+      String(options.maxPrice),
+    );
+  }
+
+  if (options.currency) {
+    url.searchParams.set(
+      'currency',
+      options.currency,
+    );
+  }
+
+  if (options.location?.trim()) {
+    url.searchParams.set(
+      'location',
+      options.location.trim(),
     );
   }
 

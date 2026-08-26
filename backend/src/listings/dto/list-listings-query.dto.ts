@@ -1,6 +1,8 @@
 import { Type } from 'class-transformer';
 import {
+  IsIn,
   IsInt,
+  IsNumber,
   IsOptional,
   IsString,
   IsUUID,
@@ -8,6 +10,7 @@ import {
   MaxLength,
   Min,
 } from 'class-validator';
+
 export class ListListingsQueryDto {
   @IsOptional()
   @IsUUID()
@@ -17,6 +20,27 @@ export class ListListingsQueryDto {
   @IsString()
   @MaxLength(200)
   search?: string;
+
+  @IsOptional()
+  @Type(() => Number)
+  @IsNumber()
+  @Min(0)
+  minPrice?: number;
+
+  @IsOptional()
+  @Type(() => Number)
+  @IsNumber()
+  @Min(0)
+  maxPrice?: number;
+
+  @IsOptional()
+  @IsIn(['UZS', 'USD'])
+  currency?: 'UZS' | 'USD';
+
+  @IsOptional()
+  @IsString()
+  @MaxLength(200)
+  location?: string;
 
   @IsOptional()
   @Type(() => Number)

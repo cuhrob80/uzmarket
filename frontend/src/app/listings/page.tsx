@@ -9,6 +9,10 @@ interface ListingsPageProps {
     page?: string;
     categoryId?: string;
     search?: string;
+    minPrice?: string;
+    maxPrice?: string;
+    currency?: string;
+    location?: string;
   }>;
 }
 
@@ -37,6 +41,32 @@ export default async function ListingsPage({
 
   const search = params.search?.trim() || '';
   const categoryId = params.categoryId || '';
+  const location = params.location?.trim() || '';
+
+  const minPriceValue = params.minPrice?.trim() || '';
+  const maxPriceValue = params.maxPrice?.trim() || '';
+
+  const parsedMinPrice = Number(minPriceValue);
+  const parsedMaxPrice = Number(maxPriceValue);
+
+  const minPrice =
+    minPriceValue &&
+    Number.isFinite(parsedMinPrice) &&
+    parsedMinPrice >= 0
+      ? parsedMinPrice
+      : undefined;
+
+  const maxPrice =
+    maxPriceValue &&
+    Number.isFinite(parsedMaxPrice) &&
+    parsedMaxPrice >= 0
+      ? parsedMaxPrice
+      : undefined;
+
+  const currency =
+    params.currency === 'UZS' || params.currency === 'USD'
+      ? params.currency
+      : '';
 
   const [result, categories] = await Promise.all([
     getListings({
@@ -44,6 +74,10 @@ export default async function ListingsPage({
       limit: 20,
       search: search || undefined,
       categoryId: categoryId || undefined,
+      minPrice,
+      maxPrice,
+      currency: currency || undefined,
+      location: location || undefined,
     }),
     getCategories(),
   ]);
@@ -64,6 +98,22 @@ export default async function ListingsPage({
 
     if (categoryId) {
       query.set('categoryId', categoryId);
+    }
+
+    if (minPriceValue) {
+      query.set('minPrice', minPriceValue);
+    }
+
+    if (maxPriceValue) {
+      query.set('maxPrice', maxPriceValue);
+    }
+
+    if (currency) {
+      query.set('currency', currency);
+    }
+
+    if (location) {
+      query.set('location', location);
     }
 
     return `/listings?${query.toString()}`;
@@ -109,6 +159,46 @@ export default async function ListingsPage({
               </option>
             ))}
           </select>
+
+          <input
+            type="number"
+            name="minPrice"
+            min="0"
+            step="any"
+            defaultValue={minPriceValue}
+            placeholder="Цена от"
+          />
+
+          <input
+            type="number"
+            name="maxPrice"
+            min="0"
+            step="any"
+            defaultValue={maxPriceValue}
+            placeholder="Цена до"
+          />
+
+          <select
+            name="currency"
+            defaultValue={currency}
+          >
+            <option value="">
+              Любая валюта
+            </option>
+            <option value="UZS">
+              UZS
+            </option>
+            <option value="USD">
+              USD
+            </option>
+          </select>
+
+          <input
+            type="search"
+            name="location"
+            defaultValue={location}
+            placeholder="Город или район"
+          />
 
           <button type="submit">
             Найти
