@@ -1236,6 +1236,177 @@ describe('Listings API', () => {
     }
   });
 
+  it('filters public listings by price, currency, location and combined criteria', async () => {
+    if (!app) throw new Error('Test application did not start');
+
+    const listingsRepository = dataSource.getRepository(Listing);
+
+    const filterListings = await listingsRepository.save([
+      listingsRepository.create({
+        sellerId: seller.id,
+        categoryId: category.id,
+        title: 'Filter Cheap Tashkent',
+        description: 'Public listing used for filter tests',
+        price: '100000.00',
+        currency: 'UZS',
+        status: ListingStatus.Active,
+        location: 'Tashkent',
+      }),
+      listingsRepository.create({
+        sellerId: seller.id,
+        categoryId: category.id,
+        title: 'Filter Expensive Tashkent',
+        description: 'Public listing used for filter tests',
+        price: '900000.00',
+        currency: 'UZS',
+        status: ListingStatus.Active,
+        location: 'Tashkent',
+      }),
+      listingsRepository.create({
+        sellerId: seller.id,
+        categoryId: category.id,
+        title: 'Filter Samarkand USD',
+        description: 'Public listing used for filter tests',
+        price: '500.00',
+        currency: 'USD',
+        status: ListingStatus.Active,
+        location: 'Samarkand',
+      }),
+    ]);
+
+    const [
+      cheapTashkent,
+      expensiveTashkent,
+      samarkandUsd,
+    ] = filterListings;
+
+    try {
+      const minPriceResponse = await request(app.getHttpServer())
+        .get('/api/v1/listings')
+        .query({
+          search: 'Filter',
+          minPrice: 500000,
+          page: 1,
+          limit: 20,
+        })
+        .expect(200);
+
+      expect(
+        minPriceResponse.body.items.map(
+          (item: { id: string }) => item.id,
+        ),
+      ).toContain(expensiveTashkent.id);
+
+      expect(
+        minPriceResponse.body.items.map(
+          (item: { id: string }) => item.id,
+        ),
+      ).not.toContain(cheapTashkent.id);
+
+      const maxPriceResponse = await request(app.getHttpServer())
+        .get('/api/v1/listings')
+        .query({
+          search: 'Filter',
+          maxPrice: 200000,
+          currency: 'UZS',
+          page: 1,
+          limit: 20,
+        })
+        .expect(200);
+
+      expect(
+        maxPriceResponse.body.items.map(
+          (item: { id: string }) => item.id,
+        ),
+      ).toContain(cheapTashkent.id);
+
+      expect(
+        maxPriceResponse.body.items.map(
+          (item: { id: string }) => item.id,
+        ),
+      ).not.toContain(expensiveTashkent.id);
+
+      const currencyResponse = await request(app.getHttpServer())
+        .get('/api/v1/listings')
+        .query({
+          search: 'Filter',
+          currency: 'USD',
+          page: 1,
+          limit: 20,
+        })
+        .expect(200);
+
+      expect(
+        currencyResponse.body.items.map(
+          (item: { id: string }) => item.id,
+        ),
+      ).toEqual([samarkandUsd.id]);
+
+      const locationResponse = await request(app.getHttpServer())
+        .get('/api/v1/listings')
+        .query({
+          search: 'Filter',
+          location: 'samar',
+          page: 1,
+          limit: 20,
+        })
+        .expect(200);
+
+      expect(
+        locationResponse.body.items.map(
+          (item: { id: string }) => item.id,
+        ),
+      ).toEqual([samarkandUsd.id]);
+
+      const combinedResponse = await request(app.getHttpServer())
+        .get('/api/v1/listings')
+        .query({
+          search: 'Filter',
+          minPrice: 500000,
+          maxPrice: 1000000,
+          currency: 'UZS',
+          location: 'Tashkent',
+          page: 1,
+          limit: 20,
+        })
+        .expect(200);
+
+      expect(
+        combinedResponse.body.items.map(
+          (item: { id: string }) => item.id,
+        ),
+      ).toEqual([expensiveTashkent.id]);
+    } finally {
+      await listingsRepository.delete({
+        id: samarkandUsd.id,
+      });
+      await listingsRepository.delete({
+        id: expensiveTashkent.id,
+      });
+      await listingsRepository.delete({
+        id: cheapTashkent.id,
+      });
+    }
+  });
+
+  it('rejects an invalid public price range', async () => {
+    if (!app) throw new Error('Test application did not start');
+
+    const response = await request(app.getHttpServer())
+      .get('/api/v1/listings')
+      .query({
+        minPrice: 1000000,
+        maxPrice: 100000,
+        page: 1,
+        limit: 20,
+      })
+      .expect(400);
+
+    expect(response.body.message).toBe(
+      'minPrice must be less than or equal to maxPrice',
+    );
+  });
+
   it('requires authentication for the owner listing feed', async () => {
     if (!app) throw new Error('Test application did not start');
 

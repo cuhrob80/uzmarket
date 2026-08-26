@@ -647,7 +647,14 @@ p { margin: 0; font-size: 1.125rem; }
 
 .catalog-filters {
   display: grid;
-  grid-template-columns: minmax(0, 2fr) minmax(220px, 1fr) auto;
+  grid-template-columns:
+    minmax(0, 2fr)
+    minmax(180px, 1fr)
+    minmax(140px, 0.8fr)
+    minmax(140px, 0.8fr)
+    minmax(140px, 0.7fr)
+    minmax(180px, 1fr)
+    auto;
   gap: 12px;
   margin-bottom: 28px;
 }

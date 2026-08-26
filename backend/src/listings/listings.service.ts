@@ -168,31 +168,71 @@ export class ListingsService {
     limit: number;
     total: number;
   }> {
-    const where: FindOptionsWhere<Listing> = {
-      status: ListingStatus.Active,
-    };
+    if (
+      query.minPrice !== undefined &&
+      query.maxPrice !== undefined &&
+      query.minPrice > query.maxPrice
+    ) {
+      throw new BadRequestException(
+        'minPrice must be less than or equal to maxPrice',
+      );
+    }
+
+    const queryBuilder = this.listingsRepository
+      .createQueryBuilder('listing')
+      .leftJoinAndSelect('listing.seller', 'seller')
+      .leftJoinAndSelect('listing.category', 'category')
+      .leftJoinAndSelect('listing.images', 'images')
+      .where('listing.status = :status', {
+        status: ListingStatus.Active,
+      });
 
     if (query.categoryId) {
-      where.categoryId = query.categoryId;
+      queryBuilder.andWhere('listing.categoryId = :categoryId', {
+        categoryId: query.categoryId,
+      });
     }
 
-    if (query.search) {
-      where.title = ILike(`%${query.search}%`);
+    const search = query.search?.trim();
+
+    if (search) {
+      queryBuilder.andWhere('listing.title ILIKE :search', {
+        search: `%${search}%`,
+      });
     }
 
-    const [items, total] = await this.listingsRepository.findAndCount({
-      where,
-      relations: {
-        seller: true,
-        category: true,
-        images: true,
-      },
-      order: {
-        createdAt: 'DESC',
-      },
-      skip: (query.page - 1) * query.limit,
-      take: query.limit,
-    });
+    if (query.minPrice !== undefined) {
+      queryBuilder.andWhere('listing.price >= :minPrice', {
+        minPrice: query.minPrice,
+      });
+    }
+
+    if (query.maxPrice !== undefined) {
+      queryBuilder.andWhere('listing.price <= :maxPrice', {
+        maxPrice: query.maxPrice,
+      });
+    }
+
+    if (query.currency) {
+      queryBuilder.andWhere('listing.currency = :currency', {
+        currency: query.currency,
+      });
+    }
+
+    const location = query.location?.trim();
+
+    if (location) {
+      queryBuilder.andWhere('listing.location ILIKE :location', {
+        location: `%${location}%`,
+      });
+    }
+
+    queryBuilder
+      .orderBy('listing.createdAt', 'DESC')
+      .skip((query.page - 1) * query.limit)
+      .take(query.limit);
+
+    const [items, total] = await queryBuilder.getManyAndCount();
 
     return {
       items: items.map((item) => this.toResponse(item)),
