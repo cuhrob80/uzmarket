@@ -7,6 +7,7 @@ import type {
   Category,
   CreateListingInput,
   Listing,
+  ListingCurrency,
   ListingsPage,
 } from '@/types/listing';
 
@@ -414,4 +415,48 @@ export async function getListings(
   }
 
   return (await response.json()) as ListingsPage;
+}
+
+export interface UpdateListingInput {
+  categoryId?: string;
+  title?: string;
+  description?: string;
+  price?: string;
+  currency?: ListingCurrency;
+  location?: string;
+}
+
+export async function updateListing(
+  listingId: string,
+  input: UpdateListingInput,
+): Promise<Listing> {
+  const token = await getAccessToken();
+
+  if (!token) {
+    throw new ApiError(401, 'Authentication required');
+  }
+
+  const response = await fetch(
+    createApiUrl(
+      `/api/v1/listings/${encodeURIComponent(listingId)}`,
+    ),
+    {
+      method: 'PATCH',
+      headers: {
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(input),
+      cache: 'no-store',
+    },
+  );
+
+  if (!response.ok) {
+    throw new ApiError(
+      response.status,
+      await getErrorMessage(response),
+    );
+  }
+
+  return (await response.json()) as Listing;
 }
