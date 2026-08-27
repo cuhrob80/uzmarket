@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import { redirect } from 'next/navigation';
 import { getMyListings } from '@/lib/api/server';
 import type { Listing, ListingStatus } from '@/types/listing';
@@ -91,6 +92,18 @@ export default async function MyListingsPage() {
                         ? ` · ${listing.location}`
                         : ''}
                     </p>
+
+                    {listing.status === 'draft' ||
+                    listing.status === 'active' ? (
+                      <div className="listing-actions">
+                        <Link
+                          href={`/my-listings/${listing.id}/edit`}
+                          className="listing-edit-link"
+                        >
+                          Редактировать
+                        </Link>
+                      </div>
+                    ) : null}
                   </div>
                 </article>
               );
