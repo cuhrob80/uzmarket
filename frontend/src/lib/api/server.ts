@@ -159,6 +159,18 @@ export async function getCategories(): Promise<Category[]> {
   return (await response.json()) as Category[];
 }
 
+export async function getCategoryBySlug(slug: string): Promise<Category> {
+  const response = await fetch(createApiUrl('/api/v1/categories/' + encodeURIComponent(slug)), {
+    cache: 'no-store',
+  });
+
+  if (!response.ok) {
+    throw new ApiError(response.status, await getErrorMessage(response));
+  }
+
+  return (await response.json()) as Category;
+}
+
 export async function getMyListing(
   listingId: string,
 ): Promise<Listing | null> {

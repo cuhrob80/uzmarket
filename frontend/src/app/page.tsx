@@ -67,8 +67,8 @@ export default async function Home() {
           {categories.map((category) => (
             <Link
               key={category.id}
-              href={`/listings?categoryId=${encodeURIComponent(
-                category.id,
+              href={`/category/${encodeURIComponent(
+                category.slug,
               )}`}
               className="home-category-card"
             >
