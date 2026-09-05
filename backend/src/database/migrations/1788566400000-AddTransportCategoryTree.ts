@@ -10,18 +10,6 @@ const transportCategories: CategorySeed[] = [
   {
     name: 'Легковые автомобили',
     slug: 'transport-passenger-cars',
-    children: [
-      { name: 'Седан', slug: 'transport-passenger-cars-sedan' },
-      { name: 'Хэтчбек', slug: 'transport-passenger-cars-hatchback' },
-      { name: 'Универсал', slug: 'transport-passenger-cars-wagon' },
-      { name: 'Внедорожник / SUV', slug: 'transport-passenger-cars-suv' },
-      { name: 'Кроссовер', slug: 'transport-passenger-cars-crossover' },
-      { name: 'Купе', slug: 'transport-passenger-cars-coupe' },
-      { name: 'Кабриолет', slug: 'transport-passenger-cars-convertible' },
-      { name: 'Минивэн', slug: 'transport-passenger-cars-minivan' },
-      { name: 'Пикап', slug: 'transport-passenger-cars-pickup' },
-      { name: 'Другой тип кузова', slug: 'transport-passenger-cars-other-body' },
-    ],
   },
   {
     name: 'Автозапчасти и аксессуары',
