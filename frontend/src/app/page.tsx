@@ -25,36 +25,16 @@ export default async function Home() {
       limit: 8,
     }),
   ]);
+  const rootCategories = categories
+    .filter((category) =>
+      category.parentId === null
+      && !(category.name === 'E2E Category' && category.slug.startsWith('e2e-category-')),
+    )
+    .sort((a, b) => a.sortOrder - b.sortOrder || a.name.localeCompare(b.name, 'ru'));
 
   return (
     <main className="marketplace-home">
       <MarketplaceHeader />
-      <section className="home-hero">
-        <div className="home-container">
-          <h1>UzMarket</h1>
-
-          <p className="home-hero-text">
-            Покупайте и продавайте товары и услуги по всему Узбекистану
-          </p>
-
-          <form
-            action="/listings"
-            method="get"
-            className="home-search"
-          >
-            <input
-              type="search"
-              name="search"
-              placeholder="Что вы ищете?"
-              aria-label="Поиск объявлений"
-            />
-
-            <button type="submit">
-              Найти
-            </button>
-          </form>
-        </div>
-      </section>
 
       <section className="home-section home-container">
         <div className="home-section-header">
@@ -66,7 +46,7 @@ export default async function Home() {
         </div>
 
         <div className="home-categories">
-          {categories.map((category) => (
+          {rootCategories.map((category) => (
             <Link
               key={category.id}
               href={`/category/${encodeURIComponent(
