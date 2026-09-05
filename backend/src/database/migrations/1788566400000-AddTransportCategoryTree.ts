@@ -166,42 +166,6 @@ const transportCategories: CategorySeed[] = [
   {
     name: 'Прицепы и полуприцепы',
     slug: 'transport-trailers',
-    children: [
-      { name: 'Легковые прицепы', slug: 'transport-trailers-car' },
-      { name: 'Грузовые прицепы', slug: 'transport-trailers-truck' },
-      {
-        name: 'Бортовые полуприцепы',
-        slug: 'transport-trailers-flatbed',
-      },
-      {
-        name: 'Тентованные полуприцепы',
-        slug: 'transport-trailers-curtain',
-      },
-      { name: 'Рефрижераторы', slug: 'transport-trailers-refrigerated' },
-      {
-        name: 'Изотермические полуприцепы',
-        slug: 'transport-trailers-isothermal',
-      },
-      {
-        name: 'Самосвальные полуприцепы',
-        slug: 'transport-trailers-dump',
-      },
-      { name: 'Контейнеровозы', slug: 'transport-trailers-container' },
-      { name: 'Цистерны', slug: 'transport-trailers-tanker' },
-      {
-        name: 'Тралы и низкорамные платформы',
-        slug: 'transport-trailers-lowbed',
-      },
-      { name: 'Автовозы', slug: 'transport-trailers-car-carrier' },
-      {
-        name: 'Прицепы для спецтехники',
-        slug: 'transport-trailers-special-machinery',
-      },
-      {
-        name: 'Другие прицепы и полуприцепы',
-        slug: 'transport-trailers-other',
-      },
-    ],
   },
   {
     name: 'Запчасти для спецтехники и сельхозтехники',
