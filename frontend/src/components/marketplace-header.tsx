@@ -25,7 +25,11 @@ export function MarketplaceHeader() {
         </Link>
 
         <nav className="marketplace-quick-links" aria-label="Пользовательское меню">
-          <Link href="/my-listings" aria-label="Избранное">♡</Link>
+          <Link href="/my-listings" aria-label="Избранное">
+            <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+              <path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1.1-1.1a5.5 5.5 0 0 0-7.8 7.8l1.1 1.1L12 21l7.7-7.5 1.1-1.1a5.5 5.5 0 0 0 0-7.8Z" />
+            </svg>
+          </Link>
           <button type="button" aria-label="Уведомления">
             <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
               <path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9Z" />
