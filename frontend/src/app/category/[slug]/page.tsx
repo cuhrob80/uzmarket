@@ -1,11 +1,15 @@
 import Link from 'next/link';
+import Image from 'next/image';
 import { notFound } from 'next/navigation';
 import {
   ApiError,
+  getCategories,
   getCategoryBySlug,
   getListings,
 } from '@/lib/api/server';
-import type { Listing } from '@/types/listing';
+import type { Category, Listing } from '@/types/listing';
+import { TransportCategoryIcon } from '@/components/transport-category-icon';
+import { MarketplaceHeader } from '@/components/marketplace-header';
 
 export const dynamic = 'force-dynamic';
 
@@ -14,6 +18,30 @@ interface CategoryPageProps {
     slug: string;
   }>;
 }
+
+const categoryAccentClasses = [
+  'category-accent-green',
+  'category-accent-coral',
+  'category-accent-blue',
+  'category-accent-lime',
+  'category-accent-orange',
+];
+
+const categoryImages: Record<string, string> = {
+  'transport-passenger-cars': '/images/categories/transport/passenger-cars.webp',
+  'transport-car-parts-accessories': '/images/categories/transport/car-parts.webp',
+  'transport-tires-rims-wheels': '/images/categories/transport/tires-wheels.webp',
+  'transport-motorcycles': '/images/categories/transport/motorcycles.webp',
+  'transport-motorcycle-parts-accessories': '/images/categories/transport/motorcycle-parts.webp',
+  'transport-personal-mobility': '/images/categories/transport/personal-mobility.webp',
+  'transport-trucks': '/images/categories/transport/trucks.webp',
+  'transport-buses': '/images/categories/transport/buses.webp',
+  'transport-special-machinery': '/images/categories/transport/special-machinery.webp',
+  'transport-agricultural-machinery': '/images/categories/transport/agricultural-machinery.webp',
+  'transport-trailers': '/images/categories/transport/trailers.webp',
+  'transport-heavy-machinery-parts': '/images/categories/transport/heavy-machinery-parts.webp',
+  'transport-watercraft': '/images/categories/transport/watercraft.webp',
+};
 
 function formatPrice(listing: Listing): string {
   const value = Number(listing.price);
@@ -27,12 +55,77 @@ function formatPrice(listing: Listing): string {
   }).format(value)} ${listing.currency}`;
 }
 
+function CategoryHub({
+  category,
+  children,
+}: {
+  category: Category;
+  children: Category[];
+}) {
+  return (
+    <main className="transport-page">
+      <MarketplaceHeader />
+
+      <div className="transport-container">
+        <nav className="transport-breadcrumbs" aria-label="Хлебные крошки">
+          <Link href="/">Главная</Link>
+          <span aria-hidden="true">→</span>
+          <span>{category.name}</span>
+        </nav>
+
+        <div className="transport-title-row">
+          <div>
+            <p className="transport-eyebrow">Категории UzMarket</p>
+            <h1>{category.name}</h1>
+            <p className="transport-subtitle">
+              Выберите нужный раздел, чтобы посмотреть объявления
+            </p>
+          </div>
+
+          <span className="transport-category-count">
+            {children.length} категорий
+          </span>
+        </div>
+
+        <section className="transport-category-grid" aria-label="Разделы категории">
+          {children.map((child, index) => (
+            <Link
+              key={child.id}
+              href={`/category/${encodeURIComponent(child.slug)}`}
+              className={`transport-category-card ${
+                categoryAccentClasses[index % categoryAccentClasses.length]
+              }`}
+            >
+              <span className="transport-category-image">
+                <span className="transport-category-icon" aria-hidden="true">
+                  <TransportCategoryIcon slug={child.slug} />
+                </span>
+                {categoryImages[child.slug] ? (
+                  <Image
+                    src={categoryImages[child.slug]}
+                    alt={child.name}
+                    fill
+                    sizes="(max-width: 640px) 50vw, (max-width: 900px) 33vw, (max-width: 1180px) 25vw, 20vw"
+                  />
+                ) : null}
+              </span>
+
+              <span className="transport-category-name">{child.name}</span>
+              <span className="transport-category-arrow" aria-hidden="true">→</span>
+            </Link>
+          ))}
+        </section>
+      </div>
+    </main>
+  );
+}
+
 export default async function CategoryPage({
   params,
 }: CategoryPageProps) {
   const { slug } = await params;
 
-  let category;
+  let category: Category;
 
   try {
     category = await getCategoryBySlug(slug);
@@ -42,6 +135,15 @@ export default async function CategoryPage({
     }
 
     throw error;
+  }
+
+  const categories = await getCategories();
+  const childCategories = categories
+    .filter((item) => item.parentId === category.id)
+    .sort((a, b) => a.sortOrder - b.sortOrder || a.name.localeCompare(b.name, 'ru'));
+
+  if (childCategories.length > 0) {
+    return <CategoryHub category={category} children={childCategories} />;
   }
 
   const listings = await getListings({
@@ -55,24 +157,17 @@ export default async function CategoryPage({
       <section className="catalog-container">
         <header className="catalog-header">
           <div>
-            <p className="catalog-category-label">
-              Категория
-            </p>
-
+            <p className="catalog-category-label">Категория</p>
             <h1>{category.name}</h1>
           </div>
 
-          <Link href="/listings">
-            Все объявления
-          </Link>
+          <Link href="/listings">Все объявления</Link>
         </header>
 
         {listings.items.length === 0 ? (
           <div className="empty-state">
             <h2>Объявлений пока нет</h2>
-            <p>
-              В этой категории пока нет активных объявлений.
-            </p>
+            <p>В этой категории пока нет активных объявлений.</p>
           </div>
         ) : (
           <div className="catalog-grid">
@@ -100,11 +195,7 @@ export default async function CategoryPage({
 
                   <div className="catalog-card-content">
                     <h2>{listing.title}</h2>
-
-                    <p className="catalog-card-price">
-                      {formatPrice(listing)}
-                    </p>
-
+                    <p className="catalog-card-price">{formatPrice(listing)}</p>
                     <p className="catalog-card-meta">
                       {listing.location ?? 'Узбекистан'}
                     </p>
