@@ -795,6 +795,7 @@ p { margin: 0; font-size: 1.125rem; }
 .marketplace-home {
   min-height: 100vh;
   padding-bottom: 64px;
+  background: #f7f9fb;
 }
 
 .home-container {
@@ -804,52 +805,13 @@ p { margin: 0; font-size: 1.125rem; }
   padding-right: 24px;
 }
 
-.home-hero {
-  padding: 56px 0 48px;
-  background: #f3f5f8;
-}
-
-.home-hero h1 {
-  margin: 0;
-  font-size: clamp(2rem, 5vw, 3.5rem);
-}
-
-.home-hero-text {
-  max-width: 720px;
-  margin: 12px 0 24px;
-  color: #687386;
-  font-size: 1.1rem;
-}
-
-.home-search {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
-  gap: 12px;
-  max-width: 760px;
-}
-
-.home-search input {
-  width: 100%;
-  padding: 14px 16px;
-  border: 1px solid #cfd6e0;
-  border-radius: 12px;
-  background: #fff;
-  font: inherit;
-}
-
-.home-search button {
-  padding: 14px 24px;
-  border: 0;
-  border-radius: 12px;
-  background: #172033;
-  color: #fff;
-  font: inherit;
-  font-weight: 700;
-  cursor: pointer;
-}
-
 .home-section {
-  margin-top: 40px;
+  margin-top: 32px;
+  padding-top: 28px;
+  padding-bottom: 28px;
+  border: 1px solid #e1e6ed;
+  border-radius: 18px;
+  background: #fff;
 }
 
 .home-section-header {
@@ -906,14 +868,6 @@ p { margin: 0; font-size: 1.125rem; }
   .home-container {
     padding-left: 16px;
     padding-right: 16px;
-  }
-
-  .home-hero {
-    padding: 36px 0 32px;
-  }
-
-  .home-search {
-    grid-template-columns: 1fr;
   }
 
   .home-categories {
