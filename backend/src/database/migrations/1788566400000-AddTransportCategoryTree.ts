@@ -170,51 +170,6 @@ const transportCategories: CategorySeed[] = [
   {
     name: 'Запчасти для спецтехники и сельхозтехники',
     slug: 'transport-heavy-machinery-parts',
-    children: [
-      {
-        name: 'Двигатели и запчасти двигателя',
-        slug: 'transport-heavy-parts-engines',
-      },
-      {
-        name: 'Трансмиссия и коробки передач',
-        slug: 'transport-heavy-parts-transmission',
-      },
-      { name: 'Гидравлика', slug: 'transport-heavy-parts-hydraulics' },
-      { name: 'Ходовая часть', slug: 'transport-heavy-parts-running-gear' },
-      {
-        name: 'Мосты и редукторы',
-        slug: 'transport-heavy-parts-axles-gearboxes',
-      },
-      {
-        name: 'Электрика и электрооборудование',
-        slug: 'transport-heavy-parts-electrical',
-      },
-      {
-        name: 'Кабины и кузовные детали',
-        slug: 'transport-heavy-parts-cab-body',
-      },
-      {
-        name: 'Фильтры и расходные материалы',
-        slug: 'transport-heavy-parts-filters-consumables',
-      },
-      {
-        name: 'Шины и колёса для спецтехники',
-        slug: 'transport-heavy-parts-tires-wheels',
-      },
-      {
-        name: 'Запчасти для тракторов',
-        slug: 'transport-heavy-parts-tractors',
-      },
-      {
-        name: 'Запчасти для комбайнов',
-        slug: 'transport-heavy-parts-harvesters',
-      },
-      {
-        name: 'Запчасти для сельхозоборудования',
-        slug: 'transport-heavy-parts-agricultural-equipment',
-      },
-      { name: 'Другие запчасти', slug: 'transport-heavy-parts-other' },
-    ],
   },
   {
     name: 'Водный транспорт',
