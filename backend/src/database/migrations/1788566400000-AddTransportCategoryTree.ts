@@ -76,22 +76,6 @@ const transportCategories: CategorySeed[] = [
   {
     name: 'Грузовые автомобили',
     slug: 'transport-trucks',
-    children: [
-      { name: 'Автовоз', slug: 'transport-trucks-car-carrier' },
-      { name: 'Автоцистерна', slug: 'transport-trucks-tanker' },
-      { name: 'Бортовой грузовик', slug: 'transport-trucks-flatbed' },
-      { name: 'Вакуумная машина', slug: 'transport-trucks-vacuum' },
-      { name: 'Для перевозки скота', slug: 'transport-trucks-livestock' },
-      { name: 'Изотермический кузов', slug: 'transport-trucks-isothermal' },
-      { name: 'Лесовоз', slug: 'transport-trucks-logging' },
-      { name: 'Самосвал', slug: 'transport-trucks-dump' },
-      { name: 'Сортиментовоз', slug: 'transport-trucks-timber' },
-      { name: 'Термокузов', slug: 'transport-trucks-thermal' },
-      { name: 'Фургон', slug: 'transport-trucks-van' },
-      { name: 'Шасси', slug: 'transport-trucks-chassis' },
-      { name: 'Эвакуатор', slug: 'transport-trucks-tow' },
-      { name: 'Другой', slug: 'transport-trucks-other' },
-    ],
   },
   { name: 'Автобусы', slug: 'transport-buses' },
   {
