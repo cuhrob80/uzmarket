@@ -168,7 +168,7 @@ const transportCategories: CategorySeed[] = [
     slug: 'transport-trailers',
   },
   {
-    name: 'Запчасти для спецтехники и сельхозтехники',
+    name: 'Запчасти для грузового транспорта и спецтехники',
     slug: 'transport-heavy-machinery-parts',
   },
   {
@@ -194,41 +194,7 @@ const transportCategories: CategorySeed[] = [
       },
     ],
   },
-  {
-    name: 'Прочие запчасти',
-    slug: 'transport-other-parts',
-    children: [
-      {
-        name: 'Запчасти для водного транспорта',
-        slug: 'transport-other-parts-watercraft',
-      },
-      {
-        name: 'Запчасти для прицепов и полуприцепов',
-        slug: 'transport-other-parts-trailers',
-      },
-      {
-        name: 'Запчасти для автобусов',
-        slug: 'transport-other-parts-buses',
-      },
-      {
-        name: 'Запчасти для грузового транспорта',
-        slug: 'transport-other-parts-trucks',
-      },
-      {
-        name: 'Запчасти для коммунальной техники',
-        slug: 'transport-other-parts-municipal',
-      },
-      {
-        name: 'Запчасти для железнодорожной техники',
-        slug: 'transport-other-parts-railway',
-      },
-      {
-        name: 'Универсальные детали и комплектующие',
-        slug: 'transport-other-parts-universal',
-      },
-      { name: 'Другие запчасти', slug: 'transport-other-parts-other' },
-    ],
-  },
+
 ];
 
 export class AddTransportCategoryTree1788566400000
