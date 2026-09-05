@@ -7,6 +7,7 @@ import {
   getListings,
 } from '@/lib/api/server';
 import type { Category, Listing } from '@/types/listing';
+import { TransportCategoryIcon } from '@/components/transport-category-icon';
 
 export const dynamic = 'force-dynamic';
 
@@ -16,21 +17,6 @@ interface CategoryPageProps {
   }>;
 }
 
-const categoryIcons: Record<string, string> = {
-  'transport-passenger-cars': '🚗',
-  'transport-car-parts-accessories': '⚙️',
-  'transport-tires-rims-wheels': '🛞',
-  'transport-motorcycles': '🏍️',
-  'transport-motorcycle-parts-accessories': '🔧',
-  'transport-personal-mobility': '🛴',
-  'transport-trucks': '🚚',
-  'transport-buses': '🚌',
-  'transport-special-machinery': '🚜',
-  'transport-agricultural-machinery': '🌾',
-  'transport-trailers': '🚛',
-  'transport-heavy-machinery-parts': '⚙️',
-  'transport-watercraft': '🚤',
-};
 
 const categoryAccentClasses = [
   'category-accent-green',
@@ -132,7 +118,7 @@ function CategoryHub({
               }`}
             >
               <span className="transport-category-icon" aria-hidden="true">
-                {categoryIcons[child.slug] ?? '📦'}
+                <TransportCategoryIcon slug={child.slug} />
               </span>
 
               <span className="transport-category-name">{child.name}</span>
