@@ -9,6 +9,7 @@ import {
 } from '@/lib/api/server';
 import type { Category, Listing } from '@/types/listing';
 import { TransportCategoryIcon } from '@/components/transport-category-icon';
+import { MarketplaceHeader } from '@/components/marketplace-header';
 
 export const dynamic = 'force-dynamic';
 
@@ -52,50 +53,6 @@ function formatPrice(listing: Listing): string {
   return `${new Intl.NumberFormat('ru-RU', {
     maximumFractionDigits: 2,
   }).format(value)} ${listing.currency}`;
-}
-
-function MarketplaceHeader() {
-  return (
-    <header className="marketplace-header">
-      <div className="marketplace-header-inner">
-        <Link href="/" className="marketplace-logo" aria-label="UzMarket">
-          <span className="marketplace-logo-word"><strong>UZ</strong>MARKET</span>
-          <small>Покупай. Продавай. Ближе к людям.</small>
-        </Link>
-
-        <form action="/listings" method="get" className="marketplace-header-search">
-          <span aria-hidden="true">⌕</span>
-          <input
-            type="search"
-            name="search"
-            placeholder="Что ищете?"
-            aria-label="Поиск объявлений"
-          />
-        </form>
-
-        <button type="button" className="marketplace-location">
-          <span aria-hidden="true">⌖</span>
-          Весь Узбекистан
-        </button>
-
-        <Link href="/create-listing" className="marketplace-create-button">
-          <span aria-hidden="true">＋</span>
-          Подать объявление
-        </Link>
-
-        <nav className="marketplace-quick-links" aria-label="Пользовательское меню">
-          <Link href="/my-listings" aria-label="Избранное">♡</Link>
-          <button type="button" aria-label="Уведомления">
-            <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden="true">
-              <path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9Z" />
-              <path d="M10 21h4" />
-            </svg>
-          </button>
-          <Link href="/login" aria-label="Профиль">♙</Link>
-        </nav>
-      </div>
-    </header>
-  );
 }
 
 function CategoryHub({
