@@ -175,22 +175,10 @@ const transportCategories: CategorySeed[] = [
     name: 'Водный транспорт',
     slug: 'transport-watercraft',
     children: [
-      { name: 'Моторные лодки', slug: 'transport-watercraft-motorboats' },
-      {
-        name: 'Надувные лодки',
-        slug: 'transport-watercraft-inflatable-boats',
-      },
+      { name: 'Лодки', slug: 'transport-watercraft-boats' },
       { name: 'Катера', slug: 'transport-watercraft-launches' },
       { name: 'Яхты', slug: 'transport-watercraft-yachts' },
       { name: 'Гидроциклы', slug: 'transport-watercraft-jet-skis' },
-      {
-        name: 'Парусные суда',
-        slug: 'transport-watercraft-sailboats',
-      },
-      {
-        name: 'Гребные лодки',
-        slug: 'transport-watercraft-rowboats',
-      },
       { name: 'Каяки и каноэ', slug: 'transport-watercraft-kayaks-canoes' },
       {
         name: 'Водные велосипеды',
@@ -199,10 +187,6 @@ const transportCategories: CategorySeed[] = [
       {
         name: 'Лодочные моторы',
         slug: 'transport-watercraft-outboard-motors',
-      },
-      {
-        name: 'Прицепы для лодок',
-        slug: 'transport-watercraft-trailers',
       },
       {
         name: 'Другой водный транспорт',
