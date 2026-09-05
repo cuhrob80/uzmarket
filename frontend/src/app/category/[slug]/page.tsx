@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import Image from 'next/image';
 import { notFound } from 'next/navigation';
 import {
   ApiError,
@@ -17,7 +18,6 @@ interface CategoryPageProps {
   }>;
 }
 
-
 const categoryAccentClasses = [
   'category-accent-green',
   'category-accent-coral',
@@ -25,6 +25,22 @@ const categoryAccentClasses = [
   'category-accent-lime',
   'category-accent-orange',
 ];
+
+const categoryImages: Record<string, string> = {
+  'transport-passenger-cars': '/images/categories/transport/passenger-cars.webp',
+  'transport-car-parts-accessories': '/images/categories/transport/car-parts.webp',
+  'transport-tires-rims-wheels': '/images/categories/transport/tires-wheels.webp',
+  'transport-motorcycles': '/images/categories/transport/motorcycles.webp',
+  'transport-motorcycle-parts-accessories': '/images/categories/transport/motorcycle-parts.webp',
+  'transport-personal-mobility': '/images/categories/transport/personal-mobility.webp',
+  'transport-trucks': '/images/categories/transport/trucks.webp',
+  'transport-buses': '/images/categories/transport/buses.webp',
+  'transport-special-machinery': '/images/categories/transport/special-machinery.webp',
+  'transport-agricultural-machinery': '/images/categories/transport/agricultural-machinery.webp',
+  'transport-trailers': '/images/categories/transport/trailers.webp',
+  'transport-heavy-machinery-parts': '/images/categories/transport/heavy-machinery-parts.webp',
+  'transport-watercraft': '/images/categories/transport/watercraft.webp',
+};
 
 function formatPrice(listing: Listing): string {
   const value = Number(listing.price);
@@ -43,7 +59,7 @@ function MarketplaceHeader() {
     <header className="marketplace-header">
       <div className="marketplace-header-inner">
         <Link href="/" className="marketplace-logo" aria-label="UzMarket">
-          <span>UZ</span>MARKET
+          <span className="marketplace-logo-word"><strong>UZ</strong>MARKET</span>
           <small>Покупай. Продавай. Ближе к людям.</small>
         </Link>
 
@@ -69,6 +85,12 @@ function MarketplaceHeader() {
 
         <nav className="marketplace-quick-links" aria-label="Пользовательское меню">
           <Link href="/my-listings" aria-label="Избранное">♡</Link>
+          <button type="button" aria-label="Уведомления">
+            <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden="true">
+              <path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9Z" />
+              <path d="M10 21h4" />
+            </svg>
+          </button>
           <Link href="/login" aria-label="Профиль">♙</Link>
         </nav>
       </div>
@@ -117,8 +139,18 @@ function CategoryHub({
                 categoryAccentClasses[index % categoryAccentClasses.length]
               }`}
             >
-              <span className="transport-category-icon" aria-hidden="true">
-                <TransportCategoryIcon slug={child.slug} />
+              <span className="transport-category-image">
+                <span className="transport-category-icon" aria-hidden="true">
+                  <TransportCategoryIcon slug={child.slug} />
+                </span>
+                {categoryImages[child.slug] ? (
+                  <Image
+                    src={categoryImages[child.slug]}
+                    alt={child.name}
+                    fill
+                    sizes="(max-width: 640px) 50vw, (max-width: 900px) 33vw, (max-width: 1180px) 25vw, 20vw"
+                  />
+                ) : null}
               </span>
 
               <span className="transport-category-name">{child.name}</span>
