@@ -169,6 +169,11 @@ export class ListingsController {
     return this.listingsService.findAll(query);
   }
 
+  @Get('public/:publicId')
+  findOneByPublicId(@Param('publicId') publicId: string): Promise<ListingResponseDto> {
+    return this.listingsService.findOneByPublicId(publicId);
+  }
+
   @Get(':id')
   findOne(@Param('id', new ParseUUIDPipe()) id: string): Promise<ListingResponseDto> {
     return this.listingsService.findOne(id);

@@ -7,6 +7,7 @@ import {
   getCategoryBySlug,
   getListings,
 } from '@/lib/api/server';
+import { getListingPublicPath } from '@/lib/listing-url';
 import type { Category, Listing } from '@/types/listing';
 import { TransportCategoryIcon } from '@/components/transport-category-icon';
 import { MarketplaceHeader } from '@/components/marketplace-header';
@@ -177,7 +178,7 @@ export default async function CategoryPage({
               return (
                 <Link
                   key={listing.id}
-                  href={`/listings/${listing.id}`}
+                  href={getListingPublicPath(listing)}
                   className="catalog-card"
                 >
                   <div className="catalog-card-image">

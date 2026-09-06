@@ -19,6 +19,7 @@ export interface ListingImageResponse {
 
 export interface ListingResponseDto {
   id: string;
+  publicId: string;
   sellerId: string;
   categoryId: string;
   title: string;

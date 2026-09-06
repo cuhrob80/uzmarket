@@ -2,6 +2,7 @@ import {
   Column,
   CreateDateColumn,
   Entity,
+  Generated,
   Index,
   JoinColumn,
   ManyToOne,
@@ -28,6 +29,10 @@ export enum ListingStatus {
 export class Listing {
   @PrimaryGeneratedColumn('uuid')
   id!: string;
+
+  @Column({ name: 'public_id', type: 'bigint', unique: true })
+  @Generated('increment')
+  publicId!: string;
 
   @Column({ name: 'seller_id', type: 'uuid' })
   sellerId!: string;
