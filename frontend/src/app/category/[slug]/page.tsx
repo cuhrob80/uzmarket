@@ -12,7 +12,7 @@ import { getListingPublicPath } from '@/lib/listing-url';
 import type { Category, Listing } from '@/types/listing';
 import { TransportCategoryIcon } from '@/components/transport-category-icon';
 import { MarketplaceHeader } from '@/components/marketplace-header';
-import { getCategorySeo, getCategoryUrl } from '@/lib/seo';
+import { absoluteUrl, getCategorySeo, getCategoryUrl } from '@/lib/seo';
 
 export const dynamic = 'force-dynamic';
 
@@ -104,15 +104,85 @@ function formatPrice(listing: Listing): string {
   }).format(value)} ${listing.currency}`;
 }
 
+function CategoryStructuredData({
+  category,
+  parentCategory,
+}: {
+  category: Category;
+  parentCategory: Category | null;
+}) {
+  const seo = getCategorySeo(category);
+  const breadcrumbItems = [
+    {
+      '@type': 'ListItem',
+      position: 1,
+      name: 'Главная',
+      item: absoluteUrl('/'),
+    },
+    ...(parentCategory
+      ? [
+          {
+            '@type': 'ListItem',
+            position: 2,
+            name: parentCategory.name,
+            item: getCategoryUrl(parentCategory.slug),
+          },
+        ]
+      : []),
+    {
+      '@type': 'ListItem',
+      position: parentCategory ? 3 : 2,
+      name: category.name,
+      item: getCategoryUrl(category.slug),
+    },
+  ];
+
+  const schema = {
+    '@context': 'https://schema.org',
+    '@graph': [
+      {
+        '@type': 'BreadcrumbList',
+        itemListElement: breadcrumbItems,
+      },
+      {
+        '@type': 'CollectionPage',
+        name: seo.title,
+        description: seo.description,
+        url: getCategoryUrl(category.slug),
+        isPartOf: {
+          '@type': 'WebSite',
+          name: 'UzMarket',
+          url: absoluteUrl('/'),
+        },
+      },
+    ],
+  };
+
+  return (
+    <script
+      type="application/ld+json"
+      dangerouslySetInnerHTML={{
+        __html: JSON.stringify(schema).replace(/</g, '\\u003c'),
+      }}
+    />
+  );
+}
+
 function CategoryHub({
   category,
+  parentCategory,
   children,
 }: {
   category: Category;
+  parentCategory: Category | null;
   children: Category[];
 }) {
   return (
     <main className="transport-page">
+      <CategoryStructuredData
+        category={category}
+        parentCategory={parentCategory}
+      />
       <MarketplaceHeader />
 
       <div className="transport-container">
@@ -187,12 +257,20 @@ export default async function CategoryPage({
   }
 
   const categories = await getCategories();
+  const parentCategory =
+    categories.find((item) => item.id === category.parentId) ?? null;
   const childCategories = categories
     .filter((item) => item.parentId === category.id)
     .sort((a, b) => a.sortOrder - b.sortOrder || a.name.localeCompare(b.name, 'ru'));
 
   if (childCategories.length > 0) {
-    return <CategoryHub category={category} children={childCategories} />;
+    return (
+      <CategoryHub
+        category={category}
+        parentCategory={parentCategory}
+        children={childCategories}
+      />
+    );
   }
 
   const listings = await getListings({
@@ -203,7 +281,26 @@ export default async function CategoryPage({
 
   return (
     <main className="catalog-page">
+      <CategoryStructuredData
+        category={category}
+        parentCategory={parentCategory}
+      />
+      <MarketplaceHeader />
+
       <section className="catalog-container">
+        <nav className="transport-breadcrumbs" aria-label="Хлебные крошки">
+          <Link href="/">Главная</Link>
+          <span aria-hidden="true">→</span>
+          {parentCategory ? (
+            <>
+              <Link href={`/category/${encodeURIComponent(parentCategory.slug)}`}>
+                {parentCategory.name}
+              </Link>
+              <span aria-hidden="true">→</span>
+            </>
+          ) : null}
+          <span>{category.name}</span>
+        </nav>
         <header className="catalog-header">
           <div>
             <p className="catalog-category-label">Категория</p>
