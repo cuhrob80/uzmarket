@@ -42,6 +42,12 @@ const categoryImages: Record<string, string> = {
   'transport-trailers': '/images/categories/transport/trailers.webp',
   'transport-heavy-machinery-parts': '/images/categories/transport/heavy-machinery-parts.webp',
   'transport-watercraft': '/images/categories/transport/watercraft.webp',
+  'real-estate-apartments': '/images/categories/real-estate/apartments.webp',
+  'real-estate-rooms-bed-spaces': '/images/categories/real-estate/rooms-bed-spaces.webp',
+  'real-estate-houses-cottages': '/images/categories/real-estate/houses-cottages.webp',
+  'real-estate-land-plots': '/images/categories/real-estate/land-plots.webp',
+  'real-estate-commercial': '/images/categories/real-estate/commercial.webp',
+  'real-estate-garages-parking': '/images/categories/real-estate/garages-parking.webp',
 };
 
 function formatPrice(listing: Listing): string {
