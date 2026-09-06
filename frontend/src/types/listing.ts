@@ -71,4 +71,5 @@ export interface Category {
   slug: string;
   parentId: string | null;
   isActive: boolean;
+  sortOrder: number;
 }

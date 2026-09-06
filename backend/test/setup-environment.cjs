@@ -8,3 +8,13 @@ process.env.DATABASE_PASSWORD = process.env.TEST_DATABASE_PASSWORD ?? 'uzmarket_
 process.env.FRONTEND_URL = 'http://localhost:3000';
 process.env.JWT_SECRET = 'test-jwt-secret-for-e2e';
 process.env.JWT_EXPIRES_IN = '900';
+process.env.STORAGE_LOCAL_PATH =
+  process.env.TEST_STORAGE_LOCAL_PATH ?? '/tmp/uzmarket-e2e-storage';
+process.env.STORAGE_PUBLIC_URL = 'http://localhost:3001/media';
+
+if (!/(^|[_-])test([_-]|$)/i.test(process.env.DATABASE_NAME)) {
+  throw new Error(
+    `E2E safety guard refused database "${process.env.DATABASE_NAME}". ` +
+      'TEST_DATABASE_NAME must identify a dedicated test database.',
+  );
+}

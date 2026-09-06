@@ -13,7 +13,7 @@ export class CategoriesService {
   findAll(): Promise<Category[]> {
     return this.categoriesRepository.find({
       where: { isActive: true },
-      order: { name: 'ASC' },
+      order: { sortOrder: 'ASC', name: 'ASC' },
     });
   }
 

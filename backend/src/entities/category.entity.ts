@@ -27,6 +27,9 @@ export class Category {
   @Column({ name: 'is_active', default: true })
   isActive!: boolean;
 
+  @Column({ name: 'sort_order', type: 'integer', default: 0 })
+  sortOrder!: number;
+
   @CreateDateColumn({ name: 'created_at', type: 'timestamptz' })
   createdAt!: Date;
 
