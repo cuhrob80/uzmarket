@@ -1,9 +1,36 @@
 import type { Metadata } from 'next';
 import type { ReactNode } from 'react';
+import { siteUrl } from '@/lib/seo';
 import './styles.css';
 
-export const metadata: Metadata = { title: 'UzMarket', description: 'UzMarket technical foundation' };
+export const metadata: Metadata = {
+  metadataBase: siteUrl,
+  title: {
+    default: 'UzMarket — объявления в Узбекистане',
+    template: '%s | UzMarket',
+  },
+  description:
+    'Покупайте и продавайте товары, транспорт и недвижимость по всему Узбекистану на UzMarket.',
+  alternates: {
+    canonical: '/',
+  },
+  openGraph: {
+    type: 'website',
+    siteName: 'UzMarket',
+    locale: 'ru_RU',
+    url: '/',
+    title: 'UzMarket — объявления в Узбекистане',
+    description:
+      'Покупайте и продавайте товары, транспорт и недвижимость по всему Узбекистану на UzMarket.',
+  },
+};
 
-export default function RootLayout({ children }: Readonly<{ children: ReactNode }>) {
-  return <html lang="en"><body>{children}</body></html>;
+export default function RootLayout({
+  children,
+}: Readonly<{ children: ReactNode }>) {
+  return (
+    <html lang="ru">
+      <body>{children}</body>
+    </html>
+  );
 }

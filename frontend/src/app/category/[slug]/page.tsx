@@ -1,3 +1,4 @@
+import type { Metadata } from 'next';
 import Link from 'next/link';
 import Image from 'next/image';
 import { notFound } from 'next/navigation';
@@ -11,6 +12,7 @@ import { getListingPublicPath } from '@/lib/listing-url';
 import type { Category, Listing } from '@/types/listing';
 import { TransportCategoryIcon } from '@/components/transport-category-icon';
 import { MarketplaceHeader } from '@/components/marketplace-header';
+import { getCategorySeo, getCategoryUrl } from '@/lib/seo';
 
 export const dynamic = 'force-dynamic';
 
@@ -18,6 +20,46 @@ interface CategoryPageProps {
   params: Promise<{
     slug: string;
   }>;
+}
+
+export async function generateMetadata({
+  params,
+}: CategoryPageProps): Promise<Metadata> {
+  const { slug } = await params;
+
+  try {
+    const category = await getCategoryBySlug(slug);
+    const seo = getCategorySeo(category);
+    const canonical = getCategoryUrl(category.slug);
+
+    return {
+      title: seo.title,
+      description: seo.description,
+      alternates: { canonical },
+      openGraph: {
+        type: 'website',
+        url: canonical,
+        title: seo.title,
+        description: seo.description,
+        siteName: 'UzMarket',
+        locale: 'ru_RU',
+      },
+      twitter: {
+        card: 'summary_large_image',
+        title: seo.title,
+        description: seo.description,
+      },
+    };
+  } catch (error: unknown) {
+    if (error instanceof ApiError && error.status === 404) {
+      return {
+        title: 'Категория не найдена',
+        robots: { index: false, follow: false },
+      };
+    }
+
+    throw error;
+  }
 }
 
 const categoryAccentClasses = [
