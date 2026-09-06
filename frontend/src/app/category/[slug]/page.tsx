@@ -5,6 +5,7 @@ import {
   getCategoryBySlug,
   getListings,
 } from '@/lib/api/server';
+import { getListingPublicPath } from '@/lib/listing-url';
 import type { Listing } from '@/types/listing';
 
 export const dynamic = 'force-dynamic';
@@ -82,7 +83,7 @@ export default async function CategoryPage({
               return (
                 <Link
                   key={listing.id}
-                  href={`/listings/${listing.id}`}
+                  href={getListingPublicPath(listing)}
                   className="catalog-card"
                 >
                   <div className="catalog-card-image">

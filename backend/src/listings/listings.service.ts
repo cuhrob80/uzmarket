@@ -162,6 +162,30 @@ export class ListingsService {
     return this.toResponse(listing);
   }
 
+  async findOneByPublicId(publicId: string): Promise<ListingResponseDto> {
+    const isValidPublicId = /^[1-9]\d{0,18}$/.test(publicId) &&
+      (publicId.length < 19 || publicId <= "9223372036854775807");
+
+    if (isValidPublicId === false) {
+      throw new NotFoundException("Listing not found");
+    }
+
+    const listing = await this.listingsRepository.findOne({
+      where: { publicId, status: ListingStatus.Active },
+      relations: {
+        seller: true,
+        category: true,
+        images: true,
+      },
+    });
+
+    if (!listing) {
+      throw new NotFoundException('Listing not found');
+    }
+
+    return this.toResponse(listing);
+  }
+
   async findAll(query: ListListingsQueryDto): Promise<{
     items: ListingResponseDto[];
     page: number;
@@ -344,6 +368,7 @@ export class ListingsService {
   private toResponse(listing: Listing): ListingResponseDto {
     return {
       id: listing.id,
+      publicId: listing.publicId,
       sellerId: listing.sellerId,
       categoryId: listing.categoryId,
       title: listing.title,

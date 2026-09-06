@@ -163,6 +163,7 @@ describe('Listings API', () => {
     });
 
     expect(typeof response.body.id).toBe('string');
+    expect(response.body.publicId).toMatch(/^[1-9]\d*$/);
     createdListingId = response.body.id;
   });
 
@@ -1185,6 +1186,53 @@ describe('Listings API', () => {
     await request(app.getHttpServer())
       .get(`/api/v1/listings/${createdListingId}`)
       .expect(404);
+
+    const draft = await dataSource.getRepository(Listing).findOneByOrFail({ id: createdListingId });
+
+    await request(app.getHttpServer())
+      .get(`/api/v1/listings/public/${draft.publicId}`)
+      .expect(404);
+  });
+
+  it('returns active listing by publicId and rejects invalid public ids', async () => {
+    if (!app) throw new Error('Test application did not start');
+
+    const listingsRepository = dataSource.getRepository(Listing);
+
+    const activeListing = await listingsRepository.save(
+      listingsRepository.create({
+        sellerId: seller.id,
+        categoryId: category.id,
+        title: 'Public ID Listing',
+        description: 'Accessible by publicId',
+        price: '700000.00',
+        currency: 'UZS',
+        status: ListingStatus.Active,
+        location: 'Samarkand',
+      }),
+    );
+
+    try {
+      const ok = await request(app.getHttpServer())
+        .get(`/api/v1/listings/public/${activeListing.publicId}`)
+        .expect(200);
+
+      expect(ok.body).toMatchObject({
+        id: activeListing.id,
+        publicId: String(activeListing.publicId),
+        status: ListingStatus.Active,
+      });
+
+      await request(app.getHttpServer())
+        .get('/api/v1/listings/public/abc')
+        .expect(404);
+
+      await request(app.getHttpServer())
+        .get('/api/v1/listings/public/9223372036854775808')
+        .expect(404);
+    } finally {
+      await listingsRepository.delete({ id: activeListing.id });
+    }
   });
 
   it('lists active listings publicly and hides drafts', async () => {

@@ -21,6 +21,7 @@ export interface ListingImage {
 
 export interface Listing {
   id: string;
+  publicId: string;
   sellerId: string;
   categoryId: string;
   title: string;

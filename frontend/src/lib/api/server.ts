@@ -347,6 +347,28 @@ export async function getListing(
   return (await response.json()) as Listing;
 }
 
+export async function getListingByPublicId(
+  publicId: string,
+): Promise<Listing> {
+  const response = await fetch(
+    createApiUrl(
+      "/api/v1/listings/public/" + encodeURIComponent(publicId),
+    ),
+    {
+      cache: "no-store",
+    },
+  );
+
+  if (!response.ok) {
+    throw new ApiError(
+      response.status,
+      await getErrorMessage(response),
+    );
+  }
+
+  return (await response.json()) as Listing;
+}
+
 export interface GetListingsOptions {
   page?: number;
   limit?: number;
