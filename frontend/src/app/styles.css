@@ -1361,3 +1361,146 @@ p { margin: 0; font-size: 1.125rem; }
     height: 146px;
   }
 }
+
+
+/* Combined marketplace search */
+.marketplace-header-inner {
+  grid-template-columns: auto minmax(520px, 1fr) auto auto;
+}
+
+.marketplace-header-search {
+  display: grid;
+  min-height: 58px;
+  padding: 0;
+  overflow: hidden;
+  border: 1px solid #e0e5e9;
+  border-radius: 10px;
+  background: #fff;
+  grid-template-columns: minmax(220px, 1fr) minmax(260px, 0.65fr) auto;
+}
+
+.marketplace-query-field,
+.marketplace-location-field {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  gap: 12px;
+  padding: 0 20px;
+  color: #063b3d;
+}
+
+.marketplace-location-field {
+  border-left: 1px solid #e5e9ec;
+  font-weight: 700;
+}
+
+.marketplace-query-field input,
+.marketplace-location-field input {
+  width: 100%;
+  min-width: 0;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  color: #172033;
+  font: inherit;
+}
+
+.marketplace-location-field input {
+  font-weight: 700;
+}
+
+.marketplace-query-field input::placeholder,
+.marketplace-location-field input::placeholder {
+  color: #435466;
+  opacity: 1;
+}
+
+.marketplace-search-button {
+  display: inline-flex;
+  min-width: 132px;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 0 22px;
+  border: 0;
+  background: #033b3d;
+  color: #fff;
+  font: inherit;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.marketplace-search-button:hover {
+  background: #052f31;
+}
+
+@media (max-width: 1180px) {
+  .marketplace-header-inner {
+    grid-template-columns: auto minmax(440px, 1fr) auto;
+  }
+
+  .marketplace-create-button {
+    display: none;
+  }
+
+  .marketplace-header-search {
+    grid-template-columns: minmax(180px, 1fr) minmax(220px, 0.8fr) auto;
+  }
+}
+
+@media (max-width: 900px) {
+  .marketplace-header-inner {
+    grid-template-columns: 1fr auto;
+  }
+
+  .marketplace-create-button {
+    display: inline-flex;
+  }
+
+  .marketplace-header-search {
+    grid-column: 1 / -1;
+    grid-row: 2;
+    grid-template-columns: minmax(0, 1fr) minmax(200px, 0.8fr) auto;
+  }
+}
+
+@media (max-width: 640px) {
+  .marketplace-header-search {
+    overflow: visible;
+    border: 0;
+    background: transparent;
+    grid-template-columns: 1fr auto;
+    gap: 8px;
+  }
+
+  .marketplace-query-field,
+  .marketplace-location-field {
+    min-height: 46px;
+    border: 1px solid #e0e5e9;
+    border-radius: 10px;
+    background: #fff;
+  }
+
+  .marketplace-query-field {
+    grid-column: 1 / -1;
+  }
+
+  .marketplace-location-field {
+    border-left: 1px solid #e0e5e9;
+  }
+
+  .marketplace-search-button {
+    min-width: 48px;
+    padding: 0 12px;
+    border-radius: 10px;
+  }
+
+  .marketplace-search-button span {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+  }
+}
