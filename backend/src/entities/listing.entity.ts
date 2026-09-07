@@ -21,11 +21,17 @@ export enum ListingStatus {
   Archived = 'archived',
 }
 
+export enum ListingJobType {
+  Vacancy = 'vacancy',
+  Resume = 'resume',
+}
+
 @Entity({ name: 'listings' })
 @Index('IDX_listings_seller_id', ['sellerId'])
 @Index('IDX_listings_category_id', ['categoryId'])
 @Index('IDX_listings_status', ['status'])
 @Index('IDX_listings_created_at', ['createdAt'])
+@Index('IDX_listings_job_type', ['jobType'])
 export class Listing {
   @PrimaryGeneratedColumn('uuid')
   id!: string;
@@ -62,6 +68,15 @@ export class Listing {
 
   @Column({ type: 'varchar', nullable: true })
   location!: string | null;
+
+  @Column({
+    name: 'job_type',
+    type: 'enum',
+    enum: ListingJobType,
+    enumName: 'listing_job_type_enum',
+    nullable: true,
+  })
+  jobType!: ListingJobType | null;
 
   @CreateDateColumn({ name: 'created_at', type: 'timestamptz' })
   createdAt!: Date;
