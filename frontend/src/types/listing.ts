@@ -2,6 +2,8 @@ export type ListingStatus = 'draft' | 'active' | 'sold' | 'archived';
 
 export type ListingCurrency = 'UZS' | 'USD';
 
+export type ListingJobType = 'vacancy' | 'resume';
+
 export interface ListingSeller {
   id: string;
   displayName: string;
@@ -30,6 +32,7 @@ export interface Listing {
   currency: ListingCurrency;
   status: ListingStatus;
   location: string | null;
+  jobType: ListingJobType | null;
   createdAt: string;
   updatedAt: string;
   seller: ListingSeller;
@@ -63,6 +66,7 @@ export interface CreateListingInput {
   price: string;
   currency: ListingCurrency;
   location?: string;
+  jobType?: ListingJobType;
 }
 
 export interface Category {
