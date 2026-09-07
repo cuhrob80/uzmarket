@@ -12,7 +12,7 @@ import { ListingJobType } from '../../entities';
 export class UpdateListingDto {
   @IsOptional()
   @IsEnum(ListingJobType)
-  jobType?: ListingJobType;
+  jobType?: ListingJobType | null;
 
   @IsOptional()
   @IsUUID()
