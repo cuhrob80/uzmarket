@@ -1361,3 +1361,211 @@ p { margin: 0; font-size: 1.125rem; }
     height: 146px;
   }
 }
+
+
+/* Jobs hub and job search pages */
+.jobs-audience-cards {
+  display: grid;
+  margin-bottom: 24px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px;
+}
+
+.jobs-audience-cards > a {
+  display: flex;
+  min-height: 126px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 24px 28px;
+  border: 1px solid #dce6e2;
+  border-radius: 18px;
+  background: linear-gradient(135deg, #effcf5, #fff);
+  color: #172033;
+  text-decoration: none;
+}
+
+.jobs-audience-cards > a:last-child {
+  border-color: #dce4ef;
+  background: linear-gradient(135deg, #eef7ff, #fff);
+}
+
+.jobs-audience-cards > a:hover {
+  box-shadow: 0 14px 34px rgb(23 32 51 / 10%);
+  transform: translateY(-2px);
+}
+
+.jobs-audience-cards span:first-child {
+  display: grid;
+  gap: 8px;
+}
+
+.jobs-audience-cards strong {
+  font-size: 1.45rem;
+}
+
+.jobs-audience-cards small {
+  color: #687386;
+  font-size: 0.94rem;
+}
+
+.jobs-audience-cards > a > span:last-child {
+  display: grid;
+  width: 48px;
+  height: 48px;
+  flex: 0 0 auto;
+  place-items: center;
+  border-radius: 50%;
+  background: #079455;
+  color: #fff;
+  font-size: 1.5rem;
+}
+
+#job-categories .transport-category-card {
+  min-height: 220px;
+}
+
+#job-categories .transport-category-image {
+  height: 138px;
+}
+
+.jobs-search-page {
+  display: block;
+  min-height: 100vh;
+  padding: 0 0 72px;
+  background: #f7f9fb;
+}
+
+.jobs-search-container {
+  width: min(100%, 1440px);
+  margin: 0 auto;
+  padding: 34px 32px 0;
+}
+
+.jobs-search-heading {
+  margin-bottom: 24px;
+}
+
+.jobs-search-heading h1 {
+  margin: 0;
+  color: #111827;
+  font-size: clamp(2rem, 4vw, 3.25rem);
+  letter-spacing: -0.04em;
+}
+
+.jobs-search-heading > p:last-child {
+  margin-top: 10px;
+  color: #687386;
+  font-size: 1rem;
+}
+
+.jobs-mode-tabs {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 22px;
+}
+
+.jobs-mode-tabs a {
+  padding: 13px 20px;
+  border: 1px solid #dce3ea;
+  border-radius: 12px;
+  background: #fff;
+  color: #172033;
+  font-weight: 800;
+  text-decoration: none;
+}
+
+.jobs-mode-tabs a[aria-current='page'] {
+  border-color: #079455;
+  background: #079455;
+  color: #fff;
+}
+
+.jobs-direction-panel,
+.jobs-results {
+  padding: 24px;
+  border: 1px solid #e1e6ed;
+  border-radius: 18px;
+  background: #fff;
+}
+
+.jobs-direction-panel h2 {
+  margin: 0 0 18px;
+}
+
+.jobs-direction-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.jobs-direction-grid a {
+  display: inline-flex;
+  min-height: 44px;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 13px;
+  border: 1px solid #dfe5ec;
+  border-radius: 10px;
+  color: #172033;
+  text-decoration: none;
+}
+
+.jobs-direction-grid a:hover,
+.jobs-direction-grid a.is-active {
+  border-color: #079455;
+  background: #effcf5;
+  color: #08783e;
+}
+
+.jobs-direction-grid svg {
+  width: 24px;
+  height: 24px;
+}
+
+.jobs-results {
+  margin-top: 22px;
+}
+
+.jobs-results .home-section-header > span {
+  color: #687386;
+  font-weight: 700;
+}
+
+@media (max-width: 720px) {
+  .jobs-audience-cards {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  .jobs-audience-cards > a {
+    min-height: 104px;
+    padding: 20px;
+  }
+
+  #job-categories .transport-category-card {
+    min-height: 190px;
+  }
+
+  #job-categories .transport-category-image {
+    height: 116px;
+  }
+
+  .jobs-search-container {
+    padding: 24px 16px 0;
+  }
+
+  .jobs-mode-tabs {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .jobs-mode-tabs a {
+    text-align: center;
+  }
+
+  .jobs-direction-panel,
+  .jobs-results {
+    padding: 18px;
+  }
+}
