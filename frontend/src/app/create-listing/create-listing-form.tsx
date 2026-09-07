@@ -1,6 +1,6 @@
 'use client';
 
-import { useActionState } from 'react';
+import { useActionState, useState } from 'react';
 import {
   createListingAction,
   type CreateListingState,
@@ -39,6 +39,15 @@ export function CreateListingForm({
     createListingAction,
     initialState,
   );
+  const [selectedCategoryId, setSelectedCategoryId] = useState('');
+  const selectedCategory = categories.find(
+    (category) => category.id === selectedCategoryId,
+  );
+  const selectedParent = categories.find(
+    (category) => category.id === selectedCategory?.parentId,
+  );
+  const isJobsCategory =
+    selectedCategory?.slug === 'jobs' || selectedParent?.slug === 'jobs';
 
   return (
     <form action={formAction} className="create-listing-form">
@@ -47,7 +56,8 @@ export function CreateListingForm({
         <select
           name="categoryId"
           required
-          defaultValue=""
+          value={selectedCategoryId}
+          onChange={(event) => setSelectedCategoryId(event.target.value)}
           disabled={pending}
         >
           <option value="" disabled>
@@ -61,6 +71,19 @@ export function CreateListingForm({
           ))}
         </select>
       </label>
+
+      {isJobsCategory ? (
+        <label>
+          Тип объявления
+          <select name="jobType" defaultValue="" required disabled={pending}>
+            <option value="" disabled>
+              Выберите тип
+            </option>
+            <option value="vacancy">Вакансия — ищу сотрудника</option>
+            <option value="resume">Резюме — ищу работу</option>
+          </select>
+        </label>
+      ) : null}
 
       <label>
         Название объявления
