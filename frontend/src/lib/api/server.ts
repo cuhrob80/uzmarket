@@ -8,6 +8,7 @@ import type {
   CreateListingInput,
   Listing,
   ListingCurrency,
+  ListingJobType,
   ListingsPage,
 } from '@/types/listing';
 
@@ -378,6 +379,7 @@ export interface GetListingsOptions {
   maxPrice?: number;
   currency?: 'UZS' | 'USD';
   location?: string;
+  jobType?: ListingJobType;
 }
 
 export async function getListings(
@@ -435,6 +437,10 @@ export async function getListings(
       'location',
       options.location.trim(),
     );
+  }
+
+  if (options.jobType) {
+    url.searchParams.set('jobType', options.jobType);
   }
 
   const response = await fetch(url, {
