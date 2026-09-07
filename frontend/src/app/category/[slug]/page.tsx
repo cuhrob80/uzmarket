@@ -209,6 +209,25 @@ function CategoryHub({
           </span>
         </div>
 
+        {category.slug === 'jobs' ? (
+          <nav className="jobs-audience-cards" aria-label="Выберите раздел работы">
+            <Link href="/rabota/vakansii">
+              <span>
+                <strong>Найти работу</strong>
+                <small>Смотреть вакансии работодателей</small>
+              </span>
+              <span aria-hidden="true">→</span>
+            </Link>
+            <Link href="/rabota/rezume">
+              <span>
+                <strong>Найти сотрудника</strong>
+                <small>Смотреть резюме специалистов</small>
+              </span>
+              <span aria-hidden="true">→</span>
+            </Link>
+          </nav>
+        ) : null}
+
         <section
           id={category.slug === 'jobs' ? 'job-categories' : undefined}
           className="transport-category-grid"
