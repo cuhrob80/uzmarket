@@ -21,6 +21,18 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       changeFrequency: 'hourly',
       priority: 0.9,
     },
+    {
+      url: absoluteUrl('/rabota/vakansii'),
+      lastModified: now,
+      changeFrequency: 'hourly',
+      priority: 0.9,
+    },
+    {
+      url: absoluteUrl('/rabota/rezume'),
+      lastModified: now,
+      changeFrequency: 'hourly',
+      priority: 0.9,
+    },
     ...categories.map((category) => ({
       url: getCategoryUrl(category.slug),
       lastModified: now,
