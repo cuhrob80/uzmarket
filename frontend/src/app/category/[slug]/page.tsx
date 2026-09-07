@@ -11,6 +11,7 @@ import {
 import { getListingPublicPath } from '@/lib/listing-url';
 import type { Category, Listing } from '@/types/listing';
 import { TransportCategoryIcon } from '@/components/transport-category-icon';
+import { JobCategoryIcon } from '@/components/job-category-icon';
 import { MarketplaceHeader } from '@/components/marketplace-header';
 import { absoluteUrl, getCategorySeo, getCategoryUrl } from '@/lib/seo';
 
@@ -197,7 +198,9 @@ function CategoryHub({
             <p className="transport-eyebrow">Категории UzMarket</p>
             <h1>{category.name}</h1>
             <p className="transport-subtitle">
-              Выберите нужный раздел, чтобы посмотреть объявления
+              {category.slug === 'jobs'
+                ? 'Вакансии и резюме по всему Узбекистану'
+                : 'Выберите нужный раздел, чтобы посмотреть объявления'}
             </p>
           </div>
 
@@ -206,7 +209,11 @@ function CategoryHub({
           </span>
         </div>
 
-        <section className="transport-category-grid" aria-label="Разделы категории">
+        <section
+          id={category.slug === 'jobs' ? 'job-categories' : undefined}
+          className="transport-category-grid"
+          aria-label="Разделы категории"
+        >
           {children.map((child, index) => (
             <Link
               key={child.id}
@@ -217,7 +224,11 @@ function CategoryHub({
             >
               <span className="transport-category-image">
                 <span className="transport-category-icon" aria-hidden="true">
-                  <TransportCategoryIcon slug={child.slug} />
+                  {child.slug.startsWith('jobs-') ? (
+                    <JobCategoryIcon slug={child.slug} />
+                  ) : (
+                    <TransportCategoryIcon slug={child.slug} />
+                  )}
                 </span>
                 {categoryImages[child.slug] ? (
                   <Image
