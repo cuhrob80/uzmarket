@@ -1,7 +1,7 @@
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { ILike, type FindOptionsWhere, Repository } from 'typeorm';
-import { Category, Listing, ListingImage, ListingStatus, User } from '../entities';
+import { Category, Listing, ListingImage, ListingJobType, ListingStatus, User } from '../entities';
 import { CreateListingDto } from './dto/create-listing.dto';
 import { ListListingsQueryDto } from './dto/list-listings-query.dto';
 import { ListMineListingsQueryDto } from './dto/list-mine-listings-query.dto';
@@ -33,6 +33,8 @@ export class ListingsService {
       throw new BadRequestException('Category does not exist');
     }
 
+    this.validateJobType(category, dto.jobType);
+
     const listing = this.listingsRepository.create({
       sellerId,
       categoryId: dto.categoryId,
@@ -42,6 +44,7 @@ export class ListingsService {
       currency: dto.currency ?? 'UZS',
       status: ListingStatus.Draft,
       location: dto.location ?? null,
+      jobType: dto.jobType ?? null,
     });
 
     return this.listingsRepository.save(listing);
@@ -217,6 +220,12 @@ export class ListingsService {
       });
     }
 
+    if (query.jobType) {
+      queryBuilder.andWhere('listing.jobType = :jobType', {
+        jobType: query.jobType,
+      });
+    }
+
     const search = query.search?.trim();
 
     if (search) {
@@ -365,6 +374,26 @@ export class ListingsService {
     return listing;
   }
 
+  private validateJobType(
+    category: Category,
+    jobType: ListingJobType | undefined,
+  ): void {
+    const isJobsCategory =
+      category.slug === 'jobs' || category.slug.startsWith('jobs-');
+
+    if (isJobsCategory && !jobType) {
+      throw new BadRequestException(
+        'Job listings require vacancy or resume type',
+      );
+    }
+
+    if (!isJobsCategory && jobType) {
+      throw new BadRequestException(
+        'Job type is only allowed for jobs categories',
+      );
+    }
+  }
+
   private toResponse(listing: Listing): ListingResponseDto {
     return {
       id: listing.id,
@@ -377,6 +406,7 @@ export class ListingsService {
       currency: listing.currency,
       status: listing.status,
       location: listing.location,
+      jobType: listing.jobType,
       createdAt: listing.createdAt,
       updatedAt: listing.updatedAt,
       seller: {
