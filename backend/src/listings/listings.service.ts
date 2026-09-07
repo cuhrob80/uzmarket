@@ -64,15 +64,20 @@ export class ListingsService {
       throw new BadRequestException('Listing cannot be edited in its current status');
     }
 
-    if (dto.categoryId && dto.categoryId !== listing.categoryId) {
-      const category = await this.categoriesRepository.findOne({
-        where: { id: dto.categoryId, isActive: true },
-      });
+    const category = await this.categoriesRepository.findOne({
+      where: {
+        id: dto.categoryId ?? listing.categoryId,
+        isActive: true,
+      },
+    });
 
-      if (!category) {
-        throw new BadRequestException('Category does not exist');
-      }
+    if (!category) {
+      throw new BadRequestException('Category does not exist');
     }
+
+    const effectiveJobType =
+      dto.jobType !== undefined ? dto.jobType : listing.jobType;
+    this.validateJobType(category, effectiveJobType);
 
     this.listingsRepository.merge(listing, dto);
     await this.listingsRepository.save(listing);
@@ -94,6 +99,8 @@ export class ListingsService {
     if (!category) {
       throw new BadRequestException('Category does not exist');
     }
+
+    this.validateJobType(category, listing.jobType);
 
     if (Number(listing.price) <= 0) {
       throw new BadRequestException(
@@ -376,7 +383,7 @@ export class ListingsService {
 
   private validateJobType(
     category: Category,
-    jobType: ListingJobType | undefined,
+    jobType: ListingJobType | null | undefined,
   ): void {
     const isJobsCategory =
       category.slug === 'jobs' || category.slug.startsWith('jobs-');
