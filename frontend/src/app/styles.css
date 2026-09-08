@@ -1870,3 +1870,125 @@ p { margin: 0; font-size: 1.125rem; }
     aspect-ratio: 4 / 3;
   }
 }
+
+
+/* Multiple photo selection and rotation */
+
+.photo-selection-header {
+  display: flex;
+  max-width: 100%;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  color: #687386;
+}
+
+.photo-selection-header strong {
+  color: #172033;
+}
+
+.photo-selection-grid {
+  display: grid;
+  width: 100%;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.photo-selection-card {
+  min-width: 0;
+  padding: 10px;
+  border: 1px solid #dfe5ec;
+  border-radius: 14px;
+  background: #fff;
+}
+
+.photo-selection-image {
+  position: relative;
+  display: grid;
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  place-items: center;
+  overflow: hidden;
+  border-radius: 10px;
+  background: #eef1f5;
+}
+
+.photo-selection-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  transition: transform 180ms ease;
+}
+
+.photo-selection-cover {
+  position: absolute;
+  left: 8px;
+  bottom: 8px;
+  padding: 5px 8px;
+  border-radius: 999px;
+  background: rgb(23 32 51 / 88%);
+  color: #fff;
+  font-size: 0.72rem;
+  font-weight: 700;
+}
+
+.photo-selection-card > p {
+  margin: 9px 0;
+  overflow: hidden;
+  color: #526075;
+  font-size: 0.8rem;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.photo-selection-actions {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 7px;
+}
+
+.photo-upload-form .photo-selection-actions button {
+  min-height: 36px;
+  padding: 6px 8px;
+  border: 1px solid #cfd6e0;
+  border-radius: 8px;
+  background: #fff;
+  color: #354052;
+  font-size: 0.78rem;
+  cursor: pointer;
+}
+
+.photo-upload-form .photo-selection-actions button:hover {
+  background: #eef1f5;
+}
+
+.photo-upload-form .photo-selection-actions .photo-preview-remove {
+  color: #b42318;
+}
+
+@media (max-width: 900px) {
+  .photo-selection-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 640px) {
+  .photo-selection-header {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .photo-selection-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .photo-selection-actions {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 380px) {
+  .photo-selection-grid {
+    grid-template-columns: 1fr;
+  }
+}
