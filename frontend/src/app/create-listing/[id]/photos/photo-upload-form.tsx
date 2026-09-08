@@ -25,62 +25,6 @@ interface SelectedPhoto {
   id: string;
   file: File;
   previewUrl: string;
-  rotation: 0 | 90 | 180 | 270;
-}
-
-function rotatePhoto(
-  photo: SelectedPhoto,
-): Promise<File> {
-  if (photo.rotation === 0) {
-    return Promise.resolve(photo.file);
-  }
-
-  return createImageBitmap(photo.file).then((bitmap) => {
-    const swapSides =
-      photo.rotation === 90 || photo.rotation === 270;
-    const canvas = document.createElement('canvas');
-
-    canvas.width = swapSides ? bitmap.height : bitmap.width;
-    canvas.height = swapSides ? bitmap.width : bitmap.height;
-
-    const context = canvas.getContext('2d');
-
-    if (!context) {
-      bitmap.close();
-      throw new Error('Не удалось повернуть фотографию.');
-    }
-
-    context.translate(canvas.width / 2, canvas.height / 2);
-    context.rotate((photo.rotation * Math.PI) / 180);
-    context.drawImage(
-      bitmap,
-      -bitmap.width / 2,
-      -bitmap.height / 2,
-    );
-    bitmap.close();
-
-    return new Promise<File>((resolve, reject) => {
-      canvas.toBlob(
-        (blob) => {
-          if (!blob) {
-            reject(
-              new Error('Не удалось подготовить фотографию.'),
-            );
-            return;
-          }
-
-          resolve(
-            new File([blob], photo.file.name, {
-              type: blob.type || photo.file.type,
-              lastModified: Date.now(),
-            }),
-          );
-        },
-        photo.file.type,
-        0.92,
-      );
-    });
-  });
 }
 
 export function PhotoUploadForm({
@@ -127,58 +71,15 @@ export function PhotoUploadForm({
     });
   }
 
-  function rotateSelectedPhoto(id: string) {
-    setSelectedPhotos((current) =>
-      current.map((photo) =>
-        photo.id === id
-          ? {
-              ...photo,
-              rotation: ((photo.rotation + 90) % 360) as
-                | 0
-                | 90
-                | 180
-                | 270,
-            }
-          : photo,
-      ),
-    );
-  }
-
-  async function submitSelectedPhotos() {
-    if (selectedPhotos.length === 0) {
-      setClientError('Выберите хотя бы одну фотографию.');
-      return;
-    }
-
-    setClientError(null);
-
-    try {
-      const files = await Promise.all(
-        selectedPhotos.map(rotatePhoto),
-      );
-      const formData = new FormData();
-
-      files.forEach((file) => formData.append('files', file));
-
-      startTransition(() => {
-        formAction(formData);
-      });
-    } catch (error: unknown) {
-      setClientError(
-        error instanceof Error
-          ? error.message
-          : 'Не удалось подготовить фотографии.',
-      );
-    }
-  }
 
   return (
     <div className="photo-upload-form">
       <label className="photo-upload-box">
         <span className="photo-upload-title">
+          <span className="photo-camera-icon" aria-hidden="true">▣</span>
           {limitReached
             ? 'Добавлено 10 фотографий'
-            : 'Выбрать фотографии'}
+            : 'Добавить фотографии'}
         </span>
 
         <span className="photo-upload-description">
@@ -214,14 +115,19 @@ export function PhotoUploadForm({
                 id: crypto.randomUUID(),
                 file,
                 previewUrl,
-                rotation: 0 as const,
               };
             });
 
-            setSelectedPhotos((current) => [
-              ...current,
-              ...newPhotos,
-            ]);
+            setSelectedPhotos(newPhotos);
+
+            const formData = new FormData();
+            acceptedFiles.forEach((file) =>
+              formData.append('files', file),
+            );
+
+            startTransition(() => {
+              formAction(formData);
+            });
 
             if (inputRef.current) {
               inputRef.current.value = '';
@@ -237,7 +143,7 @@ export function PhotoUploadForm({
               Выбрано: {selectedPhotos.length}
             </strong>
             <span>
-              Проверьте фотографии перед загрузкой
+              Фотографии загружаются автоматически
             </span>
           </div>
 
@@ -272,16 +178,6 @@ export function PhotoUploadForm({
                 <div className="photo-selection-actions">
                   <button
                     type="button"
-                    onClick={() =>
-                      rotateSelectedPhoto(photo.id)
-                    }
-                    disabled={pending}
-                    aria-label="Повернуть фотографию на 90 градусов"
-                  >
-                    ↻ Повернуть
-                  </button>
-                  <button
-                    type="button"
                     className="photo-preview-remove"
                     onClick={() => removePhoto(photo.id)}
                     disabled={pending}
@@ -300,17 +196,6 @@ export function PhotoUploadForm({
           {clientError || state.error}
         </p>
       ) : null}
-
-      <button
-        type="button"
-        className="photo-upload-submit"
-        disabled={pending || selectedPhotos.length === 0}
-        onClick={submitSelectedPhotos}
-      >
-        {pending
-          ? 'Загружаем…'
-          : `Загрузить фотографии (${selectedPhotos.length})`}
-      </button>
     </div>
   );
 }
