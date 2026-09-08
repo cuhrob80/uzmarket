@@ -2220,3 +2220,22 @@ p { margin: 0; font-size: 1.125rem; }
     min-width: 0;
   }
 }
+
+
+.listing-photo-grid > .photo-upload-form {
+  display: grid;
+  min-width: 0;
+  align-self: start;
+}
+
+.listing-photo-grid > .photo-upload-form .photo-upload-box {
+  width: 100%;
+  min-height: 0;
+  aspect-ratio: 4 / 3;
+}
+
+.listing-photo-grid > .photo-upload-form .photo-selection-header,
+.listing-photo-grid > .photo-upload-form .photo-selection-grid,
+.listing-photo-grid > .photo-upload-form .form-error {
+  grid-column: 1 / -1;
+}
