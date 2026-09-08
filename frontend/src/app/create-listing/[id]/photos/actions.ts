@@ -13,6 +13,11 @@ export interface PhotoActionState {
   error: string | null;
 }
 
+function revalidateListingPages(listingId: string): void {
+  revalidatePath(`/create-listing/${listingId}`);
+  revalidatePath(`/create-listing/${listingId}/photos`);
+}
+
 export async function uploadPhotoAction(
   listingId: string,
   _previousState: PhotoActionState,
@@ -52,7 +57,7 @@ export async function uploadPhotoAction(
     };
   }
 
-  revalidatePath(`/create-listing/${listingId}/photos`);
+  revalidateListingPages(listingId);
 
   return { error: null };
 }
@@ -71,7 +76,7 @@ export async function deletePhotoAction(
     throw error;
   }
 
-  revalidatePath(`/create-listing/${listingId}/photos`);
+  revalidateListingPages(listingId);
 }
 
 export async function reorderPhotosAction(
@@ -88,6 +93,5 @@ export async function reorderPhotosAction(
     throw error;
   }
 
-  revalidatePath(`/create-listing/${listingId}/photos`);
+  revalidateListingPages(listingId);
 }
-
