@@ -10,6 +10,11 @@ interface CategorySeo {
 }
 
 const categorySeo: Record<string, CategorySeo> = {
+  'jobs': {
+    title: 'Работа в Узбекистане — вакансии и резюме',
+    description:
+      'Вакансии и резюме по всему Узбекистану. Находите работу и сотрудников в торговле, строительстве, логистике, IT, медицине и других сферах на UzMarket.',
+  },
   'real-estate': {
     title: 'Недвижимость в Узбекистане',
     description:

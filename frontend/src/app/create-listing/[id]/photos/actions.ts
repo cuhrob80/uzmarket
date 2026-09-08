@@ -13,19 +13,35 @@ export interface PhotoActionState {
   error: string | null;
 }
 
+function revalidateListingPages(listingId: string): void {
+  revalidatePath(`/create-listing/${listingId}`);
+  revalidatePath(`/create-listing/${listingId}/photos`);
+}
+
 export async function uploadPhotoAction(
   listingId: string,
   _previousState: PhotoActionState,
   formData: FormData,
 ): Promise<PhotoActionState> {
-  const file = formData.get('file');
+  const files = formData
+    .getAll('files')
+    .filter(
+      (file): file is File =>
+        file instanceof File && file.size > 0,
+    );
 
-  if (!(file instanceof File) || file.size === 0) {
-    return { error: 'Выберите фотографию' };
+  if (files.length === 0) {
+    return { error: 'Выберите хотя бы одну фотографию' };
+  }
+
+  if (files.length > 10) {
+    return { error: 'Можно загрузить не более 10 фотографий' };
   }
 
   try {
-    await uploadListingImage(listingId, file);
+    for (const file of files) {
+      await uploadListingImage(listingId, file);
+    }
   } catch (error: unknown) {
     if (error instanceof ApiError && error.status === 401) {
       redirect('/login');
@@ -41,7 +57,7 @@ export async function uploadPhotoAction(
     };
   }
 
-  revalidatePath(`/create-listing/${listingId}/photos`);
+  revalidateListingPages(listingId);
 
   return { error: null };
 }
@@ -60,7 +76,7 @@ export async function deletePhotoAction(
     throw error;
   }
 
-  revalidatePath(`/create-listing/${listingId}/photos`);
+  revalidateListingPages(listingId);
 }
 
 export async function reorderPhotosAction(
@@ -77,6 +93,5 @@ export async function reorderPhotosAction(
     throw error;
   }
 
-  revalidatePath(`/create-listing/${listingId}/photos`);
+  revalidateListingPages(listingId);
 }
-

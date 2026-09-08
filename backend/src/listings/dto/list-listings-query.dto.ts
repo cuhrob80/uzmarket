@@ -1,5 +1,6 @@
 import { Type } from 'class-transformer';
 import {
+  IsEnum,
   IsIn,
   IsInt,
   IsNumber,
@@ -10,8 +11,13 @@ import {
   MaxLength,
   Min,
 } from 'class-validator';
+import { ListingJobType } from '../../entities';
 
 export class ListListingsQueryDto {
+  @IsOptional()
+  @IsEnum(ListingJobType)
+  jobType?: ListingJobType;
+
   @IsOptional()
   @IsUUID()
   categoryId?: string;

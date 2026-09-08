@@ -1,7 +1,7 @@
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { ILike, type FindOptionsWhere, Repository } from 'typeorm';
-import { Category, Listing, ListingImage, ListingStatus, User } from '../entities';
+import { Category, Listing, ListingImage, ListingJobType, ListingStatus, User } from '../entities';
 import { CreateListingDto } from './dto/create-listing.dto';
 import { ListListingsQueryDto } from './dto/list-listings-query.dto';
 import { ListMineListingsQueryDto } from './dto/list-mine-listings-query.dto';
@@ -33,6 +33,8 @@ export class ListingsService {
       throw new BadRequestException('Category does not exist');
     }
 
+    this.validateJobType(category, dto.jobType);
+
     const listing = this.listingsRepository.create({
       sellerId,
       categoryId: dto.categoryId,
@@ -42,6 +44,7 @@ export class ListingsService {
       currency: dto.currency ?? 'UZS',
       status: ListingStatus.Draft,
       location: dto.location ?? null,
+      jobType: dto.jobType ?? null,
     });
 
     return this.listingsRepository.save(listing);
@@ -61,15 +64,20 @@ export class ListingsService {
       throw new BadRequestException('Listing cannot be edited in its current status');
     }
 
-    if (dto.categoryId && dto.categoryId !== listing.categoryId) {
-      const category = await this.categoriesRepository.findOne({
-        where: { id: dto.categoryId, isActive: true },
-      });
+    const category = await this.categoriesRepository.findOne({
+      where: {
+        id: dto.categoryId ?? listing.categoryId,
+        isActive: true,
+      },
+    });
 
-      if (!category) {
-        throw new BadRequestException('Category does not exist');
-      }
+    if (!category) {
+      throw new BadRequestException('Category does not exist');
     }
+
+    const effectiveJobType =
+      dto.jobType !== undefined ? dto.jobType : listing.jobType;
+    this.validateJobType(category, effectiveJobType);
 
     this.listingsRepository.merge(listing, dto);
     await this.listingsRepository.save(listing);
@@ -92,6 +100,8 @@ export class ListingsService {
       throw new BadRequestException('Category does not exist');
     }
 
+    this.validateJobType(category, listing.jobType);
+
     if (Number(listing.price) <= 0) {
       throw new BadRequestException(
         'Listing price must be greater than zero before publishing',
@@ -104,7 +114,7 @@ export class ListingsService {
         where: { listingId: listing.id },
       });
 
-    if (imageCount < 1) {
+    if (!listing.jobType && imageCount < 1) {
       throw new BadRequestException(
         'Listing must have at least one image before publishing',
       );
@@ -214,6 +224,12 @@ export class ListingsService {
     if (query.categoryId) {
       queryBuilder.andWhere('listing.categoryId = :categoryId', {
         categoryId: query.categoryId,
+      });
+    }
+
+    if (query.jobType) {
+      queryBuilder.andWhere('listing.jobType = :jobType', {
+        jobType: query.jobType,
       });
     }
 
@@ -365,6 +381,26 @@ export class ListingsService {
     return listing;
   }
 
+  private validateJobType(
+    category: Category,
+    jobType: ListingJobType | null | undefined,
+  ): void {
+    const isJobsCategory =
+      category.slug === 'jobs' || category.slug.startsWith('jobs-');
+
+    if (isJobsCategory && !jobType) {
+      throw new BadRequestException(
+        'Job listings require vacancy or resume type',
+      );
+    }
+
+    if (!isJobsCategory && jobType) {
+      throw new BadRequestException(
+        'Job type is only allowed for jobs categories',
+      );
+    }
+  }
+
   private toResponse(listing: Listing): ListingResponseDto {
     return {
       id: listing.id,
@@ -377,6 +413,7 @@ export class ListingsService {
       currency: listing.currency,
       status: listing.status,
       location: listing.location,
+      jobType: listing.jobType,
       createdAt: listing.createdAt,
       updatedAt: listing.updatedAt,
       seller: {

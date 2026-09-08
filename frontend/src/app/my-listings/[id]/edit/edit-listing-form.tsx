@@ -17,6 +17,7 @@ interface EditListingFormProps {
 
 const initialState: EditListingState = {
   error: null,
+  success: null,
 };
 
 export function EditListingForm({
@@ -123,8 +124,14 @@ export function EditListingForm({
       </label>
 
       {state.error ? (
-        <p className="form-error">
+        <p className="form-error" role="alert">
           {state.error}
+        </p>
+      ) : null}
+
+      {state.success ? (
+        <p className="form-success" role="status">
+          {state.success}
         </p>
       ) : null}
 

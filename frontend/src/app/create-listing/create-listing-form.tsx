@@ -1,6 +1,6 @@
 'use client';
 
-import { useActionState } from 'react';
+import { useActionState, useState } from 'react';
 import {
   createListingAction,
   type CreateListingState,
@@ -15,21 +15,74 @@ const initialState: CreateListingState = {
   error: null,
 };
 
-function getCategoryLabel(
+function getCategoryDepth(
   category: Category,
   categories: Category[],
-): string {
-  if (!category.parentId) {
-    return category.name;
+): number {
+  let depth = 0;
+  let parentId = category.parentId;
+  const visited = new Set<string>();
+
+  while (parentId && !visited.has(parentId)) {
+    visited.add(parentId);
+    const parent = categories.find((item) => item.id === parentId);
+
+    if (!parent) {
+      break;
+    }
+
+    depth += 1;
+    parentId = parent.parentId;
   }
 
-  const parent = categories.find(
-    (item) => item.id === category.parentId,
-  );
+  return depth;
+}
 
-  return parent
-    ? `${parent.name} → ${category.name}`
-    : category.name;
+function belongsToRoot(
+  category: Category | undefined,
+  rootSlug: string,
+  categories: Category[],
+): boolean {
+  let current = category;
+  const visited = new Set<string>();
+
+  while (current && !visited.has(current.id)) {
+    if (current.slug === rootSlug) {
+      return true;
+    }
+
+    visited.add(current.id);
+    current = categories.find((item) => item.id === current?.parentId);
+  }
+
+  return false;
+}
+
+function getRootCategories(categories: Category[]): Category[] {
+  return categories
+    .filter((category) => !category.parentId)
+    .sort(
+      (a, b) =>
+        a.sortOrder - b.sortOrder || a.name.localeCompare(b.name, 'ru'),
+    );
+}
+
+function getRootOptions(
+  root: Category,
+  categories: Category[],
+): Category[] {
+  return categories
+    .filter((category) => belongsToRoot(category, root.slug, categories))
+    .sort((a, b) => {
+      const depthDifference =
+        getCategoryDepth(a, categories) - getCategoryDepth(b, categories);
+
+      if (depthDifference !== 0) {
+        return depthDifference;
+      }
+
+      return a.sortOrder - b.sortOrder || a.name.localeCompare(b.name, 'ru');
+    });
 }
 
 export function CreateListingForm({
@@ -39,6 +92,16 @@ export function CreateListingForm({
     createListingAction,
     initialState,
   );
+  const [selectedCategoryId, setSelectedCategoryId] = useState('');
+  const selectedCategory = categories.find(
+    (category) => category.id === selectedCategoryId,
+  );
+  const isJobsCategory = belongsToRoot(
+    selectedCategory,
+    'jobs',
+    categories,
+  );
+  const rootCategories = getRootCategories(categories);
 
   return (
     <form action={formAction} className="create-listing-form">
@@ -47,20 +110,46 @@ export function CreateListingForm({
         <select
           name="categoryId"
           required
-          defaultValue=""
+          value={selectedCategoryId}
+          onChange={(event) => setSelectedCategoryId(event.target.value)}
           disabled={pending}
         >
           <option value="" disabled>
             Выберите категорию
           </option>
 
-          {categories.map((category) => (
-            <option key={category.id} value={category.id}>
-              {getCategoryLabel(category, categories)}
-            </option>
+          {rootCategories.map((root) => (
+            <optgroup key={root.id} label={root.name}>
+              {getRootOptions(root, categories).map((category) => {
+                const depth = getCategoryDepth(category, categories);
+                const label =
+                  depth === 0
+                    ? `Все объявления — ${root.name}`
+                    : `${'— '.repeat(depth)}${category.name}`;
+
+                return (
+                  <option key={category.id} value={category.id}>
+                    {label}
+                  </option>
+                );
+              })}
+            </optgroup>
           ))}
         </select>
       </label>
+
+      {isJobsCategory ? (
+        <label>
+          Тип объявления
+          <select name="jobType" defaultValue="" required disabled={pending}>
+            <option value="" disabled>
+              Выберите тип
+            </option>
+            <option value="vacancy">Вакансия — ищу сотрудника</option>
+            <option value="resume">Резюме — ищу работу</option>
+          </select>
+        </label>
+      ) : null}
 
       <label>
         Название объявления
@@ -135,12 +224,12 @@ export function CreateListingForm({
       ) : null}
 
       <button type="submit" disabled={pending}>
-        {pending ? 'Сохраняем…' : 'Продолжить'}
+        {pending ? 'Сохраняем…' : 'Сохранить и добавить фотографии'}
       </button>
 
       <p className="create-listing-hint">
-        Сначала объявление сохранится как черновик. После этого
-        можно будет добавить фотографии и опубликовать его.
+        Объявление сохранится как черновик и откроется единый экран:
+        данные, фотографии и публикация.
       </p>
     </form>
   );

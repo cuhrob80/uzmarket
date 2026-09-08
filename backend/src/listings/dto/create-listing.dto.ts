@@ -1,4 +1,5 @@
 import {
+  IsEnum,
   IsOptional,
   IsString,
   IsUUID,
@@ -6,7 +7,12 @@ import {
   MaxLength,
   MinLength,
 } from 'class-validator';
+import { ListingJobType } from '../../entities';
 export class CreateListingDto {
+  @IsOptional()
+  @IsEnum(ListingJobType)
+  jobType?: ListingJobType;
+
   @IsUUID()
   categoryId!: string;
 

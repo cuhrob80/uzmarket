@@ -8,6 +8,7 @@ import type {
   CreateListingInput,
   Listing,
   ListingCurrency,
+  ListingJobType,
   ListingsPage,
 } from '@/types/listing';
 
@@ -70,7 +71,9 @@ export async function setAuthCookie(accessToken: string): Promise<void> {
 
   cookieStore.set(AUTH_COOKIE_NAME, accessToken, {
     httpOnly: true,
-    secure: process.env.NODE_ENV === 'production',
+    secure:
+      process.env.AUTH_COOKIE_SECURE === 'true' ||
+      process.env.SITE_URL?.startsWith('https://') === true,
     sameSite: 'lax',
     path: '/',
     maxAge: 15 * 60,
@@ -378,6 +381,7 @@ export interface GetListingsOptions {
   maxPrice?: number;
   currency?: 'UZS' | 'USD';
   location?: string;
+  jobType?: ListingJobType;
 }
 
 export async function getListings(
@@ -435,6 +439,10 @@ export async function getListings(
       'location',
       options.location.trim(),
     );
+  }
+
+  if (options.jobType) {
+    url.searchParams.set('jobType', options.jobType);
   }
 
   const response = await fetch(url, {

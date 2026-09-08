@@ -1,4 +1,4 @@
-import { ListingStatus } from '../../entities';
+import { ListingJobType, ListingStatus } from '../../entities';
 
 export interface ListingSellerResponse {
   id: string;
@@ -28,6 +28,7 @@ export interface ListingResponseDto {
   currency: string;
   status: ListingStatus;
   location: string | null;
+  jobType: ListingJobType | null;
   createdAt: Date;
   updatedAt: Date;
   seller: ListingSellerResponse;

@@ -2,7 +2,7 @@
 
 import { redirect } from 'next/navigation';
 import { ApiError, createListing } from '@/lib/api/server';
-import type { ListingCurrency } from '@/types/listing';
+import type { ListingCurrency, ListingJobType } from '@/types/listing';
 
 export interface CreateListingState {
   error: string | null;
@@ -18,6 +18,7 @@ export async function createListingAction(
   const price = formData.get('price');
   const currency = formData.get('currency');
   const location = formData.get('location');
+  const jobType = formData.get('jobType');
 
   if (
     typeof categoryId !== 'string' ||
@@ -54,6 +55,10 @@ export async function createListingAction(
       price: price.trim(),
       currency: currency as ListingCurrency,
       location: location.trim() || undefined,
+      jobType:
+        jobType === 'vacancy' || jobType === 'resume'
+          ? (jobType as ListingJobType)
+          : undefined,
     });
 
     listingId = listing.id;
@@ -73,6 +78,6 @@ export async function createListingAction(
   }
 
   redirect(
-    `/create-listing/${encodeURIComponent(listingId)}/photos`,
+    `/create-listing/${encodeURIComponent(listingId)}`,
   );
 }
