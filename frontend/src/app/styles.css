@@ -2125,3 +2125,98 @@ p { margin: 0; font-size: 1.125rem; }
     width: 100%;
   }
 }
+
+
+/* Avito-like automatic photo picker */
+
+.photo-upload-box {
+  display: grid;
+  width: 168px;
+  min-height: 150px;
+  place-items: center;
+  align-content: center;
+  gap: 8px;
+  padding: 18px;
+  border: 1px solid #dfe5ec;
+  border-radius: 14px;
+  background: #f2f3f5;
+  cursor: pointer;
+  text-align: center;
+}
+
+.photo-upload-box:hover {
+  border-color: #079455;
+  background: #eaf8f1;
+}
+
+.photo-upload-box input[type='file'] {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.photo-upload-title {
+  display: grid;
+  justify-items: center;
+  gap: 8px;
+  font-weight: 800;
+}
+
+.photo-camera-icon {
+  display: grid;
+  width: 54px;
+  height: 54px;
+  place-items: center;
+  border-radius: 50%;
+  background: #fff;
+  color: #172033;
+  font-size: 2rem;
+  line-height: 1;
+}
+
+.photo-upload-description {
+  color: #687386;
+  font-size: 0.75rem;
+  line-height: 1.35;
+}
+
+.listing-photo-preview .photo-rotate-button {
+  position: absolute;
+  z-index: 2;
+  top: 8px;
+  left: 8px;
+  display: grid;
+  width: 34px;
+  height: 34px;
+  place-items: center;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: rgb(255 255 255 / 94%);
+  color: #172033;
+  font-size: 1.25rem;
+  font-weight: 800;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgb(23 32 51 / 18%);
+}
+
+@media (max-width: 520px) {
+  .photo-upload-box {
+    width: 100%;
+    min-height: 132px;
+  }
+
+  .listing-photo-grid,
+  .photo-selection-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .listing-photo-card,
+  .photo-selection-card {
+    min-width: 0;
+  }
+}
