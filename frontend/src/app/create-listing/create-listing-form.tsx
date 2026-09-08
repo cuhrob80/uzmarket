@@ -15,21 +15,74 @@ const initialState: CreateListingState = {
   error: null,
 };
 
-function getCategoryLabel(
+function getCategoryDepth(
   category: Category,
   categories: Category[],
-): string {
-  if (!category.parentId) {
-    return category.name;
+): number {
+  let depth = 0;
+  let parentId = category.parentId;
+  const visited = new Set<string>();
+
+  while (parentId && !visited.has(parentId)) {
+    visited.add(parentId);
+    const parent = categories.find((item) => item.id === parentId);
+
+    if (!parent) {
+      break;
+    }
+
+    depth += 1;
+    parentId = parent.parentId;
   }
 
-  const parent = categories.find(
-    (item) => item.id === category.parentId,
-  );
+  return depth;
+}
 
-  return parent
-    ? `${parent.name} → ${category.name}`
-    : category.name;
+function belongsToRoot(
+  category: Category | undefined,
+  rootSlug: string,
+  categories: Category[],
+): boolean {
+  let current = category;
+  const visited = new Set<string>();
+
+  while (current && !visited.has(current.id)) {
+    if (current.slug === rootSlug) {
+      return true;
+    }
+
+    visited.add(current.id);
+    current = categories.find((item) => item.id === current?.parentId);
+  }
+
+  return false;
+}
+
+function getRootCategories(categories: Category[]): Category[] {
+  return categories
+    .filter((category) => !category.parentId)
+    .sort(
+      (a, b) =>
+        a.sortOrder - b.sortOrder || a.name.localeCompare(b.name, 'ru'),
+    );
+}
+
+function getRootOptions(
+  root: Category,
+  categories: Category[],
+): Category[] {
+  return categories
+    .filter((category) => belongsToRoot(category, root.slug, categories))
+    .sort((a, b) => {
+      const depthDifference =
+        getCategoryDepth(a, categories) - getCategoryDepth(b, categories);
+
+      if (depthDifference !== 0) {
+        return depthDifference;
+      }
+
+      return a.sortOrder - b.sortOrder || a.name.localeCompare(b.name, 'ru');
+    });
 }
 
 export function CreateListingForm({
@@ -43,11 +96,12 @@ export function CreateListingForm({
   const selectedCategory = categories.find(
     (category) => category.id === selectedCategoryId,
   );
-  const selectedParent = categories.find(
-    (category) => category.id === selectedCategory?.parentId,
+  const isJobsCategory = belongsToRoot(
+    selectedCategory,
+    'jobs',
+    categories,
   );
-  const isJobsCategory =
-    selectedCategory?.slug === 'jobs' || selectedParent?.slug === 'jobs';
+  const rootCategories = getRootCategories(categories);
 
   return (
     <form action={formAction} className="create-listing-form">
@@ -64,10 +118,22 @@ export function CreateListingForm({
             Выберите категорию
           </option>
 
-          {categories.map((category) => (
-            <option key={category.id} value={category.id}>
-              {getCategoryLabel(category, categories)}
-            </option>
+          {rootCategories.map((root) => (
+            <optgroup key={root.id} label={root.name}>
+              {getRootOptions(root, categories).map((category) => {
+                const depth = getCategoryDepth(category, categories);
+                const label =
+                  depth === 0
+                    ? `Все объявления — ${root.name}`
+                    : `${'— '.repeat(depth)}${category.name}`;
+
+                return (
+                  <option key={category.id} value={category.id}>
+                    {label}
+                  </option>
+                );
+              })}
+            </optgroup>
           ))}
         </select>
       </label>
