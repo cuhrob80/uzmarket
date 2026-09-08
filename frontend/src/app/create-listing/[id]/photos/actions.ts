@@ -6,6 +6,7 @@ import {
   ApiError,
   deleteListingImage,
   reorderListingImages,
+  rotateListingImage,
   uploadListingImage,
 } from '@/lib/api/server';
 
@@ -60,6 +61,23 @@ export async function uploadPhotoAction(
   revalidateListingPages(listingId);
 
   return { error: null };
+}
+
+export async function rotatePhotoAction(
+  listingId: string,
+  imageId: string,
+): Promise<void> {
+  try {
+    await rotateListingImage(listingId, imageId);
+  } catch (error: unknown) {
+    if (error instanceof ApiError && error.status === 401) {
+      redirect('/login');
+    }
+
+    throw error;
+  }
+
+  revalidateListingPages(listingId);
 }
 
 export async function deletePhotoAction(
