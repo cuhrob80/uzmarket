@@ -71,7 +71,9 @@ export async function setAuthCookie(accessToken: string): Promise<void> {
 
   cookieStore.set(AUTH_COOKIE_NAME, accessToken, {
     httpOnly: true,
-    secure: process.env.NODE_ENV === 'production',
+    secure:
+      process.env.AUTH_COOKIE_SECURE === 'true' ||
+      process.env.SITE_URL?.startsWith('https://') === true,
     sameSite: 'lax',
     path: '/',
     maxAge: 15 * 60,
