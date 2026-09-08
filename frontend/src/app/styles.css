@@ -1736,3 +1736,72 @@ p { margin: 0; font-size: 1.125rem; }
     grid-template-columns: 1fr;
   }
 }
+
+
+.my-listings-shell {
+  min-height: 100vh;
+  background: #f7f9fb;
+}
+
+.my-listings-create-link {
+  display: inline-flex;
+  min-height: 46px;
+  align-items: center;
+  justify-content: center;
+  padding: 0 20px;
+  border-radius: 11px;
+  background: #079455;
+  color: #fff;
+  font-weight: 800;
+  text-decoration: none;
+}
+
+.my-listings-create-link:hover {
+  background: #08783e;
+}
+
+.my-listings-empty {
+  display: grid;
+  min-height: 320px;
+  place-items: center;
+  align-content: center;
+}
+
+.my-listings-empty-icon {
+  display: grid;
+  width: 72px;
+  height: 72px;
+  margin-bottom: 16px;
+  place-items: center;
+  border-radius: 50%;
+  background: #e7f8ef;
+  color: #079455;
+  font-size: 2.4rem;
+  font-weight: 700;
+}
+
+.my-listings-empty .my-listings-create-link {
+  margin-top: 22px;
+}
+
+.my-listings-home-link {
+  margin-top: 16px;
+  color: #526075;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.my-listings-home-link:hover {
+  color: #079455;
+}
+
+@media (max-width: 640px) {
+  .my-listings-header {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .my-listings-create-link {
+    width: 100%;
+  }
+}
