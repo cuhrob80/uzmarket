@@ -125,7 +125,7 @@ export default async function UnifiedListingPage({
           </div>
 
           {images.length === 0 ? (
-           p className="unified-listing-help">
+            <p className="unified-listing-help">
               {isJobListing
                 ? 'Фотография необязательна — можно сразу публиковать.'
                 : 'Добавьте хотя бы одну фотографию.'}
