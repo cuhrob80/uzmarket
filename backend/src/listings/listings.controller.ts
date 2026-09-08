@@ -94,6 +94,26 @@ export class ListingsController {
     }));
   }
 
+  @Patch(':id/images/:imageId/rotate')
+  @UseGuards(JwtAuthGuard)
+  async rotateImage(
+    @Param('id', new ParseUUIDPipe()) id: string,
+    @Param('imageId', new ParseUUIDPipe()) imageId: string,
+    @CurrentUser() user: JwtUser,
+  ): Promise<ListingImageResponse> {
+    const image = await this.listingMediaService.rotateImage(
+      id,
+      imageId,
+      user.userId,
+    );
+
+    return {
+      id: image.id,
+      url: image.url,
+      sortOrder: image.sortOrder,
+    };
+  }
+
   @Delete(':id/images/:imageId')
   @HttpCode(204)
   @UseGuards(JwtAuthGuard)
