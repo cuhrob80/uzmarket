@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { notFound, redirect } from 'next/navigation';
-import { ApiError, getMyListing } from '@/lib/api/server';
+import { ApiError, getCategories, getMyListing } from '@/lib/api/server';
+import { EditListingForm } from '@/app/my-listings/[id]/edit/edit-listing-form';
 import { DeletePhotoButton } from './photos/delete-photo-button';
 import { PhotoOrderControls } from './photos/photo-order-controls';
 import { PhotoUploadForm } from './photos/photo-upload-form';
@@ -31,6 +32,7 @@ export default async function UnifiedListingPage({
     redirect('/login');
   }
 
+  const categories = await getCategories();
   const images = [...listing.images].sort(
     (a, b) => a.sortOrder - b.sortOrder,
   );
@@ -57,35 +59,12 @@ export default async function UnifiedListingPage({
               <p className="listing-photos-step">1. Основная информация</p>
               <h2>Данные объявления</h2>
             </div>
-            <Link href={`/my-listings/${encodeURIComponent(listing.id)}/edit`}>
-              Изменить
-            </Link>
           </div>
 
-          <dl className="unified-listing-summary">
-            <div>
-              <dt>Категория</dt>
-              <dd>{listing.category.name}</dd>
-            </div>
-            {listing.jobType ? (
-              <div>
-                <dt>Тип</dt>
-                <dd>
-                  {listing.jobType === 'vacancy' ? 'Вакансия' : 'Резюме'}
-                </dd>
-              </div>
-            ) : null}
-            <div>
-              <dt>Цена</dt>
-              <dd>{listing.price} {listing.currency}</dd>
-            </div>
-            <div>
-              <dt>Местоположение</dt>
-              <dd>{listing.location || 'Не указано'}</dd>
-            </div>
-          </dl>
-
-          <p className="unified-listing-description">{listing.description}</p>
+          <EditListingForm
+            listing={listing}
+            categories={categories}
+          />
         </div>
 
         <div className="unified-listing-section">
