@@ -25,6 +25,32 @@ export interface ProcessedListingImage {
 
 @Injectable()
 export class ListingImageProcessor {
+
+  async rotateQuarterTurn(input: Buffer): Promise<ProcessedListingImage> {
+    try {
+      const output = await sharp(input, {
+        failOn: 'error',
+        limitInputPixels: MAX_IMAGE_PIXELS,
+      })
+        .rotate(90)
+        .webp({
+          quality: 82,
+          effort: 4,
+        })
+        .toBuffer({ resolveWithObject: true });
+
+      return {
+        buffer: output.data,
+        mimeType: 'image/webp',
+        width: output.info.width,
+        height: output.info.height,
+        fileSizeBytes: output.data.length,
+      };
+    } catch {
+      throw new BadRequestException('Image rotation failed');
+    }
+  }
+
   async process(
     input: Buffer,
     declaredMimeType?: string,
