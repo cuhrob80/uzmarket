@@ -38,6 +38,8 @@ export default async function ListingPhotosPage({
   );
 
   const imageIds = images.map((image) => image.id);
+  const isJobListing =
+    listing.jobType === 'vacancy' || listing.jobType === 'resume';
 
   return (
     <main className="listing-photos-page">
@@ -53,11 +55,14 @@ export default async function ListingPhotosPage({
             {images.length} из 10
           </strong>
           <span>
-            Первое фото будет обложкой объявления.
+            {isJobListing
+              ? 'Фотографии необязательны. Добавьте логотип, рабочее место или примеры работ.'
+              : 'Первое фото будет обложкой объявления.'}
           </span>
         </div>
 
         <PhotoUploadForm
+          key={images.length}
           listingId={listing.id}
           imageCount={images.length}
         />
@@ -106,7 +111,9 @@ export default async function ListingPhotosPage({
           <div className="empty-state">
             <h2>Фотографий пока нет</h2>
             <p>
-              Добавьте хотя бы одну фотографию товара.
+              {isJobListing
+                ? 'Можно продолжить без фотографии или добавить примеры работ.'
+                : 'Добавьте хотя бы одну фотографию товара.'}
             </p>
           </div>
         )}
@@ -116,13 +123,15 @@ export default async function ListingPhotosPage({
             Сохранить и продолжить позже
           </a>
 
-          {images.length > 0 ? (
+          {images.length > 0 || isJobListing ? (
             <a
               href={`/create-listing/${encodeURIComponent(
                 listing.id,
               )}/review`}
             >
-              Продолжить
+              {isJobListing && images.length === 0
+                ? 'Продолжить без фотографии'
+                : 'Продолжить'}
             </a>
           ) : null}
         </div>
