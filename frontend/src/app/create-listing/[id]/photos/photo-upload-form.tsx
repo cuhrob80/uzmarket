@@ -1,20 +1,8 @@
 'use client';
 
-import {
-  startTransition,
-  useActionState,
-  useEffect,
-  useRef,
-  useState,
-} from 'react';
-import {
-  uploadPhotoAction,
-  type PhotoActionState,
-} from './actions';
-
-const initialState: PhotoActionState = {
-  error: null,
-};
+import { useEffect, useRef, useState, useTransition } from 'react';
+import { useRouter } from 'next/navigation';
+import { uploadPhotoAction } from './actions';
 
 interface PhotoUploadFormProps {
   listingId: string;
@@ -27,15 +15,14 @@ interface SelectedPhoto {
   previewUrl: string;
 }
 
+const MAX_FILE_SIZE = 20 * 1024 * 1024;
+
 export function PhotoUploadForm({
   listingId,
   imageCount,
 }: PhotoUploadFormProps) {
-  const action = uploadPhotoAction.bind(null, listingId);
-  const [state, formAction, actionPending] = useActionState(
-    action,
-    initialState,
-  );
+  const router = useRouter();
+  const [pending, startTransition] = useTransition();
   const [selectedPhotos, setSelectedPhotos] = useState<
     SelectedPhoto[]
   >([]);
@@ -45,7 +32,6 @@ export function PhotoUploadForm({
   const inputRef = useRef<HTMLInputElement>(null);
   const previewUrlsRef = useRef<string[]>([]);
   const remainingSlots = Math.max(0, 10 - imageCount);
-  const pending = actionPending;
   const limitReached = remainingSlots === 0;
 
   useEffect(() => {
@@ -56,30 +42,63 @@ export function PhotoUploadForm({
     };
   }, []);
 
-  function removePhoto(id: string) {
-    setSelectedPhotos((current) => {
-      const photo = current.find((item) => item.id === id);
-
-      if (photo) {
-        URL.revokeObjectURL(photo.previewUrl);
-        previewUrlsRef.current = previewUrlsRef.current.filter(
-          (url) => url !== photo.previewUrl,
-        );
-      }
-
-      return current.filter((item) => item.id !== id);
-    });
+  function clearPreviews() {
+    previewUrlsRef.current.forEach((url) =>
+      URL.revokeObjectURL(url),
+    );
+    previewUrlsRef.current = [];
+    setSelectedPhotos([]);
   }
 
+  async function uploadFiles(files: File[]) {
+    for (const file of files) {
+      const formData = new FormData();
+      formData.append('files', file);
+
+      const result = await uploadPhotoAction(
+        listingId,
+        { error: null },
+        formData,
+      );
+
+      if (result.error) {
+        setClientError(result.error);
+        return;
+      }
+    }
+
+    clearPreviews();
+    router.refresh();
+  }
 
   return (
     <div className="photo-upload-form">
       <label className="photo-upload-box">
         <span className="photo-upload-title">
-          <span className="photo-camera-icon" aria-hidden="true">▣</span>
+          <span className="photo-camera-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" role="img">
+              <path
+                d="M8.5 5.5 10 3.5h4l1.5 2H19A2.5 2.5 0 0 1 21.5 8v9A2.5 2.5 0 0 1 19 19.5H5A2.5 2.5 0 0 1 2.5 17V8A2.5 2.5 0 0 1 5 5.5h3.5Z"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="1.8"
+                strokeLinejoin="round"
+              />
+              <circle
+                cx="12"
+                cy="12.5"
+                r="3.5"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="1.8"
+              />
+            </svg>
+          </span>
           {limitReached
             ? 'Добавлено 10 фотографий'
-            : 'Добавить фотографии'}
+            : pending
+              ? 'Фотографии загружаются'
+              : 'Добавить фотографии'}
         </span>
 
         <span className="photo-upload-description">
@@ -95,19 +114,35 @@ export function PhotoUploadForm({
           disabled={pending || limitReached}
           onChange={(event) => {
             const files = Array.from(event.target.files ?? []);
-            const available =
-              remainingSlots - selectedPhotos.length;
-            const acceptedFiles = files.slice(0, available);
+            const acceptedFiles = files.slice(0, remainingSlots);
+            const oversizedFile = acceptedFiles.find(
+              (file) => file.size > MAX_FILE_SIZE,
+            );
 
-            if (files.length > available) {
+            if (inputRef.current) {
+              inputRef.current.value = '';
+            }
+
+            if (oversizedFile) {
               setClientError(
-                `Можно добавить ещё только ${available} фото.`,
+                `Файл «${oversizedFile.name}» больше 20 МБ.`,
+              );
+              return;
+            }
+
+            if (acceptedFiles.length === 0) {
+              return;
+            }
+
+            if (files.length > remainingSlots) {
+              setClientError(
+                `Можно добавить ещё только ${remainingSlots} фото.`,
               );
             } else {
               setClientError(null);
             }
 
-            const newPhotos = acceptedFiles.map((file) => {
+            const previews = acceptedFiles.map((file) => {
               const previewUrl = URL.createObjectURL(file);
               previewUrlsRef.current.push(previewUrl);
 
@@ -118,20 +153,11 @@ export function PhotoUploadForm({
               };
             });
 
-            setSelectedPhotos(newPhotos);
+            setSelectedPhotos(previews);
 
-            const formData = new FormData();
-            acceptedFiles.forEach((file) =>
-              formData.append('files', file),
-            );
-
-            startTransition(() => {
-              formAction(formData);
+            startTransition(async () => {
+              await uploadFiles(acceptedFiles);
             });
-
-            if (inputRef.current) {
-              inputRef.current.value = '';
-            }
           }}
         />
       </label>
@@ -139,12 +165,8 @@ export function PhotoUploadForm({
       {selectedPhotos.length > 0 ? (
         <>
           <div className="photo-selection-header">
-            <strong>
-              Выбрано: {selectedPhotos.length}
-            </strong>
-            <span>
-              Фотографии загружаются автоматически
-            </span>
+            <strong>Выбрано: {selectedPhotos.length}</strong>
+            <span>Фотографии загружаются автоматически</span>
           </div>
 
           <div
@@ -168,29 +190,16 @@ export function PhotoUploadForm({
                   ) : null}
                 </div>
 
-                <p title={photo.file.name}>
-                  {photo.file.name}
-                </p>
-
-                <div className="photo-selection-actions">
-                  <button
-                    type="button"
-                    className="photo-preview-remove"
-                    onClick={() => removePhoto(photo.id)}
-                    disabled={pending}
-                  >
-                    Удалить
-                  </button>
-                </div>
+                <p title={photo.file.name}>{photo.file.name}</p>
               </article>
             ))}
           </div>
         </>
       ) : null}
 
-      {clientError || state.error ? (
+      {clientError ? (
         <p className="form-error" role="alert">
-          {clientError || state.error}
+          {clientError}
         </p>
       ) : null}
     </div>
