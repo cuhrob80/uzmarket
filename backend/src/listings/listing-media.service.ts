@@ -96,12 +96,20 @@ export class ListingMediaService {
       throw new NotFoundException('Listing image not found');
     }
 
-    const input = await this.storage.getObject(image.storageKey);
+    const storageKey = image.storageKey;
+
+    if (!storageKey) {
+      throw new BadRequestException(
+        'This image cannot be rotated because its source file is unavailable',
+      );
+    }
+
+    const input = await this.storage.getObject(storageKey);
     const rotated =
       await this.imageProcessor.rotateQuarterTurn(input);
 
     await this.storage.putObject({
-      key: image.storageKey,
+      key: storageKey,
       body: rotated.buffer,
       contentType: rotated.mimeType,
     });
@@ -111,7 +119,7 @@ export class ListingMediaService {
     image.height = rotated.height;
     image.fileSizeBytes = String(rotated.fileSizeBytes);
     image.url =
-      `${this.storage.getPublicUrl(image.storageKey)}?v=${Date.now()}`;
+      `${this.storage.getPublicUrl(storageKey)}?v=${Date.now()}`;
 
     return imagesRepository.save(image);
   }
