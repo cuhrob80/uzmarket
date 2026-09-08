@@ -160,9 +160,6 @@ export function PhotoUploadForm({
                   <img
                     src={photo.previewUrl}
                     alt={`Выбранная фотография ${index + 1}`}
-                    style={{
-                      transform: `rotate(${photo.rotation}deg)`,
-                    }}
                   />
                   {index === 0 && imageCount === 0 ? (
                     <span className="photo-selection-cover">
