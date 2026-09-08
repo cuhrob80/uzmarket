@@ -236,6 +236,36 @@ export async function uploadListingImage(
   return (await response.json()) as Listing['images'][number];
 }
 
+export async function rotateListingImage(
+  listingId: string,
+  imageId: string,
+): Promise<Listing['images'][number]> {
+  const token = await getAccessToken();
+
+  if (!token) {
+    throw new ApiError(401, 'Authentication required');
+  }
+
+  const response = await fetch(
+    createApiUrl(
+      `/api/v1/listings/${encodeURIComponent(listingId)}/images/${encodeURIComponent(imageId)}/rotate`,
+    ),
+    {
+      method: 'PATCH',
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+      cache: 'no-store',
+    },
+  );
+
+  if (!response.ok) {
+    throw new ApiError(response.status, await getErrorMessage(response));
+  }
+
+  return (await response.json()) as Listing['images'][number];
+}
+
 export async function deleteListingImage(
   listingId: string,
   imageId: string,
