@@ -78,6 +78,6 @@ export async function createListingAction(
   }
 
   redirect(
-    `/create-listing/${encodeURIComponent(listingId)}/photos`,
+    `/create-listing/${encodeURIComponent(listingId)}`,
   );
 }
