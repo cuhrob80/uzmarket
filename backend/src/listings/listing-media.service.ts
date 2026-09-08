@@ -71,6 +71,51 @@ export class ListingMediaService {
     }
   }
 
+  async rotateImage(
+    listingId: string,
+    imageId: string,
+    sellerId: string,
+  ): Promise<ListingImage> {
+    const listing = await this.dataSource.getRepository(Listing).findOne({
+      where: { id: listingId, sellerId },
+    });
+
+    if (!listing) {
+      throw new NotFoundException('Listing not found');
+    }
+
+    this.assertEditableStatus(listing);
+
+    const imagesRepository =
+      this.dataSource.getRepository(ListingImage);
+    const image = await imagesRepository.findOne({
+      where: { id: imageId, listingId },
+    });
+
+    if (!image) {
+      throw new NotFoundException('Listing image not found');
+    }
+
+    const input = await this.storage.getObject(image.storageKey);
+    const rotated =
+      await this.imageProcessor.rotateQuarterTurn(input);
+
+    await this.storage.putObject({
+      key: image.storageKey,
+      body: rotated.buffer,
+      contentType: rotated.mimeType,
+    });
+
+    image.mimeType = rotated.mimeType;
+    image.width = rotated.width;
+    image.height = rotated.height;
+    image.fileSizeBytes = String(rotated.fileSizeBytes);
+    image.url =
+      `${this.storage.getPublicUrl(image.storageKey)}?v=${Date.now()}`;
+
+    return imagesRepository.save(image);
+  }
+
   async deleteImage(
     listingId: string,
     imageId: string,
