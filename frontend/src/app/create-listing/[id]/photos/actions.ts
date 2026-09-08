@@ -18,14 +18,25 @@ export async function uploadPhotoAction(
   _previousState: PhotoActionState,
   formData: FormData,
 ): Promise<PhotoActionState> {
-  const file = formData.get('file');
+  const files = formData
+    .getAll('files')
+    .filter(
+      (file): file is File =>
+        file instanceof File && file.size > 0,
+    );
 
-  if (!(file instanceof File) || file.size === 0) {
-    return { error: 'Выберите фотографию' };
+  if (files.length === 0) {
+    return { error: 'Выберите хотя бы одну фотографию' };
+  }
+
+  if (files.length > 10) {
+    return { error: 'Можно загрузить не более 10 фотографий' };
   }
 
   try {
-    await uploadListingImage(listingId, file);
+    for (const file of files) {
+      await uploadListingImage(listingId, file);
+    }
   } catch (error: unknown) {
     if (error instanceof ApiError && error.status === 401) {
       redirect('/login');
