@@ -1,6 +1,6 @@
 'use client';
 
-import { useActionState } from 'react';
+import { useActionState, useEffect, useRef, useState } from 'react';
 import {
   uploadPhotoAction,
   type PhotoActionState,
@@ -27,6 +27,26 @@ export function PhotoUploadForm({
   );
 
   const limitReached = imageCount >= 10;
+  const inputRef = useRef<HTMLInputElement>(null);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const [selectedName, setSelectedName] = useState<string | null>(null);
+
+  useEffect(() => {
+    return () => {
+      if (previewUrl) {
+        URL.revokeObjectURL(previewUrl);
+      }
+    };
+  }, [previewUrl]);
+
+  function clearSelection() {
+    if (inputRef.current) {
+      inputRef.current.value = '';
+    }
+
+    setPreviewUrl(null);
+    setSelectedName(null);
+  }
 
   return (
     <form
@@ -45,13 +65,46 @@ export function PhotoUploadForm({
         </span>
 
         <input
+          ref={inputRef}
           name="file"
           type="file"
           accept="image/jpeg,image/png,image/webp"
           required
           disabled={pending || limitReached}
+          onChange={(event) => {
+            const file = event.target.files?.[0];
+
+            if (!file) {
+              clearSelection();
+              return;
+            }
+
+            setPreviewUrl(URL.createObjectURL(file));
+            setSelectedName(file.name);
+          }}
         />
       </label>
+
+      {previewUrl ? (
+        <div className="photo-selection-preview">
+          <img
+            src={previewUrl}
+            alt="Предпросмотр выбранной фотографии"
+          />
+          <div className="photo-selection-details">
+            <strong>{selectedName}</strong>
+            <span>Фото ещё не загружено</span>
+            <button
+              type="button"
+              className="photo-preview-cancel"
+              onClick={clearSelection}
+              disabled={pending}
+            >
+              Отменить выбор
+            </button>
+          </div>
+        </div>
+      ) : null}
 
       {state.error ? (
         <p className="form-error" role="alert">
@@ -61,7 +114,8 @@ export function PhotoUploadForm({
 
       <button
         type="submit"
-        disabled={pending || limitReached}
+        className="photo-upload-submit"
+        disabled={pending || limitReached || !previewUrl}
       >
         {pending ? 'Загружаем…' : 'Загрузить'}
       </button>
