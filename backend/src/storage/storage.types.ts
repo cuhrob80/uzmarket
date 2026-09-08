@@ -6,6 +6,7 @@ export interface StorageUpload {
 
 export interface StorageProvider {
   putObject(upload: StorageUpload): Promise<void>;
+  getObject(key: string): Promise<Buffer>;
   deleteObject(key: string): Promise<void>;
   getPublicUrl(key: string): string;
 }
