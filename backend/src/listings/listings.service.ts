@@ -114,7 +114,7 @@ export class ListingsService {
         where: { listingId: listing.id },
       });
 
-    if (imageCount < 1) {
+    if (!listing.jobType && imageCount < 1) {
       throw new BadRequestException(
         'Listing must have at least one image before publishing',
       );
