@@ -83,55 +83,54 @@ export default async function UnifiedListingPage({
               : 'Первое фото будет обложкой объявления.'}
           </p>
 
-          <PhotoUploadForm
-            key={images.length}
-            listingId={listing.id}
-            imageCount={images.length}
-          />
+          <div className="listing-photo-grid" aria-label="Фотографии объявления">
+            {images.map((image, index) => (
+              <article className="listing-photo-card" key={image.id}>
+                <div className="listing-photo-preview">
+                  <RotatePhotoButton
+                    listingId={listing.id}
+                    imageId={image.id}
+                  />
+                  <img
+                    src={image.url}
+                    alt={`Фотография ${index + 1}`}
+                    width={320}
+                    height={240}
+                  />
+                  {index === 0 ? (
+                    <span className="listing-cover-badge">Обложка</span>
+                  ) : null}
+                </div>
+                <div className="listing-photo-actions">
+                  <PhotoOrderControls
+                    listingId={listing.id}
+                    imageIds={imageIds}
+                    index={index}
+                  />
+                  <DeletePhotoButton
+                    listingId={listing.id}
+                    imageId={image.id}
+                  />
+                </div>
+              </article>
+            ))}
 
-          {images.length > 0 ? (
-            <div className="listing-photo-grid" aria-label="Фотографии объявления">
-              {images.map((image, index) => (
-                <article className="listing-photo-card" key={image.id}>
-                  <div className="listing-photo-preview">
-                    <RotatePhotoButton
-                      listingId={listing.id}
-                      imageId={image.id}
-                    />
-                    <img
-                      src={image.url}
-                      alt={`Фотография ${index + 1}`}
-                      width={320}
-                      height={240}
-                    />
-                    {index === 0 ? (
-                      <span className="listing-cover-badge">Обложка</span>
-                    ) : null}
-                  </div>
-                  <div className="listing-photo-actions">
-                    <PhotoOrderControls
-                      listingId={listing.id}
-                      imageIds={imageIds}
-                      index={index}
-                    />
-                    <DeletePhotoButton
-                      listingId={listing.id}
-                      imageId={image.id}
-                    />
-                  </div>
-                </article>
-              ))}
-            </div>
-          ) : (
-            <div className="empty-state">
-              <h2>Фотографий пока нет</h2>
-              <p>
-                {isJobListing
-                  ? 'Можно опубликовать без фотографии или добавить примеры работ.'
-                  : 'Добавьте хотя бы одну фотографию.'}
-              </p>
-            </div>
-          )}
+            {images.length < 10 ? (
+              <PhotoUploadForm
+                key={images.length}
+                listingId={listing.id}
+                imageCount={images.length}
+              />
+            ) : null}
+          </div>
+
+          {images.length === 0 ? (
+           p className="unified-listing-help">
+              {isJobListing
+                ? 'Фотография необязательна — можно сразу публиковать.'
+                : 'Добавьте хотя бы одну фотографию.'}
+            </p>
+          ) : null}
         </div>
 
         <div className="unified-listing-section unified-listing-publish">
