@@ -5,6 +5,7 @@ import { EditListingForm } from '@/app/my-listings/[id]/edit/edit-listing-form';
 import { DeletePhotoButton } from './photos/delete-photo-button';
 import { PhotoOrderControls } from './photos/photo-order-controls';
 import { PhotoUploadForm } from './photos/photo-upload-form';
+import { RotatePhotoButton } from './photos/rotate-photo-button';
 import { PublishButton } from './review/publish-button';
 
 export const dynamic = 'force-dynamic';
@@ -93,6 +94,10 @@ export default async function UnifiedListingPage({
               {images.map((image, index) => (
                 <article className="listing-photo-card" key={image.id}>
                   <div className="listing-photo-preview">
+                    <RotatePhotoButton
+                      listingId={listing.id}
+                      imageId={image.id}
+                    />
                     <img
                       src={image.url}
                       alt={`Фотография ${index + 1}`}
