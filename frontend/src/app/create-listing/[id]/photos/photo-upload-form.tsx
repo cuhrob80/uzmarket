@@ -1,8 +1,7 @@
 'use client';
 
-import { useEffect, useRef, useState, useTransition } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { uploadPhotoAction } from './actions';
 
 interface PhotoUploadFormProps {
   listingId: string;
@@ -15,6 +14,10 @@ interface SelectedPhoto {
   previewUrl: string;
 }
 
+interface UploadErrorBody {
+  message?: string;
+}
+
 const MAX_FILE_SIZE = 20 * 1024 * 1024;
 
 export function PhotoUploadForm({
@@ -22,7 +25,7 @@ export function PhotoUploadForm({
   imageCount,
 }: PhotoUploadFormProps) {
   const router = useRouter();
-  const [pending, startTransition] = useTransition();
+  const [uploading, setUploading] = useState(false);
   const [selectedPhotos, setSelectedPhotos] = useState<
     SelectedPhoto[]
   >([]);
@@ -51,24 +54,51 @@ export function PhotoUploadForm({
   }
 
   async function uploadFiles(files: File[]) {
-    for (const file of files) {
-      const formData = new FormData();
-      formData.append('files', file);
+    setUploading(true);
 
-      const result = await uploadPhotoAction(
-        listingId,
-        { error: null },
-        formData,
-      );
+    try {
+      for (const file of files) {
+        const formData = new FormData();
+        formData.set('file', file);
 
-      if (result.error) {
-        setClientError(result.error);
-        return;
+        const response = await fetch(
+          `/api/listings/${encodeURIComponent(listingId)}/images`,
+          {
+            method: 'POST',
+            body: formData,
+          },
+        );
+
+        if (response.status === 401) {
+          window.location.assign('/login');
+          return;
+        }
+
+        if (!response.ok) {
+          let message = 'Не удалось загрузить фотографию.';
+
+          try {
+            const body = (await response.json()) as UploadErrorBody;
+            message = body.message || message;
+          } catch {
+            // The fallback message above is shown for invalid responses.
+          }
+
+          throw new Error(message);
+        }
       }
-    }
 
-    clearPreviews();
-    router.refresh();
+      clearPreviews();
+      router.refresh();
+    } catch (error: unknown) {
+      setClientError(
+        error instanceof Error
+          ? error.message
+          : 'Не удалось загрузить фотографию.',
+      );
+    } finally {
+      setUploading(false);
+    }
   }
 
   return (
@@ -76,7 +106,7 @@ export function PhotoUploadForm({
       <label className="photo-upload-box">
         <span className="photo-upload-title">
           <span className="photo-camera-icon" aria-hidden="true">
-            <svg viewBox="0 0 24 24" role="img">
+            <svg viewBox="0 0 24 24">
               <path
                 d="M8.5 5.5 10 3.5h4l1.5 2H19A2.5 2.5 0 0 1 21.5 8v9A2.5 2.5 0 0 1 19 19.5H5A2.5 2.5 0 0 1 2.5 17V8A2.5 2.5 0 0 1 5 5.5h3.5Z"
                 fill="none"
@@ -96,7 +126,7 @@ export function PhotoUploadForm({
           </span>
           {limitReached
             ? 'Добавлено 10 фотографий'
-            : pending
+            : uploading
               ? 'Фотографии загружаются'
               : 'Добавить фотографии'}
         </span>
@@ -111,7 +141,7 @@ export function PhotoUploadForm({
           type="file"
           accept="image/jpeg,image/png,image/webp"
           multiple
-          disabled={pending || limitReached}
+          disabled={uploading || limitReached}
           onChange={(event) => {
             const files = Array.from(event.target.files ?? []);
             const acceptedFiles = files.slice(0, remainingSlots);
@@ -154,10 +184,7 @@ export function PhotoUploadForm({
             });
 
             setSelectedPhotos(previews);
-
-            startTransition(async () => {
-              await uploadFiles(acceptedFiles);
-            });
+            void uploadFiles(acceptedFiles);
           }}
         />
       </label>
