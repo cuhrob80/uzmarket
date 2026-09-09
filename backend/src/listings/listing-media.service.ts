@@ -124,6 +124,35 @@ export class ListingMediaService {
     return imagesRepository.save(image);
   }
 
+  async deleteListing(
+    listingId: string,
+    sellerId: string,
+  ): Promise<void> {
+    const storageKeys = await this.dataSource.transaction(async (manager) => {
+      const listing = await this.findOwnedListingForUpdate(
+        manager,
+        listingId,
+        sellerId,
+      );
+      const imagesRepository = manager.getRepository(ListingImage);
+      const images = await imagesRepository.find({
+        where: { listingId },
+      });
+
+      await manager.getRepository(Listing).remove(listing);
+
+      return images
+        .map((image) => image.storageKey)
+        .filter((key): key is string => Boolean(key));
+    });
+
+    await Promise.all(
+      storageKeys.map((storageKey) =>
+        this.storage.deleteObject(storageKey),
+      ),
+    );
+  }
+
   async deleteImage(
     listingId: string,
     imageId: string,
