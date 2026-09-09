@@ -3771,8 +3771,15 @@ p { margin: 0; font-size: 1.125rem; }
 }
 
 .marketplace-megamenu-content {
+  width: 100%;
+  min-width: 0;
+  max-width: none;
   padding: 34px 40px 42px;
   overflow-y: auto;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
 }
 
 .marketplace-megamenu-title {
@@ -3797,8 +3804,16 @@ p { margin: 0; font-size: 1.125rem; }
 
 .marketplace-megamenu-groups > section {
   display: grid;
+  width: auto;
+  min-width: 0;
+  max-width: none;
+  padding: 0;
   align-content: start;
   gap: 10px;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
 }
 
 .marketplace-megamenu-groups a {
