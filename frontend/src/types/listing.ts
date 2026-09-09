@@ -52,6 +52,7 @@ export interface AuthUser {
   email: string;
   phone: string | null;
   displayName: string;
+  avatarUrl: string | null;
 }
 
 export interface AuthResponse {
