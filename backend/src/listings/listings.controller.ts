@@ -165,6 +165,24 @@ export class ListingsController {
     return this.listingsService.archive(id, user.userId);
   }
 
+  @Post(':id/delete')
+  @UseGuards(JwtAuthGuard)
+  moveToDeleted(
+    @Param('id', new ParseUUIDPipe()) id: string,
+    @CurrentUser() user: JwtUser,
+  ): Promise<ListingResponseDto> {
+    return this.listingsService.moveToDeleted(id, user.userId);
+  }
+
+  @Post(':id/restore')
+  @UseGuards(JwtAuthGuard)
+  restoreDeleted(
+    @Param('id', new ParseUUIDPipe()) id: string,
+    @CurrentUser() user: JwtUser,
+  ): Promise<ListingResponseDto> {
+    return this.listingsService.restoreDeleted(id, user.userId);
+  }
+
   @Delete(':id')
   @HttpCode(204)
   @UseGuards(JwtAuthGuard)
