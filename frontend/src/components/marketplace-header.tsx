@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import { unstable_rethrow } from 'next/navigation';
 import { getCurrentUser } from '@/lib/api/server';
 import { logoutAction } from '@/app/profile/actions';
 import type { AuthUser } from '@/types/listing';
@@ -52,6 +53,7 @@ export async function MarketplaceHeader() {
   try {
     user = await getCurrentUser();
   } catch (error: unknown) {
+    unstable_rethrow(error);
     console.error('Failed to load header profile:', error);
   }
 
