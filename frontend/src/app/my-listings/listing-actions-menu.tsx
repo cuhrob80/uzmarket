@@ -140,15 +140,38 @@ export function ListingActionsMenu({
             </button>
           ) : null}
 
-          <button
-            type="button"
-            role="menuitem"
-            className="is-danger"
-            disabled={isPending}
-            onClick={() => runAction('delete', true)}
-          >
-            Удалить объявление
-          </button>
+          {status === 'archived' || status === 'deleted' ? (
+            <button
+              type="button"
+              role="menuitem"
+              disabled={isPending}
+              onClick={() => runAction('restore')}
+            >
+              Восстановить
+            </button>
+          ) : null}
+
+          {status === 'deleted' ? (
+            <button
+              type="button"
+              role="menuitem"
+              className="is-danger"
+              disabled={isPending}
+              onClick={() => runAction('permanentDelete', true)}
+            >
+              Удалить навсегда
+            </button>
+          ) : (
+            <button
+              type="button"
+              role="menuitem"
+              className="is-danger"
+              disabled={isPending}
+              onClick={() => runAction('delete')}
+            >
+              Удалить
+            </button>
+          )}
 
           {isPending ? (
             <span className="listing-actions-progress">Выполняется…</span>
