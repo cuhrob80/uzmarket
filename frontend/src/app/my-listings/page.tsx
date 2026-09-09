@@ -8,9 +8,19 @@ export const dynamic = 'force-dynamic';
 const statusLabels: Record<ListingStatus, string> = {
   draft: 'Черновик',
   active: 'Активно',
-  sold: 'Продано',
+  sold: 'Завершено',
   archived: 'В архиве',
 };
+
+const statusTabs: Array<{
+  value: ListingStatus;
+  label: string;
+}> = [
+  { value: 'active', label: 'Активные' },
+  { value: 'draft', label: 'Черновики' },
+  { value: 'archived', label: 'Архив' },
+  { value: 'sold', label: 'Завершённые' },
+];
 
 function formatPrice(listing: Listing): string {
   const value = Number(listing.price);
@@ -19,114 +29,201 @@ function formatPrice(listing: Listing): string {
     return `${listing.price} ${listing.currency}`;
   }
 
+  const currencyLabel =
+    listing.currency === 'UZS' ? 'сум' : listing.currency;
+
   return `${new Intl.NumberFormat('ru-RU', {
     maximumFractionDigits: 2,
-  }).format(value)} ${listing.currency}`;
+  }).format(value)} ${currencyLabel}`;
 }
 
-export default async function MyListingsPage() {
-  const result = await getMyListings(1, 20);
+function formatDate(value: string): string {
+  return new Intl.DateTimeFormat('ru-RU', {
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric',
+  }).format(new Date(value));
+}
 
-  if (!result) {
+interface MyListingsPageProps {
+  searchParams: Promise<{
+    status?: string;
+    search?: string;
+  }>;
+}
+
+export default async function MyListingsPage({
+  searchParams,
+}: MyListingsPageProps) {
+  const params = await searchParams;
+  const activeStatus = statusTabs.some(
+    (tab) => tab.value === params.status,
+  )
+    ? (params.status as ListingStatus)
+    : 'active';
+  const search = params.search?.trim() ?? '';
+
+  const [result, ...countResults] = await Promise.all([
+    getMyListings(1, 20, {
+      status: activeStatus,
+      search,
+    }),
+    ...statusTabs.map((tab) =>
+      getMyListings(1, 1, { status: tab.value }),
+    ),
+  ]);
+
+  if (!result || countResults.some((item) => item === null)) {
     redirect('/login');
   }
 
+  const counts = Object.fromEntries(
+    statusTabs.map((tab, index) => [
+      tab.value,
+      countResults[index]?.total ?? 0,
+    ]),
+  ) as Record<ListingStatus, number>;
+
   return (
-    <div className="my-listings-shell">
-      <main className="my-listings-page">
-        <section
-          className="my-listings-container"
-          aria-labelledby="my-listings-title"
-        >
-          <header className="my-listings-header">
-            <div>
-              <h1 id="my-listings-title">Мои объявления</h1>
-              <p className="page-description">
-                Всего объявлений: {result.total}
-              </p>
-            </div>
+    <div className="account-dashboard">
+      <aside className="account-sidebar" aria-label="Личный кабинет">
+        <Link href="/profile">⌂ <span>Главное</span></Link>
+        <Link href="/my-listings" className="is-active">
+          ▣ <span>Мои объявления</span>
+        </Link>
+        <span className="is-disabled">◯ <span>Сообщения</span></span>
+        <Link href="/profile/reviews">
+          ☆ <span>Отзывы и рейтинг</span>
+        </Link>
+        <Link href="/profile">
+          ⚙ <span>Профиль и настройки</span>
+        </Link>
+      </aside>
 
-            {result.items.length > 0 ? (
-              <Link href="/create-listing" className="my-listings-create-link">
-                Подать объявление
-              </Link>
-            ) : null}
-          </header>
+      <main className="account-listings">
+        <header className="account-listings-heading">
+          <h1>Мои объявления</h1>
+          <Link href="/create-listing">Подать объявление</Link>
+        </header>
 
-          {result.items.length === 0 ? (
-            <div className="empty-state my-listings-empty">
-              <div className="my-listings-empty-icon" aria-hidden="true">＋</div>
-              <h2>Объявлений пока нет</h2>
-              <p>
-                Создайте первое объявление — вакансию, резюме или товар.
-              </p>
-              <Link href="/create-listing" className="my-listings-create-link">
-                Подать объявление
-              </Link>
-              <Link href="/" className="my-listings-home-link">
-                Вернуться на главную
-              </Link>
-            </div>
-          ) : (
-            <div className="listing-list">
-              {result.items.map((listing) => {
-                const image = listing.images[0];
+        <nav className="account-status-tabs" aria-label="Статусы объявлений">
+          {statusTabs.map((tab) => (
+            <Link
+              key={tab.value}
+              href={
+                '/my-listings?status=' +
+                tab.value +
+                (search
+                  ? '&search=' + encodeURIComponent(search)
+                  : '')
+              }
+              className={
+                activeStatus === tab.value ? 'is-active' : undefined
+              }
+            >
+              {tab.label} <sup>{counts[tab.value]}</sup>
+            </Link>
+          ))}
+        </nav>
 
-                return (
-                  <article className="listing-card" key={listing.id}>
-                    <div className="listing-image">
-                      {image ? (
-                        <img
-                          src={image.url}
-                          alt={listing.title}
-                          width={160}
-                          height={120}
-                        />
-                      ) : (
-                        <span>Нет фото</span>
-                      )}
+        <form action="/my-listings" className="account-listings-search">
+          <input type="hidden" name="status" value={activeStatus} />
+          <label>
+            <span aria-hidden="true">⌕</span>
+            <input
+              type="search"
+              name="search"
+              defaultValue={search}
+              placeholder="Поиск по своим объявлениям"
+            />
+          </label>
+          <button type="submit">Найти</button>
+        </form>
+
+        {result.items.length === 0 ? (
+          <section className="account-listings-empty">
+            <span aria-hidden="true">＋</span>
+            <h2>В этом разделе объявлений нет</h2>
+            <p>
+              {search
+                ? 'Попробуйте изменить поисковый запрос.'
+                : 'Создайте новое объявление или выберите другой раздел.'}
+            </p>
+            <Link href="/create-listing">Подать объявление</Link>
+          </section>
+        ) : (
+          <div className="account-listing-list">
+            {result.items.map((listing) => {
+              const image = listing.images[0];
+
+              return (
+                <article className="account-listing-card" key={listing.id}>
+                  <div className="account-listing-image">
+                    {image ? (
+                      <img
+                        src={image.url}
+                        alt={listing.title}
+                        width={180}
+                        height={135}
+                      />
+                    ) : (
+                      <span>Нет фото</span>
+                    )}
+                  </div>
+
+                  <div className="account-listing-info">
+                    <div>
+                      <h2>{listing.title}</h2>
+                      <strong>{formatPrice(listing)}</strong>
                     </div>
+                    {listing.location ? (
+                      <p>⌖ {listing.location}</p>
+                    ) : null}
+                    <span
+                      className={
+                        'account-listing-status status-' +
+                        listing.status
+                      }
+                    >
+                      {statusLabels[listing.status]}
+                    </span>
+                    <small>
+                      Размещено {formatDate(listing.createdAt)}
+                      {listing.updatedAt !== listing.createdAt
+                        ? ` · Обновлено ${formatDate(listing.updatedAt)}`
+                        : ''}
+                    </small>
+                  </div>
 
-                    <div className="listing-content">
-                      <div className="listing-title-row">
-                        <h2>{listing.title}</h2>
-
-                        <span
-                          className={`listing-status status-${listing.status}`}
-                        >
-                          {statusLabels[listing.status]}
-                        </span>
-                      </div>
-
-                      <p className="listing-price">
-                        {formatPrice(listing)}
-                      </p>
-
-                      <p className="listing-meta">
-                        {listing.category.name}
-                        {listing.location
-                          ? ` · ${listing.location}`
-                          : ''}
-                      </p>
-
-                      {listing.status === 'draft' ||
-                      listing.status === 'active' ? (
-                        <div className="listing-actions">
-                          <Link
-                            href={`/my-listings/${listing.id}/edit`}
-                            className="listing-edit-link"
-                          >
-                            Редактировать
-                          </Link>
-                        </div>
-                      ) : null}
+                  <dl className="account-listing-stats">
+                    <div>
+                      <dt>◉ Просмотры</dt>
+                      <dd>0</dd>
                     </div>
-                  </article>
-                );
-              })}
-            </div>
-          )}
-        </section>
+                    <div>
+                      <dt>♡ В избранном</dt>
+                      <dd>0</dd>
+                    </div>
+                  </dl>
+
+                  <div className="account-listing-actions">
+                    {(listing.status === 'draft' ||
+                      listing.status === 'active') && (
+                      <Link
+                        href={`/my-listings/${listing.id}/edit`}
+                      >
+                        Редактировать
+                      </Link>
+                    )}
+                    <button type="button" aria-label="Другие действия">
+                      •••
+                    </button>
+                  </div>
+                </article>
+              );
+            })}
+          </div>
+        )}
       </main>
     </div>
   );
