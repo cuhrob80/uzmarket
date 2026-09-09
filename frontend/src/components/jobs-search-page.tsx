@@ -2,7 +2,6 @@ import Link from 'next/link';
 import { getCategories, getListings } from '@/lib/api/server';
 import { getListingPublicPath } from '@/lib/listing-url';
 import type { Listing, ListingJobType } from '@/types/listing';
-import { MarketplaceHeader } from '@/components/marketplace-header';
 import { JobCategoryIcon } from '@/components/job-category-icon';
 
 interface JobsSearchPageProps {
@@ -47,8 +46,6 @@ export async function JobsSearchPage({
 
   return (
     <main className="jobs-search-page">
-      <MarketplaceHeader />
-
       <div className="jobs-search-container">
         <nav className="transport-breadcrumbs" aria-label="Хлебные крошки">
           <Link href="/">Главная</Link>
