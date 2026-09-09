@@ -2239,3 +2239,287 @@ p { margin: 0; font-size: 1.125rem; }
 .listing-photo-grid > .photo-upload-form .form-error {
   grid-column: 1 / -1;
 }
+
+
+/* Approved Avito-inspired unified listing editor */
+.listing-photos-page {
+  display: block;
+  min-height: 100vh;
+  padding: 42px 24px 72px;
+  background: #fff;
+}
+
+.listing-photos-container.unified-listing-container {
+  width: min(100%, 900px);
+  margin: 0 auto;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: #fff;
+  box-shadow: none;
+  gap: 0;
+}
+
+.listing-photos-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 24px;
+  margin: 0 0 48px;
+}
+
+.listing-editor-back {
+  display: grid;
+  flex: 0 0 56px;
+  width: 56px;
+  height: 56px;
+  margin: 0;
+  place-items: center;
+  border: 1px solid #eceef1;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 8px 24px rgb(23 32 51 / 10%);
+  color: #172033;
+  font-size: 1.7rem;
+  line-height: 13;
+}
+
+.listing-photos-header h1 {
+  margin: 4px 0 8px;
+  color:72: #101828;
+  font-size: clamp(2rem,4: , 4.5vw, 3.15rem);
+  line-height: 1.08;
+  letter-spacing: -0.035em;
+}
+
+.listing-photos-header > div > p {
+  color: #7b8494;
+  font-size: 1+xpe1rem;
+}
+
+.unified-listing-section {
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+}
+
+.unified-listing-section + .unified-listing-section {
+  margin-top: 52px;
+}
+
+.unified-listing-section-heading {
+  margin-bottom: 18px;
+}
+
+.unified-listing-section-heading .listing-photos-step {
+  display: none;
+}
+
+.unified-listing-section h2 {
+  margin: 0;
+  color: #101828;
+  font-size: 1.65rem;
+  letter-spacing: -0.02em;
+}
+
+.unified-listing-help {
+  margin-bottom: 18px;
+  color: #7b8494;
+  font-size: 0.98rem;
+}
+
+.unified-listing-container .create-listing-form {
+  gap: 26px;
+}
+
+.unified-listing-container .create-listing-form label {
+  gap: 10px;
+  color: #101828;
+  font-weight: 750;
+}
+
+.unified-listing-container .create-listing-form input,
+.unified-listing-container .create-listing-form textarea,
+.unified-listing-container .create-listing-form select {
+  min-height: 64px;
+  padding: 17px 22px;
+  border: 1px solid transparent;
+  border-radius: 18px;
+  background: #f2f2f2;
+  color: #101828;
+  font-size: 1.05rem;
+  transition:
+    background 160ms ease,
+    border-color 160ms ease,
+    box-shadow 160ms ease;
+}
+
+.unified-listing-container .create-listing-form textarea {
+  min-height: 180px;
+  line-height: 1.55;
+}
+
+.unified-listing-container .create-listing-form input:hover,
+.unified-listing-container .create-listing-form textarea:hover,
+.unified-listing-container .create-listing-form select:hover {
+  background: #ededed;
+}
+
+.unified-listing-container .create-listing-form input:focus,
+.unified-listing-container .create-listing-form textarea:focus,
+.unified-listing-container .create-listing-form select:focus {
+  border-color: #079455;
+  outline: 0;
+  background: #fff;
+  box-shadow: 0 0 0 4px rgb(7 148 85 / 12%);
+}
+
+.unified-listing-container .price-row,
+.unified-listing-container .price-fields {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(220px, 1fr);
+  gap: 24px;
+}
+
+.unified-listing-container .listing-photo-grid {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.unified-listing-container .listing-photo-preview {
+  border-radius: 16px;
+  background: #f2f2f2;
+}
+
+.unified-listing-container .photo-upload-form {
+  min-width: 0;
+  margin: 0;
+}
+
+.unified-listing-container .photo-upload-box {
+  min-height: 100%;
+  padding: 18px 12px;
+  align-content: center;
+  justify-items: center;
+  border: 0;
+  border-radius: 16px;
+  background: #f2f2f2;
+  text-align: center;
+}
+
+.unified-listing-container .photo-upload-box:hover {
+  background: #e9eaec;
+}
+
+.unified-listing-container .photo-camera-icon {
+  width: 44px;
+  height: 44px;
+}
+
+.unified-listing-container .photo-upload-description {
+  font-size: 0.78rem;
+  line-height: 1.4;
+}
+
+.unified-listing-container .listing-photo-actions {
+  gap: 8px;
+  margin-top: 9px;
+}
+
+.unified-listing-publish {
+  justify-items: stretch;
+  padding: 34px 0 0;
+  border-top: 1px solid #eceef1;
+}
+
+.unified-listing-publish .listing-photos-step,
+.unified-listing-publish h2,
+.unified-listing-publish > p:not(.form-error) {
+  display: none;
+}
+
+.unified-listing-publish > button {
+  width: 100%;
+  min-height: 58px;
+  padding: 0 28px;
+  border: 0;
+  border-radius: 16px;
+  background: #079455;
+  color: #fff;
+  font: inherit;
+  font-size: 1.05rem;
+  font-weight: 800;
+  cursor: pointer;
+  transition:
+    background 160ms ease,
+    transform 160ms ease;
+}
+
+.unified-listing-publish > button:hover:not(:disabled) {
+  background: #08783e;
+}
+
+.unified-listing-publish > button:active:not(:disabled) {
+  transform: translateY(1px);
+}
+
+.unified-listing-publish > button:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+@media (max-width: 760px) {
+  .listing-photos-page {
+    padding: 24px 16px 48px;
+  }
+
+  .listing-photos-header {
+    gap: 14px;
+    margin-bottom: 36px;
+  }
+
+  .listing-editor-back {
+    flex-basis: 44px;
+    width: 44px;
+    height: 44px;
+    font-size: 1.35rem;
+  }
+
+  .listing-photos-header h1 {
+    margin-top: 5px;
+    font-size: clamp(1.75rem, 8vw, 2.35rem);
+  }
+
+  .listing-photos-header > div > p {
+    font-size: 0.9rem;
+    line-height: 1.45;
+  }
+
+  .unified-listing-section + .unified-listing-section {
+    margin-top: 40px;
+  }
+
+  .unified-listing-container .create-listing-form input,
+  .unified-listing-container .create-listing-form textarea,
+  .unified-listing-container .create-listing-form select {
+    min-height: 56px;
+    padding: 15px 17px;
+    border-radius: 15px;
+    font-size: 1rem;
+  }
+
+  .unified-listing-container .price-row,
+  .unified-listing-container .price-fields {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+
+  .unified-listing-container .listing-photo-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+  }
+
+  .unified-listing-publish {
+    padding-top: 26px;
+  }
+}
