@@ -172,12 +172,12 @@ export function PhotoUploadForm({
               setClientError(null);
             }
 
-            const previews = acceptedFiles.map((file) => {
+            const previews = acceptedFiles.map((file, index) => {
               const previewUrl = URL.createObjectURL(file);
               previewUrlsRef.current.push(previewUrl);
 
               return {
-                id: crypto.randomUUID(),
+                id: `${Date.now()}-${index}-${file.name}`,
                 file,
                 previewUrl,
               };
