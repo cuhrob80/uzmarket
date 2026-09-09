@@ -1,4 +1,10 @@
-export type ListingStatus = 'draft' | 'active' | 'sold' | 'archived';
+export type ListingStatus =
+  | 'draft'
+  | 'pending'
+  | 'active'
+  | 'rejected'
+  | 'sold'
+  | 'archived';
 
 export type ListingCurrency = 'UZS' | 'USD';
 
@@ -32,6 +38,7 @@ export interface Listing {
   currency: ListingCurrency;
   status: ListingStatus;
   location: string | null;
+  moderationNote: string | null;
   jobType: ListingJobType | null;
   createdAt: string;
   updatedAt: string;
