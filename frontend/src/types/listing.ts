@@ -41,6 +41,7 @@ export interface Listing {
   status: ListingStatus;
   location: string | null;
   moderationNote: string | null;
+  favoriteCount: number;
   jobType: ListingJobType | null;
   createdAt: string;
   updatedAt: string;
