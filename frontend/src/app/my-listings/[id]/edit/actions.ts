@@ -2,7 +2,11 @@
 
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
-import { ApiError, updateListing } from '@/lib/api/server';
+import {
+  ApiError,
+  publishListing,
+  updateListing,
+} from '@/lib/api/server';
 import type { ListingCurrency } from '@/types/listing';
 
 export interface EditListingState {
@@ -23,6 +27,8 @@ export async function editListingAction(
     formData.get('currency') ?? 'UZS',
   ) as ListingCurrency;
   const location = String(formData.get('location') ?? '').trim();
+  const publishAfterSave =
+    formData.get('publishAfterSave') === 'true';
 
   try {
     await updateListing(listingId, {
@@ -33,6 +39,10 @@ export async function editListingAction(
       currency,
       location,
     });
+
+    if (publishAfterSave) {
+      await publishListing(listingId);
+    }
   } catch (error: unknown) {
     if (error instanceof ApiError && error.status === 401) {
       redirect('/login');
@@ -42,13 +52,22 @@ export async function editListingAction(
       error:
         error instanceof ApiError
           ? error.message
-          : 'Не удалось сохранить объявление',
+          : publishAfterSave
+            ? 'Не удалось разместить объявление'
+            : 'Не удалось сохранить объявление',
       success: null,
     };
   }
 
   revalidatePath(`/create-listing/${listingId}`);
   revalidatePath(`/my-listings/${listingId}/edit`);
+  revalidatePath('/my-listings');
+
+  if (publishAfterSave) {
+    redirect(
+      `/my-listings?published=${encodeURIComponent(listingId)}`,
+    );
+  }
 
   return {
     error: null,
