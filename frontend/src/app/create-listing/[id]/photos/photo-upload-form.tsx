@@ -138,7 +138,7 @@ export function PhotoUploadForm({
     const files = Array.from(event.target.files ?? []);
     const acceptedFiles = files.slice(0, remainingSlots);
     const oversizedFile = acceptedFiles.find(
-      (file)(file) => file.size > MAX_FILE_SIZE,
+      (file) => file.size > MAX_FILE_SIZE,
     );
 
     if (inputRef.current) {
