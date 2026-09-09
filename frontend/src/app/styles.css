@@ -3977,6 +3977,10 @@ p { margin: 0; font-size: 1.125rem; }
 
 .account-listings-heading {
   display: flex;
+  width: 100%;
+  max-width: none;
+  margin: 0;
+  padding: 0;
   align-items: center;
   justify-content: space-between;
   gap: 20px;
@@ -4049,6 +4053,8 @@ p { margin: 0; font-size: 1.125rem; }
 
 .account-listings-search {
   display: grid;
+  width: 100%;
+  max-width: none;
   margin: 22px 0;
   grid-template-columns: minmax(0, 1fr) auto;
   gap: 12px;
