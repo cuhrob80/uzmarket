@@ -5,8 +5,10 @@ import { redirect } from 'next/navigation';
 import {
   ApiError,
   archiveListing,
-  deleteListing,
   markListingSold,
+  moveListingToDeleted,
+  permanentlyDeleteListing,
+  restoreListing,
   unpublishListing,
 } from '@/lib/api/server';
 
@@ -14,7 +16,9 @@ export type ListingMenuOperation =
   | 'unpublish'
   | 'sold'
   | 'archive'
-  | 'delete';
+  | 'delete'
+  | 'restore'
+  | 'permanentDelete';
 
 export interface ListingMenuResult {
   error: string | null;
@@ -31,8 +35,12 @@ export async function manageListingAction(
       await markListingSold(listingId);
     } else if (operation === 'archive') {
       await archiveListing(listingId);
+    } else if (operation === 'delete') {
+      await moveListingToDeleted(listingId);
+    } else if (operation === 'restore') {
+      await restoreListing(listingId);
     } else {
-      await deleteListing(listingId);
+      await permanentlyDeleteListing(listingId);
     }
   } catch (error: unknown) {
     if (error instanceof ApiError && error.status === 401) {
