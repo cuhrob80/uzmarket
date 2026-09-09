@@ -220,7 +220,7 @@ export default async function MyListingsPage({
                     </div>
                     <div>
                       <dt>♡ В избранном</dt>
-                      <dd>0</dd>
+                      <dd>{listing.favoriteCount}</dd>
                     </div>
                   </dl>
 
