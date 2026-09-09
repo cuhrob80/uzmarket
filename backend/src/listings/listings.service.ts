@@ -95,7 +95,7 @@ export class ListingsService {
     ) {
       throw new BadRequestException(
         'Only draft or rejected listings can be submitted for review',
-lify      );
+      );
     }
 
     const category = await this.categoriesRepository.findOne({
