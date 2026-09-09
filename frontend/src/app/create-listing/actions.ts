@@ -6,6 +6,7 @@ import type { ListingCurrency, ListingJobType } from '@/types/listing';
 
 export interface CreateListingState {
   error: string | null;
+  listingId?: string | null;
 }
 
 export async function createListingAction(
@@ -74,10 +75,12 @@ export async function createListingAction(
         error instanceof ApiError
           ? error.message
           : 'Не удалось создать объявление. Попробуйте ещё раз.',
+      listingId: null,
     };
   }
 
-  redirect(
-    `/create-listing/${encodeURIComponent(listingId)}`,
-  );
+  return {
+    error: null,
+    listingId,
+  };
 }
