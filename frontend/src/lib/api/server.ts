@@ -373,6 +373,73 @@ export async function publishListing(
   return (await response.json()) as Listing;
 }
 
+async function requestListingAction(
+  listingId: string,
+  action: 'unpublish' | 'sold' | 'archive',
+): Promise<Listing> {
+  const token = await getAccessToken();
+
+  if (!token) {
+    throw new ApiError(401, 'Authentication required');
+  }
+
+  const response = await fetch(
+    createApiUrl(
+      `/api/v1/listings/${encodeURIComponent(listingId)}/${action}`,
+    ),
+    {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+      cache: 'no-store',
+    },
+  );
+
+  if (!response.ok) {
+    throw new ApiError(response.status, await getErrorMessage(response));
+  }
+
+  return (await response.json()) as Listing;
+}
+
+export function unpublishListing(listingId: string): Promise<Listing> {
+  return requestListingAction(listingId, 'unpublish');
+}
+
+export function markListingSold(listingId: string): Promise<Listing> {
+  return requestListingAction(listingId, 'sold');
+}
+
+export function archiveListing(listingId: string): Promise<Listing> {
+  return requestListingAction(listingId, 'archive');
+}
+
+export async function deleteListing(listingId: string): Promise<void> {
+  const token = await getAccessToken();
+
+  if (!token) {
+    throw new ApiError(401, 'Authentication required');
+  }
+
+  const response = await fetch(
+    createApiUrl(
+      `/api/v1/listings/${encodeURIComponent(listingId)}`,
+    ),
+    {
+      method: 'DELETE',
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+      cache: 'no-store',
+    },
+  );
+
+  if (!response.ok) {
+    throw new ApiError(response.status, await getErrorMessage(response));
+  }
+}
+
 export async function getListing(
   listingId: string,
 ): Promise<Listing> {
