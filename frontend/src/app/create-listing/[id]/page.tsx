@@ -112,6 +112,12 @@ export default async function UnifiedListingPage({
                     listingId={listing.id}
                     imageId={image.id}
                   />
+                  <span
+                    className="photo-drag-handle saved-photo-drag-handle"
+                    aria-hidden="true"
+                  >
+                    ⠿
+                  </span>
                 </div>
                 {index === 0 ? (
                   <span className="photo-cover-label">Основное фото</span>
