@@ -11,8 +11,10 @@ const statusLabels: Record<ListingStatus, string> = {
   pending: 'На проверке',
   active: 'Активно',
   rejected: 'Требует исправления',
-  sold: 'Завершено',
+  unpublished: 'Не опубликовано',
+  sold: 'В архиве',
   archived: 'В архиве',
+  deleted: 'Удалено',
 };
 
 const statusTabs: Array<{
@@ -20,11 +22,11 @@ const statusTabs: Array<{
   label: string;
 }> = [
   { value: 'active', label: 'Активные' },
-  { value: 'pending', label: 'На проверке' },
   { value: 'rejected', label: 'С ошибками' },
+  { value: 'unpublished', label: 'Неопубликованные' },
   { value: 'draft', label: 'Черновики' },
   { value: 'archived', label: 'Архив' },
-  { value: 'sold', label: 'Завершённые' },
+  { value: 'deleted', label: 'Удалённые' },
 ];
 
 function formatPrice(listing: Listing): string {
@@ -225,7 +227,8 @@ export default async function MyListingsPage({
                   <div className="account-listing-actions">
                     {(listing.status === 'draft' ||
                       listing.status === 'active' ||
-                      listing.status === 'rejected') && (
+                      listing.status === 'rejected' ||
+                      listing.status === 'unpublished') && (
                       <Link
                         href={`/my-listings/${listing.id}/edit`}
                       >
