@@ -98,7 +98,7 @@ export function CategoriesMenu({
     ) ?? rootCategories[0];
   const groups = selectedRoot
     ? activeCategories.filter(
-        (category) => category.parentId === selectedRootRoot.id,
+        (category) => category.parentId === selectedRoot.id,
       )
     : [];
 
@@ -168,7 +168,7 @@ export function CategoriesMenu({
                           '/category/' +
                           encodeURIComponent(group.slug)
                         }
-                        className="marketplacee-megamenu-group"
+                        className="marketplace-megamenu-group"
                         onClick={closeMenu}
                       >
                         {group.name} ›
