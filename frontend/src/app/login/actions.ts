@@ -13,6 +13,12 @@ export async function loginAction(
 ): Promise<LoginState> {
   const email = formData.get('email');
   const password = formData.get('password');
+  const requestedReturnTo = String(formData.get('returnTo') ?? '');
+  const returnTo =
+    requestedReturnTo.startsWith('/') &&
+    !requestedReturnTo.startsWith('//')
+      ? requestedReturnTo
+      : '/my-listings';
 
   if (typeof email !== 'string' || typeof password !== 'string') {
     return { error: 'Введите email и пароль' };
@@ -34,5 +40,5 @@ export async function loginAction(
     return { error: 'Не удалось выполнить вход. Попробуйте ещё раз.' };
   }
 
-  redirect('/my-listings');
+  redirect(returnTo);
 }
