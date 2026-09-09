@@ -2523,3 +2523,67 @@ p { margin: 0; font-size: 1.125rem; }
     padding-top: 26px;
   }
 }
+
+
+/* Full create-listing form shown before draft creation */
+.unified-create-form {
+  display: grid;
+  gap: 0;
+}
+
+.unified-create-fields {
+  display: grid;
+  gap: 26px;
+}
+
+.unified-create-photos {
+  margin-top: 52px;
+}
+
+.unified-create-photos .photo-upload-form {
+  grid-column: 1 / -1;
+}
+
+.unified-create-submit {
+  margin-top: 34px;
+  padding-top: 34px;
+  border-top: 1px solid #eceef1;
+}
+
+.unified-create-submit > button {
+  width: 100%;
+  min-height: 58px;
+  padding: 0 28px;
+  border: 0;
+  border-radius: 16px;
+  background: #079455;
+  color: #fff;
+  font: inherit;
+  font-size: 1.05rem;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.unified-create-submit > button:hover:not(:disabled) {
+  background: #08783e;
+}
+
+.unified-create-submit > button:disabled {
+  cursor: wait;
+  opacity: 0.6;
+}
+
+@media (max-width: 760px) {
+  .unified-create-fields {
+    gap: 20px;
+  }
+
+  .unified-create-photos {
+    margin-top: 40px;
+  }
+
+  .unified-create-submit {
+    margin-top: 26px;
+    padding-top: 26px;
+  }
+}
