@@ -561,9 +561,9 @@ export async function getCurrentUser(): Promise<AuthUser | null> {
 }
 
 export interface UpdateProfileInput {
-  displayName: string;
-  email: string;
-  phone: string;
+  displayName?: string;
+  email?: string;
+  phone?: string;
 }
 
 export async function updateProfile(
