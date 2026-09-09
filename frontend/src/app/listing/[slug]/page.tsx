@@ -1,5 +1,9 @@
 import { notFound, redirect } from 'next/navigation';
-import { ApiError, getListingByPublicId } from '@/lib/api/server';
+import {
+  ApiError,
+  getFavoriteListingIds,
+  getListingByPublicId,
+} from '@/lib/api/server';
 import type { Listing } from '@/types/listing';
 import { PublicListingView } from '@/components/public-listing-view';
 import { getListingPublicPath } from '@/lib/listing-url';
@@ -47,5 +51,13 @@ export default async function ListingSeoPage({
     redirect(expectedPath);
   }
 
-  return <PublicListingView listing={listing} />;
+  const favoriteIds = await getFavoriteListingIds();
+
+  return (
+    <PublicListingView
+      listing={listing}
+      initialFavorite={favoriteIds?.includes(listing.id) ?? false}
+      isAuthenticated={favoriteIds !== null}
+    />
+  );
 }
