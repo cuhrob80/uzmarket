@@ -2820,3 +2820,76 @@ p { margin: 0; font-size: 1.125rem; }
     font-size: 0.72rem;
   }
 }
+
+
+/* Approved Avito-scale editor sizing */
+.listing-photos-container.unified-listing-container {
+  width: min(100%, 720px);
+}
+
+.listing-photos-header h1 {
+  font-size: 2rem;
+  line-height: 1.15;
+  letter-spacing: -0.025em;
+}
+
+.unified-listing-container > .unified-listing-section,
+.unified-listing-container > .unified-create-form,
+.unified-create-form > .unified-listing-section,
+.unified-create-form > .unified-create-submit {
+  width: calc(100% - 90px);
+  margin-left: 90px;
+}
+
+.unified-listing-section h2 {
+  font-size: 1.75rem;
+}
+
+.unified-listing-container .listing-photo-grid,
+.photo-staging-grid {
+  grid-template-columns: repeat(3, 150px);
+  gap: 10px;
+}
+
+.listing-photo-preview,
+.photo-staging-grid .photo-selection-image,
+.photo-staging-grid .photo-upload-box {
+  width: 150px;
+  height: 113px;
+  aspect-ratio: auto;
+}
+
+@media (max-width: 640px) {
+  .listing-photos-container.unified-listing-container {
+    width: 100%;
+  }
+
+  .listing-photos-header h1 {
+    font-size: 1.75rem;
+  }
+
+  .unified-listing-container > .unified-listing-section,
+  .unified-listing-container > .unified-create-form,
+  .unified-create-form > .unified-listing-section,
+  .unified-create-form > .unified-create-submit {
+    width: 100%;
+    margin-left: 0;
+  }
+
+  .unified-listing-section h2 {
+    font-size: 1.5rem;
+  }
+
+  .unified-listing-container .listing-photo-grid,
+  .photo-staging-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .listing-photo-preview,
+  .photo-staging-grid .photo-selection-image,
+  .photo-staging-grid .photo-upload-box {
+    width: 100%;
+    height: auto;
+    aspect-ratio: 4 / 3;
+  }
+}
