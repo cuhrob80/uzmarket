@@ -1,5 +1,10 @@
 import Link from 'next/link';
-import { getCategories, getListings } from '@/lib/api/server';
+import {
+  getCategories,
+  getFavoriteListingIds,
+  getListings,
+} from '@/lib/api/server';
+import { FavoriteButton } from '@/components/favorite-button';
 import { getListingPublicPath } from '@/lib/listing-url';
 import type { Listing } from '@/types/listing';
 
@@ -69,7 +74,7 @@ export default async function ListingsPage({
       ? params.currency
       : '';
 
-  const [result, categories] = await Promise.all([
+  const [result, categories, favoriteIds] = await Promise.all([
     getListings({
       page,
       limit: 20,
@@ -81,7 +86,10 @@ export default async function ListingsPage({
       location: location || undefined,
     }),
     getCategories(),
+    getFavoriteListingIds(),
   ]);
+
+  const favoriteIdSet = new Set(favoriteIds ?? []);
 
   const totalPages = Math.max(
     1,
@@ -219,39 +227,46 @@ export default async function ListingsPage({
               const image = listing.images[0];
 
               return (
-                <Link
-                  key={listing.id}
-                  href={getListingPublicPath(listing)}
-                  className="catalog-card"
-                >
-                  <div className="catalog-card-image">
-                    {image ? (
-                      <img
-                        src={image.url}
-                        alt={listing.title}
-                        width={320}
-                        height={240}
-                      />
-                    ) : (
-                      <span>Нет фото</span>
-                    )}
-                  </div>
+                <article className="catalog-card" key={listing.id}>
+                  <Link
+                    href={getListingPublicPath(listing)}
+                    className="catalog-card-link"
+                  >
+                    <div className="catalog-card-image">
+                      {image ? (
+                        <img
+                          src={image.url}
+                          alt={listing.title}
+                          width={320}
+                          height={240}
+                        />
+                      ) : (
+                        <span>Нет фото</span>
+                      )}
+                    </div>
 
-                  <div className="catalog-card-content">
-                    <h2>{listing.title}</h2>
+                    <div className="catalog-card-content">
+                      <h2>{listing.title}</h2>
 
-                    <p className="catalog-card-price">
-                      {formatPrice(listing)}
-                    </p>
+                      <p className="catalog-card-price">
+                        {formatPrice(listing)}
+                      </p>
 
-                    <p className="catalog-card-meta">
-                      {listing.category.name}
-                      {listing.location
-                        ? ` · ${listing.location}`
-                        : ''}
-                    </p>
-                  </div>
-                </Link>
+                      <p className="catalog-card-meta">
+                        {listing.category.name}
+                        {listing.location
+                          ? ` · ${listing.location}`
+                          : ''}
+                      </p>
+                    </div>
+                  </Link>
+                  <FavoriteButton
+                    listingId={listing.id}
+                    initialFavorite={favoriteIdSet.has(listing.id)}
+                    isAuthenticated={favoriteIds !== null}
+                    className="catalog-favorite-button"
+                  />
+                </article>
               );
             })}
           </div>
