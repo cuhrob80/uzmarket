@@ -59,7 +59,8 @@ export class ListingsService {
 
     if (
       listing.status !== ListingStatus.Draft &&
-      listing.status !== ListingStatus.Active
+      listing.status !== ListingStatus.Active &&
+      listing.status !== ListingStatus.Rejected
     ) {
       throw new BadRequestException('Listing cannot be edited in its current status');
     }
@@ -88,8 +89,13 @@ export class ListingsService {
   async publish(id: string, sellerId: string): Promise<ListingResponseDto> {
     const listing = await this.findOwnedListing(id, sellerId);
 
-    if (listing.status !== ListingStatus.Draft) {
-      throw new BadRequestException('Only draft listings can be published');
+    if (
+      listing.status !== ListingStatus.Draft &&
+      listing.status !== ListingStatus.Rejected
+    ) {
+      throw new BadRequestException(
+        'Only draft or rejected listings can be submitted for review',
+lify      );
     }
 
     const category = await this.categoriesRepository.findOne({
@@ -120,7 +126,8 @@ export class ListingsService {
       );
     }
 
-    listing.status = ListingStatus.Active;
+    listing.status = ListingStatus.Pending;
+    listing.moderationNote = null;
     await this.listingsRepository.save(listing);
 
     return this.findResponseById(listing.id);
@@ -129,8 +136,13 @@ export class ListingsService {
   async unpublish(id: string, sellerId: string): Promise<ListingResponseDto> {
     const listing = await this.findOwnedListing(id, sellerId);
 
-    if (listing.status !== ListingStatus.Active) {
-      throw new BadRequestException('Only active listings can be unpublished');
+    if (
+      listing.status !== ListingStatus.Active &&
+      listing.status !== ListingStatus.Pending
+    ) {
+      throw new BadRequestException(
+        'Only active or pending listings can be unpublished',
+      );
     }
 
     listing.status = ListingStatus.Draft;
@@ -157,7 +169,8 @@ export class ListingsService {
 
     if (
       listing.status !== ListingStatus.Draft &&
-      listing.status !== ListingStatus.Active
+      listing.status !== ListingStatus.Active &&
+      listing.status !== ListingStatus.Rejected
     ) {
       throw new BadRequestException('Listing cannot be archived in its current status');
     }
@@ -426,6 +439,7 @@ export class ListingsService {
       currency: listing.currency,
       status: listing.status,
       location: listing.location,
+      moderationNote: listing.moderationNote,
       jobType: listing.jobType,
       createdAt: listing.createdAt,
       updatedAt: listing.updatedAt,
