@@ -2,7 +2,6 @@ import Link from 'next/link';
 import { getCategories, getListings } from '@/lib/api/server';
 import { getListingPublicPath } from '@/lib/listing-url';
 import type { Listing } from '@/types/listing';
-import { MarketplaceHeader } from '@/components/marketplace-header';
 
 export const dynamic = 'force-dynamic';
 
@@ -35,8 +34,6 @@ export default async function Home() {
 
   return (
     <main className="marketplace-home">
-      <MarketplaceHeader />
-
       <section className="home-section home-container">
         <div className="home-section-header">
           <h2>Категории</h2>
