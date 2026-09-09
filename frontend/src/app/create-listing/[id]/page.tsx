@@ -2,7 +2,7 @@ import { notFound, redirect } from 'next/navigation';
 import { ApiError, getCategories, getMyListing } from '@/lib/api/server';
 import { EditListingForm } from '@/app/my-listings/[id]/edit/edit-listing-form';
 import { DeletePhotoButton } from './photos/delete-photo-button';
-import { PhotoOrderControls } from './photos/photo-order-controls';
+import { DraggablePhotoCard } from './photos/draggable-photo-card';
 import { PhotoUploadForm } from './photos/photo-upload-form';
 import { RotatePhotoButton } from './photos/rotate-photo-button';
 
@@ -91,7 +91,12 @@ export default async function UnifiedListingPage({
 
           <div className="listing-photo-grid" aria-label="Фотографии объявления">
             {images.map((image, index) => (
-              <article className="listing-photo-card" key={image.id}>
+              <DraggablePhotoCard
+                key={image.id}
+                listingId={listing.id}
+                imageIds={imageIds}
+                imageId={image.id}
+              >
                 <div className="listing-photo-preview">
                   <RotatePhotoButton
                     listingId={listing.id}
@@ -103,22 +108,15 @@ export default async function UnifiedListingPage({
                     width={320}
                     height={240}
                   />
-                  {index === 0 ? (
-                    <span className="listing-cover-badge">Обложка</span>
-                  ) : null}
-                </div>
-                <div className="listing-photo-actions">
-                  <PhotoOrderControls
-                    listingId={listing.id}
-                    imageIds={imageIds}
-                    index={index}
-                  />
                   <DeletePhotoButton
                     listingId={listing.id}
                     imageId={image.id}
                   />
                 </div>
-              </article>
+                {index === 0 ? (
+                  <span className="photo-cover-label">Основное фото</span>
+                ) : null}
+              </DraggablePhotoCard>
             ))}
 
             {images.length < 10 ? (
