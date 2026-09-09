@@ -375,7 +375,7 @@ export async function publishListing(
 
 async function requestListingAction(
   listingId: string,
-  action: 'unpublish' | 'sold' | 'archive',
+  action: 'unpublish' | 'sold' | 'archive' | 'delete' | 'restore',
 ): Promise<Listing> {
   const token = await getAccessToken();
 
@@ -415,7 +415,17 @@ export function archiveListing(listingId: string): Promise<Listing> {
   return requestListingAction(listingId, 'archive');
 }
 
-export async function deleteListing(listingId: string): Promise<void> {
+export function moveListingToDeleted(
+  listingId: string,
+): Promise<Listing> {
+  return requestListingAction(listingId, 'delete');
+}
+
+export function restoreListing(listingId: string): Promise<Listing> {
+  return requestListingAction(listingId, 'restore');
+}
+
+export async function permanentlyDeleteListing(listingId: string): Promise<void> {
   const token = await getAccessToken();
 
   if (!token) {
