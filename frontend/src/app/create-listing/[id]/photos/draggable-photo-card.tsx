@@ -67,13 +67,6 @@ export function DraggablePhotoCard({
       onDragEnd={() => setIsDragging(false)}
     >
       {children}
-      <span
-        className="photo-drag-handle saved-photo-drag-handle"
-        aria-label="Перетащите фотографию, чтобы изменить порядок"
-        role="img"
-      >
-        ⠿
-      </span>
     </article>
   );
 }
