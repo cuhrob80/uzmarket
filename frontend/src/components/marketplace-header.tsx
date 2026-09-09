@@ -1,4 +1,7 @@
 import Link from 'next/link';
+import { getCurrentUser } from '@/lib/api/server';
+import { logoutAction } from '@/app/profile/actions';
+import type { AuthUser } from '@/types/listing';
 
 function SearchIcon() {
   return (
@@ -43,7 +46,18 @@ function MessageIcon() {
   );
 }
 
-export function MarketplaceHeader() {
+export async function MarketplaceHeader() {
+  let user: AuthUser | null = null;
+
+  try {
+    user = await getCurrentUser();
+  } catch (error: unknown) {
+    console.error('Failed to load header profile:', error);
+  }
+
+  const initials =
+    user?.displayName.trim().slice(0, 2).toUpperCase() || 'UZ';
+
   return (
     <header className="marketplace-header">
       <div className="marketplace-header-top">
@@ -91,13 +105,32 @@ export function MarketplaceHeader() {
             >
               <MessageIcon />
             </button>
-            <Link
-              href="/login"
-              className="marketplace-avatar"
-              aria-label="Личный кабинет"
-            >
-              UZ
-            </Link>
+            {user ? (
+              <details className="marketplace-profile-menu">
+                <summary
+                  className="marketplace-avatar"
+                  aria-label="Открыть личный кабинет"
+                >
+                  {user.avatarUrl ? (
+                    <img src={user.avatarUrl} alt="" />
+                  ) : (
+                    <span>{initials}</span>
+                  )}
+                </summary>
+                <nav aria-label="Личный кабинет">
+                  <Link href="/profile">Личный кабинет</Link>
+                  <Link href="/my-listings">Мои объявления</Link>
+                  <Link href="/profile">Настройки профиля</Link>
+                  <form action={logoutAction}>
+                    <button type="submit">Выйти</button>
+                  </form>
+                </nav>
+              </details>
+            ) : (
+              <Link href="/login" className="marketplace-login-link">
+                Войти
+              </Link>
+            )}
           </nav>
         </div>
       </div>
