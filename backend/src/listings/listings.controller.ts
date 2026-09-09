@@ -138,6 +138,15 @@ export class ListingsController {
     return this.listingsService.publish(id, user.userId);
   }
 
+  @Post(':id/unpublish')
+  @UseGuards(JwtAuthGuard)
+  unpublish(
+    @Param('id', new ParseUUIDPipe()) id: string,
+    @CurrentUser() user: JwtUser,
+  ): Promise<ListingResponseDto> {
+    return this.listingsService.unpublish(id, user.userId);
+  }
+
   @Post(':id/sold')
   @UseGuards(JwtAuthGuard)
   markSold(
@@ -154,6 +163,16 @@ export class ListingsController {
     @CurrentUser() user: JwtUser,
   ): Promise<ListingResponseDto> {
     return this.listingsService.archive(id, user.userId);
+  }
+
+  @Delete(':id')
+  @HttpCode(204)
+  @UseGuards(JwtAuthGuard)
+  async deleteListing(
+    @Param('id', new ParseUUIDPipe()) id: string,
+    @CurrentUser() user: JwtUser,
+  ): Promise<void> {
+    await this.listingMediaService.deleteListing(id, user.userId);
   }
 
   @Get('mine')
