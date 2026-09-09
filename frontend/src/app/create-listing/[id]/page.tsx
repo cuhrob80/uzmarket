@@ -45,12 +45,17 @@ export default async function UnifiedListingPage({
     <main className="listing-photos-page">
       <section className="listing-photos-container unified-listing-container">
         <header className="listing-photos-header">
-          <p className="listing-photos-step">Новое объявление</p>
-          <h1>{listing.title}</h1>
-          <p>
-            Всё на одной странице: проверьте данные, добавьте фотографии
-            и опубликуйте объявление.
-          </p>
+          <p className="listing-editor-back" aria-hidden="true">←</p>
+          <div>
+            <h1>
+              {listing.status === 'draft'
+                ? 'Новое объявление'
+                : 'Редактирование объявления'}
+            </h1>
+            <p>
+              {listing.category.name} › {listing.title}
+            </p>
+          </div>
         </header>
 
         <div className="unified-listing-section">
