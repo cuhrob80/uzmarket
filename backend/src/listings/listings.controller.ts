@@ -193,6 +193,38 @@ export class ListingsController {
     await this.listingMediaService.deleteListing(id, user.userId);
   }
 
+  @Post(':id/favorite')
+  @HttpCode(204)
+  @UseGuards(JwtAuthGuard)
+  async addFavorite(
+    @Param('id', new ParseUUIDPipe()) id: string,
+    @CurrentUser() user: JwtUser,
+  ): Promise<void> {
+    await this.listingsService.addFavorite(id, user.userId);
+  }
+
+  @Delete(':id/favorite')
+  @HttpCode(204)
+  @UseGuards(JwtAuthGuard)
+  async removeFavorite(
+    @Param('id', new ParseUUIDPipe()) id: string,
+    @CurrentUser() user: JwtUser,
+  ): Promise<void> {
+    await this.listingsService.removeFavorite(id, user.userId);
+  }
+
+  @Get('favorites/ids')
+  @UseGuards(JwtAuthGuard)
+  getFavoriteIds(@CurrentUser() user: JwtUser): Promise<string[]> {
+    return this.listingsService.getFavoriteIds(user.userId);
+  }
+
+  @Get('favorites')
+  @UseGuards(JwtAuthGuard)
+  getFavorites(@CurrentUser() user: JwtUser): Promise<ListingResponseDto[]> {
+    return this.listingsService.getFavorites(user.userId);
+  }
+
   @Get('mine')
   @UseGuards(JwtAuthGuard)
   findMine(
