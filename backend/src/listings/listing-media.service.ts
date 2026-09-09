@@ -134,6 +134,13 @@ export class ListingMediaService {
         listingId,
         sellerId,
       );
+
+      if (listing.status !== ListingStatus.Deleted) {
+        throw new BadRequestException(
+          'Listing must be moved to deleted before permanent deletion',
+        );
+      }
+
       const imagesRepository = manager.getRepository(ListingImage);
       const images = await imagesRepository.find({
         where: { listingId },
@@ -372,7 +379,8 @@ export class ListingMediaService {
     if (
       listing.status !== ListingStatus.Draft &&
       listing.status !== ListingStatus.Active &&
-      listing.status !== ListingStatus.Rejected
+      listing.status !== ListingStatus.Rejected &&
+      listing.status !== ListingStatus.Unpublished
     ) {
       throw new BadRequestException(
         'Listing media cannot be edited in its current status',
