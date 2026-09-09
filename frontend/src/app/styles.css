@@ -4111,7 +4111,7 @@ p { margin: 0; font-size: 1.125rem; }
   border-radius: 16px;
   background: #fff;
   box-shadow: 0 7px 22px rgb(23 32 51 / 5%);
-  grid-template-columns: 180px minmax(240px, 1fr) 160px auto;
+  grid-template-columns: 180px minmax(240px, 1fr) 160px 210px;
   gap: 20px;
 }
 
@@ -4193,6 +4193,22 @@ p { margin: 0; font-size: 1.125rem; }
   color: #b42318;
 }
 
+.account-listing-status.status-unpublished {
+  background: #f0f2f5;
+  color: #475467;
+}
+
+.account-listing-status.status-archived,
+.account-listing-status.status-sold {
+  background: #eef1f4;
+  color: #475467;
+}
+
+.account-listing-status.status-deleted {
+  background: #feeceb;
+  color: #b42318;
+}
+
 .account-moderation-message {
   padding: 9px 11px;
   border-radius: 9px;
@@ -4234,7 +4250,9 @@ p { margin: 0; font-size: 1.125rem; }
 
 .account-listing-actions {
   display: flex;
+  width: 210px;
   align-self: start;
+  justify-content: flex-end;
   gap: 8px;
 }
 
@@ -4437,8 +4455,10 @@ p { margin: 0; font-size: 1.125rem; }
   }
 
   .account-listing-actions {
+    width: 100%;
     grid-column: 1 / -1;
     grid-row: auto;
+    justify-content: flex-start;
   }
 }
 
