@@ -3528,3 +3528,131 @@ p { margin: 0; font-size: 1.125rem; }
     height: 112px;
   }
 }
+
+
+/* Account reviews and rating */
+.reviews-container {
+  width: min(100%, 760px);
+}
+
+.reviews-heading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 24px;
+  margin-bottom: 28px;
+}
+
+.reviews-heading h1 {
+  margin: 12px 0 0;
+  text-align: left;
+}
+
+.reviews-back {
+  color: #526075;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.reviews-back:hover {
+  color: #079455;
+}
+
+.account-rating {
+  display: grid;
+  min-width: 150px;
+  padding: 16px 20px;
+  border-radius: 14px;
+  background: #f2f7f4;
+  grid-template-columns: auto auto;
+  align-items: center;
+  justify-content: center;
+  column-gap: 6px;
+}
+
+.account-rating strong {
+  color: #172033;
+  font-size: 1.8rem;
+}
+
+.account-rating > span {
+  color: #ffb800;
+  font-size: 1.55rem;
+}
+
+.account-rating small {
+  grid-column: 1 / -1;
+  color: #687386;
+}
+
+.reviews-tabs {
+  display: grid;
+  padding: 4px;
+  border-radius: 13px;
+  background: #f2f3f5;
+  grid-template-columns: 1fr 1fr;
+}
+
+.reviews-tabs a {
+  min-height: 46px;
+  padding: 12px;
+  border-radius: 10px;
+  color: #526075;
+  font-weight: 800;
+  text-align: center;
+  text-decoration: none;
+}
+
+.reviews-tabs a.is-active {
+  background: #fff;
+  color: #079455;
+  box-shadow: 0 2px 8px rgb(16 24 40 / 8%);
+}
+
+.reviews-empty {
+  display: grid;
+  min-height: 300px;
+  place-items: center;
+  align-content: center;
+  text-align: center;
+}
+
+.reviews-empty > span {
+  display: grid;
+  width: 68px;
+  height: 68px;
+  margin-bottom: 16px;
+  place-items: center;
+  border-radius: 50%;
+  background: #e8f7ef;
+  color: #079455;
+  font-size: 2rem;
+}
+
+.reviews-empty h2 {
+  margin: 0 0 8px;
+  color: #172033;
+}
+
+.reviews-empty p {
+  max-width: 440px;
+  margin: 0;
+  color: #687386;
+  line-height: 1.5;
+}
+
+@media (max-width: 640px) {
+  .reviews-heading {
+    flex-direction: column;
+  }
+
+  .account-rating {
+    width: 100%;
+  }
+
+  .reviews-tabs a {
+    display: grid;
+    place-items: center;
+    font-size: 0.85rem;
+  }
+}
