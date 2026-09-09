@@ -1,8 +1,8 @@
 import Link from 'next/link';
 import { unstable_rethrow } from 'next/navigation';
 import { getCurrentUser } from '@/lib/api/server';
-import { logoutAction } from '@/app/profile/actions';
 import type { AuthUser } from '@/types/listing';
+import { ProfileMenu } from './profile-menu';
 
 function SearchIcon() {
   return (
@@ -57,8 +57,6 @@ export async function MarketplaceHeader() {
     console.error('Failed to load header profile:', error);
   }
 
-  const initials =
-    user?.displayName.trim().slice(0, 2).toUpperCase() || 'UZ';
 
   return (
     <header className="marketplace-header">
@@ -108,27 +106,7 @@ export async function MarketplaceHeader() {
               <MessageIcon />
             </button>
             {user ? (
-              <details className="marketplace-profile-menu">
-                <summary
-                  className="marketplace-avatar"
-                  aria-label="Открыть личный кабинет"
-                >
-                  {user.avatarUrl ? (
-                    <img src={user.avatarUrl} alt="" />
-                  ) : (
-                    <span>{initials}</span>
-                  )}
-                </summary>
-                <nav aria-label="Личный кабинет">
-                  <Link href="/profile">Личный кабинет</Link>
-                  <Link href="/my-listings">Мои объявления</Link>
-                  <Link href="/profile/reviews">Отзывы и рейтинг</Link>
-                  <Link href="/profile">Настройки профиля</Link>
-                  <form action={logoutAction}>
-                    <button type="submit">Выйти</button>
-                  </form>
-                </nav>
-              </details>
+              <ProfileMenu user={user} />
             ) : (
               <Link href="/login" className="marketplace-login-link">
                 Войти
