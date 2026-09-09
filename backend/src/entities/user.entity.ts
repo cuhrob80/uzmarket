@@ -22,6 +22,17 @@ export class User {
   @Column({ name: 'display_name' })
   displayName!: string;
 
+  @Column({ name: 'avatar_url', type: 'varchar', nullable: true })
+  avatarUrl!: string | null;
+
+  @Column({
+    name: 'avatar_storage_key',
+    type: 'varchar',
+    nullable: true,
+    select: false,
+  })
+  avatarStorageKey!: string | null;
+
   @Column({ name: 'password_hash', select: false })
   passwordHash!: string;
 
