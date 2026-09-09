@@ -2,7 +2,6 @@ import type { Metadata } from 'next';
 import type { ReactNode } from 'react';
 import { MarketplaceHeader } from '@/components/marketplace-header';
 import { siteUrl } from '@/lib/seo';
-import { MarketplaceHeader } from '@/components/marketplace-header';
 import './styles.css';
 
 export const metadata: Metadata = {
