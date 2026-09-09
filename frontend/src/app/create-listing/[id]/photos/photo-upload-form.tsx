@@ -4,8 +4,9 @@ import { useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 
 interface PhotoUploadFormProps {
-  listingId: string;
+  listingId?: string;
   imageCount: number;
+  onFilesSelected?: (files: File[]) => void;
 }
 
 interface SelectedPhoto {
@@ -23,6 +24,7 @@ const MAX_FILE_SIZE = 20 * 1024 * 1024;
 export function PhotoUploadForm({
   listingId,
   imageCount,
+  onFilesSelected,
 }: PhotoUploadFormProps) {
   const router = useRouter();
   const [uploading, setUploading] = useState(false);
@@ -54,6 +56,10 @@ export function PhotoUploadForm({
   }
 
   async function uploadFiles(files: File[]) {
+    if (!listingId) {
+      return;
+    }
+
     setUploading(true);
 
     try {
@@ -184,7 +190,11 @@ export function PhotoUploadForm({
             });
 
             setSelectedPhotos(previews);
-            void uploadFiles(acceptedFiles);
+            onFilesSelected?.(acceptedFiles);
+
+            if (listingId) {
+              void uploadFiles(acceptedFiles);
+            }
           }}
         />
       </label>
@@ -193,7 +203,11 @@ export function PhotoUploadForm({
         <>
           <div className="photo-selection-header">
             <strong>Выбрано: {selectedPhotos.length}</strong>
-            <span>Фотографии загружаются автоматически</span>
+            <span>
+              {listingId
+                ? 'Фотографии загружаются автоматически'
+                : 'Фотографии будут загружены при размещении'}
+            </span>
           </div>
 
           <div
