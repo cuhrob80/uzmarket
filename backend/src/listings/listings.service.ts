@@ -126,6 +126,19 @@ export class ListingsService {
     return this.findResponseById(listing.id);
   }
 
+  async unpublish(id: string, sellerId: string): Promise<ListingResponseDto> {
+    const listing = await this.findOwnedListing(id, sellerId);
+
+    if (listing.status !== ListingStatus.Active) {
+      throw new BadRequestException('Only active listings can be unpublished');
+    }
+
+    listing.status = ListingStatus.Draft;
+    await this.listingsRepository.save(listing);
+
+    return this.findResponseById(listing.id);
+  }
+
   async markSold(id: string, sellerId: string): Promise<ListingResponseDto> {
     const listing = await this.findOwnedListing(id, sellerId);
 
