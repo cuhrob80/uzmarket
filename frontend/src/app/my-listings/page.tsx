@@ -1,6 +1,5 @@
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
-import { MarketplaceHeader } from '@/components/marketplace-header';
 import { getMyListings } from '@/lib/api/server';
 import type { Listing, ListingStatus } from '@/types/listing';
 
@@ -34,8 +33,6 @@ export default async function MyListingsPage() {
 
   return (
     <div className="my-listings-shell">
-      <MarketplaceHeader />
-
       <main className="my-listings-page">
         <section
           className="my-listings-container"
