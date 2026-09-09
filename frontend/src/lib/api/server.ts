@@ -93,9 +93,15 @@ export async function getAccessToken(): Promise<string | null> {
   return cookieStore.get(AUTH_COOKIE_NAME)?.value ?? null;
 }
 
+export interface GetMyListingsOptions {
+  status?: Listing['status'];
+  search?: string;
+}
+
 export async function getMyListings(
   page = 1,
   limit = 20,
+  options: GetMyListingsOptions = {},
 ): Promise<ListingsPage | null> {
   const accessToken = await getAccessToken();
 
@@ -106,6 +112,14 @@ export async function getMyListings(
   const url = createApiUrl('/api/v1/listings/mine');
   url.searchParams.set('page', String(page));
   url.searchParams.set('limit', String(limit));
+
+  if (options.status) {
+    url.searchParams.set('status', options.status);
+  }
+
+  if (options.search?.trim()) {
+    url.searchParams.set('search', options.search.trim());
+  }
 
   const response = await fetch(url, {
     headers: {
