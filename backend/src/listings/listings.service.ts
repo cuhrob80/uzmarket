@@ -1,7 +1,7 @@
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { ILike, In, type FindOptionsWhere, Repository } from 'typeorm';
-import { Category, Listing, ListingImage, ListingJobType, ListingStatus, User } from '../entities';
+import { Category, Listing, ListingFavorite, ListingImage, ListingJobType, ListingStatus, User } from '../entities';
 import { CreateListingDto } from './dto/create-listing.dto';
 import { ListListingsQueryDto } from './dto/list-listings-query.dto';
 import { ListMineListingsQueryDto } from './dto/list-mine-listings-query.dto';
@@ -13,6 +13,8 @@ export class ListingsService {
   constructor(
     @InjectRepository(Listing)
     private readonly listingsRepository: Repository<Listing>,
+    @InjectRepository(ListingFavorite)
+    private readonly favoritesRepository: Repository<ListingFavorite>,
     @InjectRepository(User)
     private readonly usersRepository: Repository<User>,
     @InjectRepository(Category)
@@ -219,6 +221,59 @@ export class ListingsService {
     await this.listingsRepository.save(listing);
 
     return this.findResponseById(listing.id);
+  }
+
+  async addFavorite(listingId: string, userId: string): Promise<void> {
+    const listing = await this.listingsRepository.findOne({
+      where: { id: listingId, status: ListingStatus.Active },
+      select: { id: true },
+    });
+
+    if (!listing) {
+      throw new NotFoundException('Listing not found');
+    }
+
+    await this.favoritesRepository.upsert(
+      { listingId, userId },
+      ['userId', 'listingId'],
+    );
+  }
+
+  async removeFavorite(listingId: string, userId: string): Promise<void> {
+    await this.favoritesRepository.delete({ listingId, userId });
+  }
+
+  async getFavoriteIds(userId: string): Promise<string[]> {
+    const favorites = await this.favoritesRepository.find({
+      where: {
+        userId,
+        listing: { status: ListingStatus.Active },
+      },
+      relations: { listing: true },
+      select: { listingId: true },
+      order: { createdAt: 'DESC' },
+    });
+
+    return favorites.map((favorite) => favorite.listingId);
+  }
+
+  async getFavorites(userId: string): Promise<ListingResponseDto[]> {
+    const favorites = await this.favoritesRepository.find({
+      where: {
+        userId,
+        listing: { status: ListingStatus.Active },
+      },
+      relations: {
+        listing: {
+          seller: true,
+          category: true,
+          images: true,
+        },
+      },
+      order: { createdAt: 'DESC' },
+    });
+
+    return favorites.map((favorite) => this.toResponse(favorite.listing));
   }
 
   async findOne(id: string): Promise<ListingResponseDto> {
