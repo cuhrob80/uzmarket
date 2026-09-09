@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import type { ReactNode } from 'react';
 import { siteUrl } from '@/lib/seo';
+import { MarketplaceHeader } from '@/components/marketplace-header';
 import './styles.css';
 
 export const metadata: Metadata = {
@@ -30,7 +31,10 @@ export default function RootLayout({
 }: Readonly<{ children: ReactNode }>) {
   return (
     <html lang="ru">
-      <body>{children}</body>
+      <body>
+        <MarketplaceHeader />
+        {children}
+      </body>
     </html>
   );
 }
