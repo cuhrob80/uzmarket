@@ -1,8 +1,26 @@
 'use client';
 
 import Link from 'next/link';
-import { useEffect, useMemo, useRef } from 'react';
+import {
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 import type { Category } from '@/types/listing';
+
+function getCategoryIcon(category: Category): string {
+  const value = (category.slug + ' ' + category.name).toLowerCase();
+
+  if (value.includes('transport') || value.includes('транспорт')) return '🚙';
+  if (value.includes('real') || value.includes('недвиж')) return '🏢';
+  if (value.includes('job') || value.includes('работ')) return '💼';
+  if (value.includes('service') || value.includes('услуг')) return '🛠️';
+  if (value.includes('electron') || value.includes('электрон')) return '📱';
+  if (value.includes('home') || value.includes('дом')) return '🏠';
+
+  return '●';
+}
 
 export function CategoriesMenu({
   categories,
@@ -21,9 +39,27 @@ export function CategoriesMenu({
         ),
     [categories],
   );
-  const rootCategories = activeCategories.filter(
-    (category) => category.parentId === null,
+  const rootCategories = useMemo(
+    () =>
+      activeCategories.filter(
+        (category) => category.parentId === null,
+      ),
+    [activeCategories],
   );
+  const [selectedRootId, setSelectedRootId] = useState(
+    rootCategories[0]?.id ?? '',
+  );
+
+  useEffect(() => {
+    if (
+      rootCategories.length > 0 &&
+      !rootCategories.some(
+        (category) => category.id === selectedRootId,
+      )
+    ) {
+      setSelectedRootId(rootCategories[0].id);
+    }
+  }, [rootCategories, selectedRootId]);
 
   useEffect(() => {
     function closeMenu() {
@@ -56,6 +92,16 @@ export function CategoriesMenu({
     };
   }, []);
 
+  const selectedRoot =
+    rootCategories.find(
+      (category) => category.id === selectedRootId,
+    ) ?? rootCategories[0];
+  const groups = selectedRoot
+    ? activeCategories.filter(
+        (category) => category.parentId === selectedRootRoot.id,
+      )
+    : [];
+
   function closeMenu() {
     menuRef.current?.removeAttribute('open');
   }
@@ -71,39 +117,104 @@ export function CategoriesMenu({
         Все категории
       </summary>
 
-      <nav aria-label="Все категории" onClick={closeMenu}>
-        {rootCategories.map((category) => {
-          const children = activeCategories.filter(
-            (item) => item.parentId === category.id,
-          );
+      <div className="marketplace-categories-overlay" aria-hidden="true" />
 
-          return (
-            <section key={category.id}>
+      <div className="marketplace-megamenu">
+        <aside aria-label="Главные категории">
+          {rootCategories.map((category) => (
+            <button
+              key={category.id}
+              type="button"
+              className={
+                category.id === selectedRoot?.id
+                  ? 'is-active'
+                  : undefined
+              }
+              onClick={() => setSelectedRootId(category.id)}
+            >
+              <span aria-hidden="true">
+                {getCategoryIcon(category)}
+              </span>
+              <strong>{category.name}</strong>
+              <i aria-hidden="true">›</i>
+            </button>
+          ))}
+        </aside>
+
+        <section className="marketplace-megamenu-content">
+          {selectedRoot ? (
+            <>
               <Link
-                href={'/category/' + encodeURIComponent(category.slug)}
-                className="marketplace-category-root"
+                href={
+                  '/category/' +
+                  encodeURIComponent(selectedRoot.slug)
+                }
+                className="marketplace-megamenu-title"
+                onClick={closeMenu}
               >
-                {category.name}
+                {selectedRoot.name} ›
               </Link>
-              {children.length > 0 ? (
-                <div>
-                  {children.map((child) => (
-                    <Link
-                      key={child.id}
-                      href={'/category/' + encodeURIComponent(child.slug)}
-                    >
-                      {child.name}
-                    </Link>
-                  ))}
+
+              <div className="marketplace-megamenu-groups">
+                {groups.map((group) => {
+                  const children = activeCategories.filter(
+                    (category) => category.parentId === group.id,
+                  );
+
+                  return (
+                    <section key={group.id}>
+                      <Link
+                        href={
+                          '/category/' +
+                          encodeURIComponent(group.slug)
+                        }
+                        className="marketplacee-megamenu-group"
+                        onClick={closeMenu}
+                      >
+                        {group.name} ›
+                      </Link>
+                      {children.map((child) => (
+                        <Link
+                          key={child.id}
+                          href={
+                            '/category/' +
+                            encodeURIComponent(child.slug)
+                          }
+                          onClick={closeMenu}
+                        >
+                          {child.name}
+                        </Link>
+                      ))}
+                    </section>
+                  );
+                })}
+              </div>
+
+              {groups.length === 0 ? (
+                <div className="marketplace-megamenu-empty">
+                  <p>В этом разделе пока нет подкатегорий.</p>
+                  <Link
+                    href={
+                      '/category/' +
+                      encodeURIComponent(selectedRoot.slug)
+                    }
+                    onClick={closeMenu}
+                  >
+                    Смотреть объявления
+                  </Link>
                 </div>
               ) : null}
-            </section>
-          );
-        })}
-        {rootCategories.length === 0 ? (
-          <Link href="/listings">Смотреть все объявления</Link>
-        ) : null}
-      </nav>
+            </>
+          ) : (
+            <div className="marketplace-megamenu-empty">
+              <p>Категории пока не добавлены.</p>
+              <Link href="/listings" onClick={closeMenu}>
+                Смотреть все объявления
+              </Link>
+            </div>
+          )}
+        </section>
+      </div>
     </details>
   );
 }
