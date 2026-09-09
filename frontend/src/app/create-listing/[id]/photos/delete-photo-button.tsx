@@ -19,13 +19,15 @@ export function DeletePhotoButton({
       type="button"
       className="photo-delete-button"
       disabled={pending}
+      aria-label="Удалить фотографию"
+      title="Удалить фотографию"
       onClick={() => {
         startTransition(async () => {
           await deletePhotoAction(listingId, imageId);
         });
       }}
     >
-      {pending ? 'Удаляем…' : 'Удалить'}
+      {pending ? '…' : '×'}
     </button>
   );
 }
