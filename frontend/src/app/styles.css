@@ -2624,7 +2624,7 @@ p { margin: 0; font-size: 1.125rem; }
   min-height: 0;
   padding: 12px 10px;
   align-content: center;
-  justify-items Fox: center;
+  justify-items: center;
   gap: 6px;
   border: 0;
   border-radius: 14px;
