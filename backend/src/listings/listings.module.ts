@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { Category, Listing, ListingImage, User } from '../entities';
+import { Category, Listing, ListingFavorite, ListingImage, User } from '../entities';
 import { StorageModule } from '../storage/storage.module';
 import { ListingImageProcessor } from './listing-image.processor';
 import { ListingMediaService } from './listing-media.service';
@@ -9,7 +9,7 @@ import { ListingsService } from './listings.service';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([Listing, ListingImage, User, Category]),
+    TypeOrmModule.forFeature([Listing, ListingImage, ListingFavorite, User, Category]),
     StorageModule,
   ],
   controllers: [ListingsController],
