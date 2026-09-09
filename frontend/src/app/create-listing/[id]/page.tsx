@@ -1,4 +1,3 @@
-import Link from 'next/link';
 import { notFound, redirect } from 'next/navigation';
 import { ApiError, getCategories, getMyListing } from '@/lib/api/server';
 import { EditListingForm } from '@/app/my-listings/[id]/edit/edit-listing-form';
@@ -6,7 +5,6 @@ import { DeletePhotoButton } from './photos/delete-photo-button';
 import { PhotoOrderControls } from './photos/photo-order-controls';
 import { PhotoUploadForm } from './photos/photo-upload-form';
 import { RotatePhotoButton } from './photos/rotate-photo-button';
-import { PublishButton } from './review/publish-button';
 
 export const dynamic = 'force-dynamic';
 
@@ -41,6 +39,7 @@ export default async function UnifiedListingPage({
   const isJobListing =
     listing.jobType === 'vacancy' || listing.jobType === 'resume';
   const canPublish = images.length > 0 || isJobListing;
+  const listingFormId = 'unified-listing-form';
 
   return (
     <main className="listing-photos-page">
@@ -65,6 +64,8 @@ export default async function UnifiedListingPage({
           <EditListingForm
             listing={listing}
             categories={categories}
+            formId={listingFormId}
+            publishAfterSave={listing.status === 'draft'}
           />
         </div>
 
@@ -140,17 +141,21 @@ export default async function UnifiedListingPage({
             После публикации объявление станет доступно посетителям UzMarket.
           </p>
 
-          {listing.status === 'draft' && canPublish ? (
-            <PublishButton listingId={listing.id} />
-          ) : listing.status === 'draft' ? (
+          {listing.status === 'draft' && !canPublish ? (
             <p className="form-error">
               Для обычного объявления добавьте хотя бы одну фотографию.
             </p>
-          ) : (
-            <p className="form-success">Объявление уже опубликовано.</p>
-          )}
+          ) : null}
 
-          <Link href="/my-listings">Сохранить и продолжить позже</Link>
+          <button
+            type="submit"
+            form={listingFormId}
+            disabled={listing.status === 'draft' && !canPublish}
+          >
+            {listing.status === 'draft'
+              ? 'Разместить объявление'
+              : 'Сохранить изменения'}
+          </button>
         </div>
       </section>
     </main>
