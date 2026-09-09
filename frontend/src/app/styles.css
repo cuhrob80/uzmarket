@@ -3323,7 +3323,7 @@ p { margin: 0; font-size: 1.125rem; }
   width: 240px;
   padding: 10px;
   border: 1px solid #eceef1;
-  border-radius: 16pxpx;
+  border-radius: 16px;
   background: #fff;
   box-shadow: 0 16px 40px rgb(16 24 40 / 16%);
 }
@@ -3332,7 +3332,7 @@ p { margin: 0; font-size: 1.125rem; }
 .marketplace-profile-menu > nav button {
   display: flex;
   width: 100%;
-  min-height: px;
+  min-height: 44px;
   align-items: center;
   padding: 0 14px;
   border: 0;
