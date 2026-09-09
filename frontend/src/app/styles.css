@@ -3658,14 +3658,14 @@ p { margin: 0; font-size: 1.125rem; }
 }
 
 
-/* Header categories dropdown */
+/* Approved full-width header categories mega-menu */
 .marketplace-categories-menu {
   position: relative;
 }
 
 .marketplace-categories-menu > summary {
   list-style: none;
-  cursor: pointer;
+  cursor:: pointer;
 }
 
 .marketplace-categories-menu > summary::-webkit-details-marker {
@@ -3676,72 +3676,233 @@ p { margin: 0; font-size: 1.125rem; }
   background: #08783e;
 }
 
-.marketplace-categories-menu > nav {
-  position: absolute;
-  z-index: 130;
-  top: calc(100% + 12px);
-  left: 0;
-  display: grid;
-  width: min(760px, calc(100vw - 48px));
-  max-height: min(620px, calc(100vh - 150px));
-  padding: 22px;
-  overflow-y: auto;
-  border: 1px solid #e4e7eb;
-  border-radius: 18px;
-  background: #fff;
-  box-shadow: 0 18px 48px rgb(16 24 40 / 18%);
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 24px;
+.marketplace-categories-menu[open] .marketplace-menu-icon {
+  position: relative;
+  height: 18px;
 }
 
-.marketplace-categories-menu > nav section {
+.marketplace-categories-menu[open] .marketplace-menu-icon i {
+  position: absolute;
+  top: 8px;
+  left: 0;
+  width: 18px;
+}
+
+.marketplace-categories-menu[open] .marketplace-menu-icon i:first-child {
+  transform: rotate(45deg);
+}
+
+.marketplace-categories-menu[open] .marketplace-menu-icon i:nth-child(2) {
+  opacity: 0;
+}
+
+.marketplace-categories-menu[open] .marketplace-menu-icon i:last-child {
+  transform: rotate(-45deg);
+}
+
+.marketplace-categories-overlay {
+  position: fixed;
+  z-index: 110;
+  inset: 120px 0 0;
+  background: rgb(16 24 40 / 48%);
+}
+
+.marketplace-megamenu {
+  position: fixed;
+  z-index: 120;
+  top: 132px;
+  left: 50%;
+  display: grid;
+  width: min(94vw, 1440px);
+  max-height: calc(100vh - 158px);
+  min-height: 520px;
+  overflow: hidden;
+  border: 1px solid #e4e7eb;
+  border-radius: 24px;
+  background: #fff;
+  box-shadow: 0 22px 60px rgb(16 24 40 / 22%);
+  grid-template-columns: 300px minmax(0, 1fr);
+  transform: translateX(-50%);
+}
+
+.marketplace-megamenu > aside {
+  padding: 28px 18px;
+  overflow-y: auto;
+  border-right: 1px solid #e7e9ec;
+}
+
+.marketplace-megamenu > aside button {
+  display: grid;
+  width: 100%;
+  min-height: 56px;
+  padding: 0 14px;
+  border: 0;
+  border-radius: 12px;
+  background: transparent;
+  color: #172px;
+  font: inherit;
+  grid-template-columns: 34px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 10px;
+  text-align: left;
+  cursor: pointer;
+}
+
+.marketplace-megamenu > aside button:hover,
+.marketplace-megamenu > aside button.is-active {
+  background: #eaf8f1;
+  color: #079455;
+}
+
+.marketplace-megamenu > aside button > span {
+  font-size: 1.25rem;
+}
+
+.marketplace-megamenu > aside button > strong {
+  overflow: hidden;
+  font-size: 1rem;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.marketplace-megamenu > aside button > i {
+  font-size: 1.6rem;
+  font-style: normal;
+}
+
+.marketplace-megamenu-content {
+  padding: 34px 40px 42px;
+  overflow-y: auto;
+}
+
+.marketplace-megamenu-title {
+  display: inline-block;
+  margin-bottom: 28px;
+  color: #101828;
+  font-size: 2rem;
+  font-weight: 900;
+  text-decoration: none;
+}
+
+.marketplace-megamenu-title:hover {
+  color: #079455;
+}
+
+.marketplace-megamenu-groups {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(180px, 1fr));
+  align-items: start;
+  gap: 34px 38px;
+}
+
+.marketplace-megamenu-groups > section {
   display: grid;
   align-content: start;
-  gap: 9px;
+  gap: 10px;
 }
 
-.marketplace-categories-menu > nav section > div {
-  display: grid;
-  gap: 7px;
-}
-
-.marketplace-categories-menu > nav a {
-  color: #526075;
-  font-size: 0.88rem;
+.marketplace-megamenu-groups a {
+  color: #354052;
+  font-size: 0.95rem;
   line-height: 1.35;
   text-decoration: none;
 }
 
-.marketplace-categories-menu > nav a:hover {
+.marketplace-megamenu-groups a:hover {
   color: #079455;
 }
 
-.marketplace-categories-menu > nav .marketplace-category-root {
+.marketplace-megamenu-groups .marketplace-megamenu-group {
+  margin-bottom: 3px;
   color: #172033;
-  font-size: 1rem;
+  font-size: 1.05rem;
+  font-weight: 850;
+}
+
+.marketplace-megamenu-empty {
+  display: grid;
+  min-height: 280px;
+  place-items: center;
+  align-content: center;
+  gap: 14px;
+  color: #687386;
+  text-align: center;
+}
+
+.marketplace-megamenu-empty a {
+  color: #079455;
   font-weight: 800;
 }
 
-@media (max-width: 760px) {
-  .marketplace-categories-menu {
-    position: static;
+@media (max-width: 980px) {
+  .marketplace-categories-overlay {
+    inset-block-start: 156px;
   }
 
-  .marketplace-categories-menu > nav {
-    position: fixed;
-    top: 112px;
-    right: 12px;
-    left: 12px;
-    width: auto;
-    max-height: calc(100vh - 128px);
-    padding: 18px;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 20px;
+  .marketplace-megamenu {
+    top: 168px;
+    width: calc(100vw - 28px);
+    max-height: calc(100vh - 182px);
+    min-height: 440px;
+    grid-template-columns: 230px minmax(0, 1fr);
+  }
+
+  .marketplace-megamenu-content {
+    padding: 28px;
+  }
+
+  .marketplace-megamenu-groups {
+    grid-template-columns: repeat(2, minmax(160px, 1fr));
   }
 }
 
-@media (max-width: 480px) {
-  .marketplace-categories-menu > nav {
+@media (max-width: 640px) {
+  .marketplace-categories-overlay {
+    inset-block-start: 148px;
+  }
+
+  .marketplace-megamenu {
+    top: 156px;
+    width: calc(100vw - 16px);
+    max-height: calc(100vh - 164px);
+    min-height: 0;
+    border-radius: 18px;
     grid-template-columns: 1fr;
+    grid-template-rows: auto minmax(0, 1fr);
+  }
+
+  .marketplace-megamenu > aside {
+    display: flex;
+    padding: 12px;
+    overflow-x: auto;
+    border-right: 0;
+    border-bottom: 1px solid #e7e9ec;
+    gap: 8px;
+  }
+
+  .marketplace-megamenu > aside button {
+    width: auto;
+    min-width: max-content;
+    min-height: 44px;
+    padding: 0 12px;
+    grid-template-columns: auto auto;
+  }
+
+  .marketplace-megamenu > aside button > i {
+    display: none;
+  }
+
+  .marketplace-megamenu-content {
+    padding: 22px 18px 30px;
+  }
+
+  .marketplace-megamenu-title {
+    margin-bottom: 20px;
+    font-size: 1.55rem;
+  }
+
+  .marketplace-megamenu-groups {
+    grid-template-columns: 1fr;
+    gap: 26px;
   }
 }
