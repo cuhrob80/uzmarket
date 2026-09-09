@@ -12,7 +12,6 @@ import { getListingPublicPath } from '@/lib/listing-url';
 import type { Category, Listing } from '@/types/listing';
 import { TransportCategoryIcon } from '@/components/transport-category-icon';
 import { JobCategoryIcon } from '@/components/job-category-icon';
-import { MarketplaceHeader } from '@/components/marketplace-header';
 import { absoluteUrl, getCategorySeo, getCategoryUrl } from '@/lib/seo';
 
 export const dynamic = 'force-dynamic';
@@ -184,8 +183,6 @@ function CategoryHub({
         category={category}
         parentCategory={parentCategory}
       />
-      <MarketplaceHeader />
-
       <div className="transport-container">
         <nav className="transport-breadcrumbs" aria-label="Хлебные крошки">
           <Link href="/">Главная</Link>
@@ -315,8 +312,6 @@ export default async function CategoryPage({
         category={category}
         parentCategory={parentCategory}
       />
-      <MarketplaceHeader />
-
       <section className="catalog-container">
         <nav className="transport-breadcrumbs" aria-label="Хлебные крошки">
           <Link href="/">Главная</Link>
