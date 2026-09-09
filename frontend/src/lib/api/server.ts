@@ -626,6 +626,84 @@ export async function updateListing(
 }
 
 
+export async function getFavoriteListingIds(): Promise<string[] | null> {
+  const token = await getAccessToken();
+
+  if (!token) {
+    return null;
+  }
+
+  const response = await fetch(
+    createApiUrl('/api/v1/listings/favorites/ids'),
+    {
+      headers: { Authorization: `Bearer ${token}` },
+      cache: 'no-store',
+    },
+  );
+
+  if (response.status === 401) {
+    return null;
+  }
+
+  if (!response.ok) {
+    throw new ApiError(response.status, await getErrorMessage(response));
+  }
+
+  return (await response.json()) as string[];
+}
+
+export async function getFavoriteListings(): Promise<Listing[] | null> {
+  const token = await getAccessToken();
+
+  if (!token) {
+    return null;
+  }
+
+  const response = await fetch(
+    createApiUrl('/api/v1/listings/favorites'),
+    {
+      headers: { Authorization: `Bearer ${token}` },
+      cache: 'no-store',
+    },
+  );
+
+  if (response.status === 401) {
+    return null;
+  }
+
+  if (!response.ok) {
+    throw new ApiError(response.status, await getErrorMessage(response));
+  }
+
+  return (await response.json()) as Listing[];
+}
+
+export async function setListingFavorite(
+  listingId: string,
+  favorite: boolean,
+): Promise<void> {
+  const token = await getAccessToken();
+
+  if (!token) {
+    throw new ApiError(401, 'Authentication required');
+  }
+
+  const response = await fetch(
+    createApiUrl(
+      `/api/v1/listings/${encodeURIComponent(listingId)}/favorite`,
+    ),
+    {
+      method: favorite ? 'POST' : 'DELETE',
+      headers: { Authorization: `Bearer ${token}` },
+      cache: 'no-store',
+    },
+  );
+
+  if (!response.ok) {
+    throw new ApiError(response.status, await getErrorMessage(response));
+  }
+}
+
 export async function getCurrentUser(): Promise<AuthUser | null> {
   const token = await getAccessToken();
 
