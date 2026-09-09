@@ -1,6 +1,6 @@
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { ILike, type FindOptionsWhere, Repository } from 'typeorm';
+import { ILike, In, type FindOptionsWhere, Repository } from 'typeorm';
 import { Category, Listing, ListingImage, ListingJobType, ListingStatus, User } from '../entities';
 import { CreateListingDto } from './dto/create-listing.dto';
 import { ListListingsQueryDto } from './dto/list-listings-query.dto';
@@ -60,7 +60,8 @@ export class ListingsService {
     if (
       listing.status !== ListingStatus.Draft &&
       listing.status !== ListingStatus.Active &&
-      listing.status !== ListingStatus.Rejected
+      listing.status !== ListingStatus.Rejected &&
+      listing.status !== ListingStatus.Unpublished
     ) {
       throw new BadRequestException('Listing cannot be edited in its current status');
     }
@@ -91,10 +92,11 @@ export class ListingsService {
 
     if (
       listing.status !== ListingStatus.Draft &&
-      listing.status !== ListingStatus.Rejected
+      listing.status !== ListingStatus.Rejected &&
+      listing.status !== ListingStatus.Unpublished
     ) {
       throw new BadRequestException(
-        'Only draft or rejected listings can be submitted for review',
+        'Only draft, rejected, or unpublished listings can be submitted for review',
       );
     }
 
@@ -145,7 +147,7 @@ export class ListingsService {
       );
     }
 
-    listing.status = ListingStatus.Draft;
+    listing.status = ListingStatus.Unpublished;
     await this.listingsRepository.save(listing);
 
     return this.findResponseById(listing.id);
@@ -158,7 +160,7 @@ export class ListingsService {
       throw new BadRequestException('Only active listings can be marked as sold');
     }
 
-    listing.status = ListingStatus.Sold;
+    listing.status = ListingStatus.Archived;
     await this.listingsRepository.save(listing);
 
     return this.findResponseById(listing.id);
@@ -170,12 +172,45 @@ export class ListingsService {
     if (
       listing.status !== ListingStatus.Draft &&
       listing.status !== ListingStatus.Active &&
-      listing.status !== ListingStatus.Rejected
+      listing.status !== ListingStatus.Rejected &&
+      listing.status !== ListingStatus.Unpublished
     ) {
       throw new BadRequestException('Listing cannot be archived in its current status');
     }
 
     listing.status = ListingStatus.Archived;
+    await this.listingsRepository.save(listing);
+
+    return this.findResponseById(listing.id);
+  }
+
+  async moveToDeleted(
+    id: string,
+    sellerId: string,
+  ): Promise<ListingResponseDto> {
+    const listing = await this.findOwnedListing(id, sellerId);
+
+    if (listing.status === ListingStatus.Deleted) {
+      throw new BadRequestException('Listing is already deleted');
+    }
+
+    listing.status = ListingStatus.Deleted;
+    await this.listingsRepository.save(listing);
+
+    return this.findResponseById(listing.id);
+  }
+
+  async restoreDeleted(
+    id: string,
+    sellerId: string,
+  ): Promise<ListingResponseDto> {
+    const listing = await this.findOwnedListing(id, sellerId);
+
+    if (listing.status !== ListingStatus.Deleted) {
+      throw new BadRequestException('Only deleted listings can be restored');
+    }
+
+    listing.status = ListingStatus.Unpublished;
     await this.listingsRepository.save(listing);
 
     return this.findResponseById(listing.id);
@@ -348,7 +383,12 @@ export class ListingsService {
       where.categoryId = query.categoryId;
     }
 
-    if (query.status) {
+    if (query.status === ListingStatus.Unpublished) {
+      where.status = In([
+        ListingStatus.Unpublished,
+        ListingStatus.Pending,
+      ]);
+    } else if (query.status) {
       where.status = query.status;
     }
 
