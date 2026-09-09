@@ -19,8 +19,10 @@ export enum ListingStatus {
   Pending = 'pending',
   Active = 'active',
   Rejected = 'rejected',
+  Unpublished = 'unpublished',
   Sold = 'sold',
   Archived = 'archived',
+  Deleted = 'deleted',
 }
 
 export enum ListingJobType {
