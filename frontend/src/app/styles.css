@@ -3968,7 +3968,10 @@ p { margin: 0; font-size: 1.125rem; }
 }
 
 .account-listings {
+  display: block;
+  width: 100%;
   min-width: 0;
+  min-height: calc(100vh - 120px);
   padding: 42px 34px 72px;
 }
 
@@ -4001,10 +4004,17 @@ p { margin: 0; font-size: 1.125rem; }
 
 .account-status-tabs {
   display: flex;
+  width: 100%;
   margin-top: 28px;
   overflow-x: auto;
+  overflow-y: hidden;
   border-bottom: 1px solid #dfe3e8;
   gap: 28px;
+  scrollbar-width: none;
+}
+
+.account-status-tabs::-webkit-scrollbar {
+  display: none;
 }
 
 .account-status-tabs a {
