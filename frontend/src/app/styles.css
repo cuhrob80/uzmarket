@@ -3665,7 +3665,7 @@ p { margin: 0; font-size: 1.125rem; }
 
 .marketplace-categories-menu > summary {
   list-style: none;
-  cursor:: pointer;
+  cursor: pointer;
 }
 
 .marketplace-categories-menu > summary::-webkit-details-marker {
@@ -3739,7 +3739,7 @@ p { margin: 0; font-size: 1.125rem; }
   border: 0;
   border-radius: 12px;
   background: transparent;
-  color: #172px;
+  color: #172033;
   font: inherit;
   grid-template-columns: 34px minmax(0, 1fr) auto;
   align-items: center;
