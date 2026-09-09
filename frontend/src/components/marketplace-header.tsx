@@ -92,7 +92,7 @@ export async function MarketplaceHeader() {
             </Link>
             <Link href="/my-listings">Мои объявления</Link>
             <Link
-              href="/my-listings"
+              href="/favorites"
               className="marketplace-header-icon"
               aria-label="Избранное"
             >
