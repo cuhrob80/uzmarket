@@ -1,7 +1,8 @@
 import Link from 'next/link';
 import { unstable_rethrow } from 'next/navigation';
-import { getCurrentUser } from '@/lib/api/server';
-import type { AuthUser } from '@/types/listing';
+import { getCategories, getCurrentUser } from '@/lib/api/server';
+import type { AuthUser, Category } from '@/types/listing';
+import { CategoriesMenu } from './categories-menu';
 import { ProfileMenu } from './profile-menu';
 
 function SearchIcon() {
@@ -49,6 +50,7 @@ function MessageIcon() {
 
 export async function MarketplaceHeader() {
   let user: AuthUser | null = null;
+  let categories: Category[] = [];
 
   try {
     user = await getCurrentUser();
@@ -57,6 +59,11 @@ export async function MarketplaceHeader() {
     console.error('Failed to load header profile:', error);
   }
 
+  try {
+    categories = await getCategories();
+  } catch (error: unknown) {
+    console.error('Failed to load header categories:', error);
+  }
 
   return (
     <header className="marketplace-header">
@@ -128,14 +135,7 @@ export async function MarketplaceHeader() {
             </span>
           </Link>
 
-          <Link href="/listings" className="marketplace-categories-button">
-            <span className="marketplace-menu-icon" aria-hidden="true">
-              <i />
-              <i />
-              <i />
-            </span>
-            Все категории
-          </Link>
+          <CategoriesMenu categories={categories} />
 
           <form
             action="/listings"
