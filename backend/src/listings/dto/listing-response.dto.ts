@@ -28,6 +28,7 @@ export interface ListingResponseDto {
   currency: string;
   status: ListingStatus;
   location: string | null;
+  moderationNote: string | null;
   jobType: ListingJobType | null;
   createdAt: Date;
   updatedAt: Date;
