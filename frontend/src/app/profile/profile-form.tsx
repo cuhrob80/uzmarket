@@ -82,7 +82,6 @@ export function ProfileForm({ user }: { user: AuthUser }) {
           name="displayName"
           defaultValue={user.displayName}
           maxLength={120}
-          required
           disabled={pending}
         />
       </label>
@@ -106,7 +105,6 @@ export function ProfileForm({ user }: { user: AuthUser }) {
           name="email"
           defaultValue={user.email}
           maxLength={320}
-          required
           disabled={pending}
         />
       </label>
