@@ -2280,20 +2280,20 @@ p { margin: 0; font-size: 1.125rem; }
   box-shadow: 0 8px 24px rgb(23 32 51 / 10%);
   color: #172033;
   font-size: 1.7rem;
-  line-height: 13;
+  line-height: 1;
 }
 
 .listing-photos-header h1 {
   margin: 4px 0 8px;
-  color:72: #101828;
-  font-size: clamp(2rem,4: , 4.5vw, 3.15rem);
+  color: #101828;
+  font-size: clamp(2rem, 4.5vw, 3.15rem);
   line-height: 1.08;
   letter-spacing: -0.035em;
 }
 
 .listing-photos-header > div > p {
   color: #7b8494;
-  font-size: 1+xpe1rem;
+  font-size: 1rem;
 }
 
 .unified-listing-section {
