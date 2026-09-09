@@ -23,15 +23,14 @@ export async function updateProfileAction(
   const phone = String(formData.get('phone') ?? '').trim();
   const avatar = formData.get('avatar');
 
-  if (!displayName || !email) {
-    return {
-      error: 'Введите имя и электронную почту.',
-      success: null,
-    };
-  }
+  const profileUpdates = {
+    ...(displayName ? { displayName } : {}),
+    ...(email ? { email } : {}),
+    phone,
+  };
 
   try {
-    await updateProfile({ displayName, email, phone });
+    await updateProfile(profileUpdates);
 
     if (avatar instanceof File && avatar.size > 0) {
       if (avatar.size > 5 * 1024 * 1024) {
