@@ -3,8 +3,10 @@ export type ListingStatus =
   | 'pending'
   | 'active'
   | 'rejected'
+  | 'unpublished'
   | 'sold'
-  | 'archived';
+  | 'archived'
+  | 'deleted';
 
 export type ListingCurrency = 'UZS' | 'USD';
 
