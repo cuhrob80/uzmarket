@@ -63,14 +63,9 @@ export async function editListingAction(
   revalidatePath(`/my-listings/${listingId}/edit`);
   revalidatePath('/my-listings');
 
-  if (publishAfterSave) {
-    redirect(
-      `/my-listings?published=${encodeURIComponent(listingId)}`,
-    );
-  }
-
-  return {
-    error: null,
-    success: 'Изменения сохранены',
-  };
+  redirect(
+    publishAfterSave
+      ? `/my-listings?published=${encodeURIComponent(listingId)}`
+      : `/my-listings?saved=${encodeURIComponent(listingId)}`,
+  );
 }
