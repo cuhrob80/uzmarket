@@ -470,8 +470,28 @@ export class ListingsService {
       take: query.limit,
     });
 
+    const favoriteCounts = new Map<string, number>();
+
+    if (items.length > 0) {
+      const rows = await this.favoritesRepository
+        .createQueryBuilder('favorite')
+        .select('favorite.listingId', 'listingId')
+        .addSelect('COUNT(*)', 'count')
+        .where('favorite.listingId IN (:...listingIds)', {
+          listingIds: items.map((item) => item.id),
+        })
+        .groupBy('favorite.listingId')
+        .getRawMany<{ listingId: string; count: string }>();
+
+      for (const row of rows) {
+        favoriteCounts.set(row.listingId, Number(row.count));
+      }
+    }
+
     return {
-      items: items.map((item) => this.toResponse(item)),
+      items: items.map((item) =>
+        this.toResponse(item, favoriteCounts.get(item.id) ?? 0),
+      ),
       page: query.page,
       limit: query.limit,
       total,
@@ -527,7 +547,10 @@ export class ListingsService {
     }
   }
 
-  private toResponse(listing: Listing): ListingResponseDto {
+  private toResponse(
+    listing: Listing,
+    favoriteCount = 0,
+  ): ListingResponseDto {
     return {
       id: listing.id,
       publicId: listing.publicId,
@@ -540,6 +563,7 @@ export class ListingsService {
       status: listing.status,
       location: listing.location,
       moderationNote: listing.moderationNote,
+      favoriteCount,
       jobType: listing.jobType,
       createdAt: listing.createdAt,
       updatedAt: listing.updatedAt,
