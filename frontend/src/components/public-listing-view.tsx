@@ -1,7 +1,10 @@
 import type { Listing } from '@/types/listing';
+import { FavoriteButton } from './favorite-button';
 
 interface PublicListingViewProps {
   listing: Listing;
+  initialFavorite: boolean;
+  isAuthenticated: boolean;
 }
 
 function formatPrice(listing: Listing): string {
@@ -18,6 +21,8 @@ function formatPrice(listing: Listing): string {
 
 export function PublicListingView({
   listing,
+  initialFavorite,
+  isAuthenticated,
 }: PublicListingViewProps) {
   const images = [...listing.images].sort(
     (a, b) => a.sortOrder - b.sortOrder,
@@ -51,9 +56,17 @@ export function PublicListingView({
 
           <h1>{listing.title}</h1>
 
-          <p className="public-listing-price">
-            {formatPrice(listing)}
-          </p>
+          <div className="public-listing-price-row">
+            <p className="public-listing-price">
+              {formatPrice(listing)}
+            </p>
+            <FavoriteButton
+              listingId={listing.id}
+              initialFavorite={initialFavorite}
+              isAuthenticated={isAuthenticated}
+              className="public-listing-favorite"
+            />
+          </div>
 
           {listing.location ? (
             <p className="public-listing-location">
