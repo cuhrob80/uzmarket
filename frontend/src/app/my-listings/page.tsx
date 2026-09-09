@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
 import { getMyListings } from '@/lib/api/server';
+import { ListingActionsMenu } from './listing-actions-menu';
 import type { Listing, ListingStatus } from '@/types/listing';
 
 export const dynamic = 'force-dynamic';
@@ -215,9 +216,10 @@ export default async function MyListingsPage({
                         Редактировать
                       </Link>
                     )}
-                    <button type="button" aria-label="Другие действия">
-                      •••
-                    </button>
+                    <ListingActionsMenu
+                      listingId={listing.id}
+                      status={listing.status}
+                    />
                   </div>
                 </article>
               );
