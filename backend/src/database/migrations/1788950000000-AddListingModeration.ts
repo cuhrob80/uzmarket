@@ -13,6 +13,12 @@ export class AddListingModeration1788950000000
       `ALTER TYPE "listing_status_enum" ADD VALUE IF NOT EXISTS 'rejected'`,
     );
     await queryRunner.query(
+      `ALTER TYPE "listing_status_enum" ADD VALUE IF NOT EXISTS 'unpublished'`,
+    );
+    await queryRunner.query(
+      `ALTER TYPE "listing_status_enum" ADD VALUE IF NOT EXISTS 'deleted'`,
+    );
+    await queryRunner.query(
       'ALTER TABLE "listings" ADD "moderation_note" text',
     );
   }
@@ -22,7 +28,7 @@ export class AddListingModeration1788950000000
       'ALTER TABLE "listings" DROP COLUMN "moderation_note"',
     );
     await queryRunner.query(
-      `UPDATE "listings" SET "status" = 'draft' WHERE "status"::text IN ('pending', 'rejected')`,
+      `UPDATE "listings" SET "status" = 'draft' WHERE "status"::text IN ('pending', 'rejected', 'unpublished', 'deleted')`,
     );
     await queryRunner.query(
       'ALTER TYPE "listing_status_enum" RENAME TO "listing_status_enum_old"',
