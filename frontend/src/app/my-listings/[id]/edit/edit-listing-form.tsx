@@ -13,6 +13,8 @@ import {
 interface EditListingFormProps {
   listing: Listing;
   categories: Category[];
+  formId?: string;
+  publishAfterSave?: boolean;
 }
 
 const initialState: EditListingState = {
@@ -23,22 +25,31 @@ const initialState: EditListingState = {
 export function EditListingForm({
   listing,
   categories,
+  formId,
+  publishAfterSave = false,
 }: EditListingFormProps) {
   const action = editListingAction.bind(
     null,
     listing.id,
   );
 
-  const [state, formAction, pending] = useActionState(
+  const [state, formAction] = useActionState(
     action,
     initialState,
   );
 
   return (
     <form
+      id={formId}
       action={formAction}
       className="create-listing-form"
     >
+      <input
+        type="hidden"
+        name="publishAfterSave"
+        value={publishAfterSave ? 'true' : 'false'}
+      />
+
       <label>
         Категория
 
@@ -134,15 +145,6 @@ export function EditListingForm({
           {state.success}
         </p>
       ) : null}
-
-      <button
-        type="submit"
-        disabled={pending}
-      >
-        {pending
-          ? 'Сохраняем...'
-          : 'Сохранить изменения'}
-      </button>
     </form>
   );
 }
