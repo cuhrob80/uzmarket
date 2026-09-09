@@ -30,14 +30,16 @@ export default async function CreateListingPage() {
   }
 
   return (
-    <main className="create-listing-page">
-      <section className="create-listing-container">
-        <header className="create-listing-header">
-          <h1>Подать объявление</h1>
-          <p>
-            Заполните основные данные. Затем на одном экране добавьте
-            фотографии, проверьте всё и опубликуйте объявление.
-          </p>
+    <main className="listing-photos-page">
+      <section className="listing-photos-container unified-listing-container">
+        <header className="listing-photos-header">
+          <p className="listing-editor-back" aria-hidden="true">←</p>
+          <div>
+            <h1>Новое объявление</h1>
+            <p>
+              Заполните данные, добавьте фотографии и разместите объявление.
+            </p>
+          </div>
         </header>
 
         {categories.length > 0 ? (
