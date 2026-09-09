@@ -93,28 +93,43 @@ export function ListingActionsMenu({
 
       {isOpen ? (
         <div className="listing-actions-popover" role="menu">
-          {status === 'active' ? (
+          {status === 'active' || status === 'pending' ? (
             <>
-              <button
-                type="button"
-                role="menuitem"
-                disabled={isPending}
-                onClick={() => runAction('unpublish')}
-              >
-                Снять с публикации
-              </button>
-              <button
-                type="button"
-                role="menuitem"
-                disabled={isPending}
-                onClick={() => runAction('sold')}
-              >
-                Продать / завершить
-              </button>
+              {status === 'pending' ? (
+                <button
+                  type="button"
+                  role="menuitem"
+                  disabled={isPending}
+                  onClick={() => runAction('unpublish')}
+                >
+                  Отменить проверку
+                </button>
+              ) : (
+                <button
+                  type="button"
+                  role="menuitem"
+                  disabled={isPending}
+                  onClick={() => runAction('unpublish')}
+                >
+                  Снять с публикации
+                </button>
+              )}
+              {status === 'active' ? (
+                <button
+                  type="button"
+                  role="menuitem"
+                  disabled={isPending}
+                  onClick={() => runAction('sold')}
+                >
+                  Продать / завершить
+                </button>
+              ) : null}
             </>
           ) : null}
 
-          {status === 'active' || status === 'draft' ? (
+          {status === 'active' ||
+          status === 'draft' ||
+          status === 'rejected' ? (
             <button
               type="button"
               role="menuitem"
