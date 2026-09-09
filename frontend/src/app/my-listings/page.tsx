@@ -8,7 +8,9 @@ export const dynamic = 'force-dynamic';
 
 const statusLabels: Record<ListingStatus, string> = {
   draft: 'Черновик',
+  pending: 'На проверке',
   active: 'Активно',
+  rejected: 'Требует исправления',
   sold: 'Завершено',
   archived: 'В архиве',
 };
@@ -18,6 +20,8 @@ const statusTabs: Array<{
   label: string;
 }> = [
   { value: 'active', label: 'Активные' },
+  { value: 'pending', label: 'На проверке' },
+  { value: 'rejected', label: 'С ошибками' },
   { value: 'draft', label: 'Черновики' },
   { value: 'archived', label: 'Архив' },
   { value: 'sold', label: 'Завершённые' },
@@ -188,6 +192,17 @@ export default async function MyListingsPage({
                     >
                       {statusLabels[listing.status]}
                     </span>
+                    {listing.status === 'pending' ? (
+                      <p className="account-moderation-message">
+                        Ваше объявление проверяется
+                      </p>
+                    ) : null}
+                    {listing.status === 'rejected' ? (
+                      <p className="account-moderation-message is-error">
+                        {listing.moderationNote ||
+                          'Исправьте объявление и отправьте его повторно'}
+                      </p>
+                    ) : null}
                     <small>
                       Размещено {formatDate(listing.createdAt)}
                       {listing.updatedAt !== listing.createdAt
@@ -209,7 +224,8 @@ export default async function MyListingsPage({
 
                   <div className="account-listing-actions">
                     {(listing.status === 'draft' ||
-                      listing.status === 'active') && (
+                      listing.status === 'active' ||
+                      listing.status === 'rejected') && (
                       <Link
                         href={`/my-listings/${listing.id}/edit`}
                       >
