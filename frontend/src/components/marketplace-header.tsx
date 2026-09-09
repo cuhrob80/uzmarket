@@ -120,6 +120,7 @@ export async function MarketplaceHeader() {
                 <nav aria-label="Личный кабинет">
                   <Link href="/profile">Личный кабинет</Link>
                   <Link href="/my-listings">Мои объявления</Link>
+                  <Link href="/profile/reviews">Отзывы и рейтинг</Link>
                   <Link href="/profile">Настройки профиля</Link>
                   <form action={logoutAction}>
                     <button type="submit">Выйти</button>
