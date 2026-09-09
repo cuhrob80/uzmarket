@@ -2834,7 +2834,6 @@ p { margin: 0; font-size: 1.125rem; }
 }
 
 .unified-listing-container > .unified-listing-section,
-.unified-listing-container > .unified-create-form,
 .unified-create-form > .unified-listing-section,
 .unified-create-form > .unified-create-submit {
   width: calc(100% - 90px);
@@ -2869,7 +2868,6 @@ p { margin: 0; font-size: 1.125rem; }
   }
 
   .unified-listing-container > .unified-listing-section,
-  .unified-listing-container > .unified-create-form,
   .unified-create-form > .unified-listing-section,
   .unified-create-form > .unified-create-submit {
     width: 100%;
