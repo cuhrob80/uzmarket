@@ -206,8 +206,13 @@ export class ListingsService {
   ): Promise<ListingResponseDto> {
     const listing = await this.findOwnedListing(id, sellerId);
 
-    if (listing.status !== ListingStatus.Deleted) {
-      throw new BadRequestException('Only deleted listings can be restored');
+    if (
+      listing.status !== ListingStatus.Deleted &&
+      listing.status !== ListingStatus.Archived
+    ) {
+      throw new BadRequestException(
+        'Only deleted or archived listings can be restored',
+      );
     }
 
     listing.status = ListingStatus.Unpublished;
