@@ -21,6 +21,9 @@ export class AddListingModeration1788950000000
     await queryRunner.query(
       'ALTER TABLE "listings" ADD "moderation_note" text',
     );
+    await queryRunner.query(
+      `UPDATE "listings" SET "status" = 'archived' WHERE "status" = 'sold'`,
+    );
   }
 
   async down(queryRunner: QueryRunner): Promise<void> {
