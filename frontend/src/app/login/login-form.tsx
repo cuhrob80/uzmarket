@@ -7,7 +7,7 @@ const initialState: LoginState = {
   error: null,
 };
 
-export function LoginForm() {
+export function LoginForm({ returnTo = '/my-listings' }: { returnTo?: string }) {
   const [state, formAction, pending] = useActionState(
     loginAction,
     initialState,
@@ -15,6 +15,7 @@ export function LoginForm() {
 
   return (
     <form action={formAction} className="auth-form">
+      <input type="hidden" name="returnTo" value={returnTo} />
       <label>
         Email
         <input
