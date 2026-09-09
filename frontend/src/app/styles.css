@@ -3259,3 +3259,22 @@ p { margin: 0; font-size: 1.125rem; }
     padding: 0 14px;
   }
 }
+
+
+/* Search button fills the complete search-field height */
+.marketplace-header-search {
+  align-items: stretch;
+}
+
+.marketplace-header-search button {
+  align-self: stretch;
+  height: auto;
+  min-height: 48px;
+  border-radius: 0 12px 12px 0;
+}
+
+@media (max-width: 640px) {
+  .marketplace-header-search button {
+    min-height: 44px;
+  }
+}
