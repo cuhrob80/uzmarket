@@ -371,7 +371,8 @@ export class ListingMediaService {
   private assertEditableStatus(listing: Listing): void {
     if (
       listing.status !== ListingStatus.Draft &&
-      listing.status !== ListingStatus.Active
+      listing.status !== ListingStatus.Active &&
+      listing.status !== ListingStatus.Rejected
     ) {
       throw new BadRequestException(
         'Listing media cannot be edited in its current status',
