@@ -16,7 +16,9 @@ import { User } from './user.entity';
 
 export enum ListingStatus {
   Draft = 'draft',
+  Pending = 'pending',
   Active = 'active',
+  Rejected = 'rejected',
   Sold = 'sold',
   Archived = 'archived',
 }
@@ -68,6 +70,9 @@ export class Listing {
 
   @Column({ type: 'varchar', nullable: true })
   location!: string | null;
+
+  @Column({ name: 'moderation_note', type: 'text', nullable: true })
+  moderationNote!: string | null;
 
   @Column({
     name: 'job_type',
