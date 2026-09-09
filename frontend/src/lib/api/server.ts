@@ -4,6 +4,7 @@ import { cookies } from 'next/headers';
 import { createApiUrl } from './config';
 import type {
   AuthResponse,
+  AuthUser,
   Category,
   CreateListingInput,
   Listing,
@@ -531,4 +532,93 @@ export async function updateListing(
   }
 
   return (await response.json()) as Listing;
+}
+
+
+export async function getCurrentUser(): Promise<AuthUser | null> {
+  const token = await getAccessToken();
+
+  if (!token) {
+    return null;
+  }
+
+  const response = await fetch(createApiUrl('/api/v1/auth/me'), {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+    cache: 'no-store',
+  });
+
+  if (response.status === 401) {
+    return null;
+  }
+
+  if (!response.ok) {
+    throw new ApiError(response.status, await getErrorMessage(response));
+  }
+
+  return (await response.json()) as AuthUser;
+}
+
+export interface UpdateProfileInput {
+  displayName: string;
+  email: string;
+  phone: string;
+}
+
+export async function updateProfile(
+  input: UpdateProfileInput,
+): Promise<AuthUser> {
+  const token = await getAccessToken();
+
+  if (!token) {
+    throw new ApiError(401, 'Authentication required');
+  }
+
+  const response = await fetch(createApiUrl('/api/v1/auth/me'), {
+    method: 'PATCH',
+    headers: {
+      Authorization: `Bearer ${token}`,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(input),
+    cache: 'no-store',
+  });
+
+  if (!response.ok) {
+    throw new ApiError(response.status, await getErrorMessage(response));
+  }
+
+  return (await response.json()) as AuthUser;
+}
+
+export async function uploadProfileAvatar(
+  file: File,
+): Promise<AuthUser> {
+  const token = await getAccessToken();
+
+  if (!token) {
+    throw new ApiError(401, 'Authentication required');
+  }
+
+  const formData = new FormData();
+  formData.set('file', file);
+
+  const response = await fetch(
+    createApiUrl('/api/v1/auth/me/avatar'),
+    {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+      body: formData,
+      cache: 'no-store',
+    },
+  );
+
+  if (!response.ok) {
+    throw new ApiError(response.status, await getErrorMessage(response));
+  }
+
+  return (await response.json()) as AuthUser;
 }
