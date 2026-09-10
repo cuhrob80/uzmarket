@@ -1,6 +1,5 @@
 'use client';
 
-import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import {
   useEffect,
@@ -10,6 +9,7 @@ import {
 } from 'react';
 import type { Category } from '@/types/listing';
 import { getCategoryName, type UiLocale } from '@/lib/category-i18n';
+import { LocalizedLink } from './localized-link';
 
 function getCategoryIcon(category: Category): string {
   const value = (category.slug + ' ' + category.name).toLowerCase();
@@ -165,7 +165,7 @@ export function CategoriesMenu({
         <section className="marketplace-megamenu-content">
           {selectedRoot ? (
             <>
-              <Link
+              <LocalizedLink
                 href={
                   '/category/' +
                   encodeURIComponent(selectedRoot.slug)
@@ -174,7 +174,7 @@ export function CategoriesMenu({
                 onClick={closeMenu}
               >
                 {getCategoryName(selectedRoot, locale)} ›
-              </Link>
+              </LocalizedLink>
 
               <div className="marketplace-megamenu-groups">
                 {groups.map((group) => {
@@ -184,7 +184,7 @@ export function CategoriesMenu({
 
                   return (
                     <section key={group.id}>
-                      <Link
+                      <LocalizedLink
                         href={
                           '/category/' +
                           encodeURIComponent(group.slug)
@@ -193,9 +193,9 @@ export function CategoriesMenu({
                         onClick={closeMenu}
                       >
                         {getCategoryName(group, locale)} ›
-                      </Link>
+                      </LocalizedLink>
                       {children.map((child) => (
-                        <Link
+                        <LocalizedLink
                           key={child.id}
                           href={
                             '/category/' +
@@ -204,7 +204,7 @@ export function CategoriesMenu({
                           onClick={closeMenu}
                         >
                           {getCategoryName(child, locale)}
-                        </Link>
+                        </LocalizedLink>
                       ))}
                     </section>
                   );
@@ -214,7 +214,7 @@ export function CategoriesMenu({
               {groups.length === 0 ? (
                 <div className="marketplace-megamenu-empty">
                   <p>{text.noGroups}</p>
-                  <Link
+                  <LocalizedLink
                     href={
                       '/category/' +
                       encodeURIComponent(selectedRoot.slug)
@@ -222,16 +222,16 @@ export function CategoriesMenu({
                     onClick={closeMenu}
                   >
                     {text.viewCategory}
-                  </Link>
+                  </LocalizedLink>
                 </div>
               ) : null}
             </>
           ) : (
             <div className="marketplace-megamenu-empty">
               <p>{text.noCategories}</p>
-              <Link href="/listings" onClick={closeMenu}>
+              <LocalizedLink href="/listings" onClick={closeMenu}>
                 {text.viewAll}
-              </Link>
+              </LocalizedLink>
             </div>
           )}
         </section>
