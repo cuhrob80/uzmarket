@@ -6,7 +6,9 @@ import {
   useState,
   type ChangeEvent,
 } from 'react';
+import { usePathname } from 'next/navigation';
 import type { AuthUser } from '@/types/listing';
+import { localeFromPathname } from '@/lib/locale-path';
 import {
   updateProfileAction,
   type ProfileActionState,
@@ -18,6 +20,16 @@ const initialState: ProfileActionState = {
 };
 
 export function ProfileForm({ user }: { user: AuthUser }) {
+  const locale = localeFromPathname(usePathname());
+  const text = locale === 'uz'
+    ? {
+        avatarAlt: 'Profil rasmi', photo: 'Rasmni o‘zgartirish', format: 'JPG, PNG yoki WEBP · 5 MB gacha',
+        name: 'Ism', phone: 'Telefon', email: 'Elektron pochta', saving: 'Saqlanmoqda…', save: 'O‘zgarishlarni saqlash',
+      }
+    : {
+        avatarAlt: 'Аватар профиля', photo: 'Изменить фото', format: 'JPG, PNG или WEBP · до 5 МБ',
+        name: 'Имя', phone: 'Телефон', email: 'Электронная почта', saving: 'Сохраняем…', save: 'Сохранить изменения',
+      };
   const [state, formAction, pending] = useActionState(
     updateProfileAction,
     initialState,
@@ -53,7 +65,7 @@ export function ProfileForm({ user }: { user: AuthUser }) {
       <div className="profile-avatar-editor">
         <div className="profile-avatar-preview">
           {previewUrl ? (
-            <img src={previewUrl} alt="Аватар профиля" />
+            <img src={previewUrl} alt={text.avatarAlt} />
           ) : (
             <span>{initials}</span>
           )}
@@ -63,7 +75,7 @@ export function ProfileForm({ user }: { user: AuthUser }) {
         </div>
 
         <label className="profile-avatar-button">
-          Изменить фото
+          {text.photo}
           <input
             type="file"
             name="avatar"
@@ -72,11 +84,11 @@ export function ProfileForm({ user }: { user: AuthUser }) {
             onChange={handleAvatarChange}
           />
         </label>
-        <small>JPG, PNG или WEBP · до 5 МБ</small>
+        <small>{text.format}</small>
       </div>
 
       <label>
-        Имя
+        {text.name}
         <input
           type="text"
           name="displayName"
@@ -87,7 +99,7 @@ export function ProfileForm({ user }: { user: AuthUser }) {
       </label>
 
       <label>
-        Телефон
+        {text.phone}
         <input
           type="tel"
           name="phone"
@@ -99,7 +111,7 @@ export function ProfileForm({ user }: { user: AuthUser }) {
       </label>
 
       <label>
-        Электронная почта
+        {text.email}
         <input
           type="email"
           name="email"
@@ -117,7 +129,7 @@ export function ProfileForm({ user }: { user: AuthUser }) {
       ) : null}
 
       <button type="submit" disabled={pending}>
-        {pending ? 'Сохраняем…' : 'Сохранить изменения'}
+        {pending ? text.saving : text.save}
       </button>
     </form>
   );
