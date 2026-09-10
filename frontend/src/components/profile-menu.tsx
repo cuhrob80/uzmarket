@@ -1,12 +1,18 @@
 'use client';
 
 import { useEffect, useRef } from 'react';
+import { usePathname } from 'next/navigation';
+import { localeFromPathname } from '@/lib/locale-path';
 import { logoutAction } from '@/app/profile/actions';
 import type { AuthUser } from '@/types/listing';
 import { LocalizedLink } from './localized-link';
 
 export function ProfileMenu({ user }: { user: AuthUser }) {
   const menuRef = useRef<HTMLDetailsElement>(null);
+  const locale = localeFromPathname(usePathname());
+  const text = locale === 'uz'
+    ? { account: 'Shaxsiy kabinet', listings: 'Mening e’lonlarim', reviews: 'Sharhlar va reyting', settings: 'Profil sozlamalari', logout: 'Chiqish' }
+    : { account: 'Личный кабинет', listings: 'Мои объявления', reviews: 'Отзывы и рейтинг', settings: 'Настройки профиля', logout: 'Выйти' };
   const initials =
     user.displayName.trim().slice(0, 2).toUpperCase() || 'UZ';
 
@@ -58,12 +64,12 @@ export function ProfileMenu({ user }: { user: AuthUser }) {
         )}
       </summary>
       <nav aria-label="Личный кабинет" onClick={closeMenu}>
-        <LocalizedLink href="/profile">Личный кабинет</LocalizedLink>
-        <LocalizedLink href="/my-listings">Мои объявления</LocalizedLink>
-        <LocalizedLink href="/profile/reviews">Отзывы и рейтинг</LocalizedLink>
-        <LocalizedLink href="/profile">Настройки профиля</LocalizedLink>
+        <LocalizedLink href="/profile">{text.account}</LocalizedLink>
+        <LocalizedLink href="/my-listings">{text.listings}</LocalizedLink>
+        <LocalizedLink href="/profile/reviews">{text.reviews}</LocalizedLink>
+        <LocalizedLink href="/profile">{text.settings}</LocalizedLink>
         <form action={logoutAction}>
-          <button type="submit">Выйти</button>
+          <button type="submit">{text.logout}</button>
         </form>
       </nav>
     </details>
