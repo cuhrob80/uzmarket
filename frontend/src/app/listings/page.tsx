@@ -223,7 +223,7 @@ export default async function ListingsPage({
           <div className="empty-state">
             <h2>{text.empty}</h2>
             <p>
-              {text.change}
+              {text.emptyHelp}
             </p>
           </div>
         ) : (
@@ -296,7 +296,7 @@ export default async function ListingsPage({
 
             {page < totalPages ? (
               <LocalizedLink href={createPageHref(page + 1)}>
-                {text.forward} →
+                {text.next} →
               </LocalizedLink>
             ) : (
               <span />
