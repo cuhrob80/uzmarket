@@ -8,6 +8,7 @@ import { LocalizedLink } from '@/components/localized-link';
 import { getRequestLocale } from '@/lib/server-locale';
 import { getCategoryName } from '@/lib/category-i18n';
 import type { SiteLocale } from '@/lib/locale-path';
+import { getDictionary } from '@/i18n/dictionaries';
 import { getListingPublicPath } from '@/lib/listing-url';
 import type { Listing } from '@/types/listing';
 
@@ -41,10 +42,8 @@ export default async function ListingsPage({
   searchParams,
 }: ListingsPageProps) {
   const [params, locale] = await Promise.all([searchParams, getRequestLocale()]);
-  const text = locale === 'uz'
-    ? { title: 'E’lonlar', found: 'Topildi', search: 'E’lonlarni qidirish', allCategories: 'Barcha kategoriyalar', minPrice: 'Narx: dan', maxPrice: 'Narx: gacha', currency: 'Istalgan valyuta', location: 'Shahar yoki tuman', find: 'Topish', empty: 'E’lonlar topilmadi', change: 'Qidiruv parametrlarini o‘zgartirib ko‘ring.', noPhoto: 'Rasm yo‘q', pagination: 'Sahifalar bo‘yicha navigatsiya', back: 'Orqaga', page: 'Sahifa', of: 'dan', forward: 'Oldinga' }
-    : { title: 'Объявления', found: 'Найдено', search: 'Поиск объявлений', allCategories: 'Все категории', minPrice: 'Цена от', maxPrice: 'Цена до', currency: 'Любая валюта', location: 'Город или район', find: 'Найти', empty: 'Объявления не найдены', change: 'Попробуйте изменить параметры поиска.', noPhoto: 'Нет фото', pagination: 'Навигация по страницам', back: 'Назад', page: 'Страница', of: 'из', forward: 'Вперёд' };
-
+  const dictionary = getDictionary(locale);
+  const text = dictionary.catalog;
   const parsedPage = Number(params.page);
   const page =
     Number.isInteger(parsedPage) && parsedPage > 0
@@ -216,7 +215,7 @@ export default async function ListingsPage({
           />
 
           <button type="submit">
-            {text.find}
+            {dictionary.common.find}
           </button>
         </form>
 
@@ -247,7 +246,7 @@ export default async function ListingsPage({
                           height={240}
                         />
                       ) : (
-                        <span>{text.noPhoto}</span>
+                        <span>{dictionary.common.noPhoto}</span>
                       )}
                     </div>
 
