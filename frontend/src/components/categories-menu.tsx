@@ -10,6 +10,7 @@ import {
 import type { Category } from '@/types/listing';
 import { getCategoryName, type UiLocale } from '@/lib/category-i18n';
 import { LocalizedLink } from './localized-link';
+import { getDictionary } from '@/i18n/dictionaries';
 
 function getCategoryIcon(category: Category): string {
   const value = (category.slug + ' ' + category.name).toLowerCase();
@@ -32,23 +33,7 @@ export function CategoriesMenu({
   const menuRef = useRef<HTMLDetailsElement>(null);
   const pathname = usePathname();
   const locale: UiLocale = pathname === '/uz' || pathname.startsWith('/uz/') ? 'uz' : 'ru';
-  const text = locale === 'uz'
-    ? {
-        button: 'Barcha kategoriyalar',
-        navigation: 'Kategoriyalar',
-        noGroups: 'Bu kategoriyada hozircha bo‘limlar yo‘q.',
-        viewCategory: 'Kategoriyani ko‘rish',
-        noCategories: 'Hozircha kategoriyalar yo‘q.',
-        viewAll: 'Barcha e’lonlarni ko‘rish',
-      }
-    : {
-        button: 'Все категории',
-        navigation: 'Категории',
-        noGroups: 'В этой категории пока нет разделов.',
-        viewCategory: 'Смотреть категорию',
-        noCategories: 'Пока нет категорий.',
-        viewAll: 'Смотреть все объявления',
-      };
+  const text = getDictionary(locale).categoriesMenu;
   const activeCategories = useMemo(
     () =>
       categories
