@@ -10,9 +10,13 @@ import {
   type CreateListingState,
 } from './actions';
 import type { Category } from '@/types/listing';
+import type { SiteLocale } from '@/lib/locale-path';
+import { getDictionary } from '@/i18n/dictionaries';
+import { getCategoryName } from '@/lib/category-i18n';
 
 interface CreateListingFormProps {
   categories: Category[];
+  locale: SiteLocale;
 }
 
 function getCategoryDepth(
@@ -81,7 +85,9 @@ function getRootOptions(
 
 export function CreateListingForm({
   categories,
+  locale,
 }: CreateListingFormProps) {
+  const text = getDictionary(locale).listingEditor;
   const [pending, setPending] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
@@ -101,7 +107,7 @@ export function CreateListingForm({
     setError(null);
 
     if (!isJobsCategory && selectedFiles.length === 0) {
-      setError('Добавьте хотя бы одну фотографию.');
+      setError(text.emptyHelp);
       return;
     }
 
@@ -116,7 +122,7 @@ export function CreateListingForm({
       );
 
       if (result.error || !result.listingId) {
-        setError(result.error || 'Не удалось создать объявление.');
+        setError(result.error || text.createFailed);
         return;
       }
 
@@ -135,7 +141,7 @@ export function CreateListingForm({
         );
 
         if (!response.ok) {
-          throw new Error('Не удалось загрузить одну из фотографий.');
+          throw new Error(text.uploadFailed);
         }
       }
 
@@ -158,7 +164,7 @@ export function CreateListingForm({
       setError(
         uploadError instanceof Error
           ? uploadError.message
-          : 'Не удалось разместить объявление.',
+          : text.publishFailed,
       );
     } finally {
       setPending(false);
@@ -172,12 +178,12 @@ export function CreateListingForm({
     >
       <div className="unified-listing-section">
         <div className="unified-listing-section-heading">
-          <h2>Данные объявления</h2>
+          <h2>{text.details}</h2>
         </div>
 
         <div className="unified-create-fields">
           <label>
-            Категория
+            {text.category}
             <select
               name="categoryId"
               required
@@ -188,17 +194,17 @@ export function CreateListingForm({
               disabled={pending}
             >
               <option value="" disabled>
-                Выберите категорию
+                {text.chooseCategory}
               </option>
 
               {rootCategories.map((root) => (
-                <optgroup key={root.id} label={root.name}>
+                <optgroup key={root.id} label={getCategoryName(root, locale)}>
                   {getRootOptions(root, categories).map((category) => {
                     const depth = getCategoryDepth(category, categories);
                     const label =
                       depth === 0
-                        ? `Все объявления — ${root.name}`
-                        : `${'— '.repeat(depth)}${category.name}`;
+                        ? `${text.allListings} — ${getCategoryName(root, locale)}`
+                        : `${'— '.repeat(depth)}${getCategoryName(category, locale)}`;
 
                     return (
                       <option key={category.id} value={category.id}>
@@ -213,7 +219,7 @@ export function CreateListingForm({
 
           {isJobsCategory ? (
             <label>
-              Тип объявления
+              {text.jobType}
               <select
                 name="jobType"
                 defaultValue=""
@@ -221,39 +227,39 @@ export function CreateListingForm({
                 disabled={pending}
               >
                 <option value="" disabled>
-                  Выберите тип
+                  {text.chooseType}
                 </option>
                 <option value="vacancy">
-                  Вакансия — ищу сотрудника
+                  {text.vacancy}
                 </option>
                 <option value="resume">
-                  Резюме — ищу работу
+                  {text.resume}
                 </option>
               </select>
             </label>
           ) : null}
 
           <label>
-            Название объявления
+            {text.name}
             <input
               name="title"
               type="text"
               minLength={3}
               maxLength={200}
-              placeholder="Например: iPhone 15 Pro 256 GB"
+              placeholder={text.titlePlaceholder}
               required
               disabled={pending}
             />
           </label>
 
           <label>
-            Описание
+            {text.description}
             <textarea
               name="description"
               minLength={1}
               maxLength={10000}
               rows={7}
-              placeholder="Опишите товар или услугу"
+              placeholder={text.descriptionPlaceholder}
               required
               disabled={pending}
             />
@@ -261,7 +267,7 @@ export function CreateListingForm({
 
           <div className="price-fields">
             <label>
-              Цена
+              {text.price}
               <input
                 name="price"
                 type="number"
@@ -275,26 +281,26 @@ export function CreateListingForm({
             </label>
 
             <label>
-              Валюта
+              {text.currency}
               <select
                 name="currency"
                 defaultValue="UZS"
                 required
                 disabled={pending}
               >
-                <option value="UZS">Сум (UZS)</option>
-                <option value="USD">Доллар (USD)</option>
+                <option value="UZS">{text.sum}</option>
+                <option value="USD">{text.dollar}</option>
               </select>
             </label>
           </div>
 
           <label>
-            Местоположение
+            {text.location}
             <input
               name="location"
               type="text"
               maxLength={255}
-              placeholder="Например: Ташкент"
+              placeholder={text.locationExample}
               disabled={pending}
             />
           </label>
@@ -304,12 +310,12 @@ export function CreateListingForm({
       <div className="unified-listing-section unified-create-photos">
         <div className="unified-listing-section-heading">
           <div>
-            <h2>Фотографии</h2>
+            <h2>{text.photos}</h2>
             <p className="unified-listing-help">
-              Первое фото будет обложкой объявления.
+              {text.coverHelp}
             </p>
           </div>
-          <strong>{selectedFiles.length} из 10</strong>
+          <strong>{selectedFiles.length} {text.ofTen}</strong>
         </div>
 
         <div className="listing-photo-grid">
@@ -328,7 +334,7 @@ export function CreateListingForm({
 
       <div className="unified-create-submit">
         <button type="submit" disabled={pending}>
-          {pending ? 'Размещаем…' : 'Разместить объявление'}
+          {pending ? text.placing : text.publish}
         </button>
       </div>
     </form>
