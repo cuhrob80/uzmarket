@@ -5,6 +5,9 @@ import { DeletePhotoButton } from './photos/delete-photo-button';
 import { DraggablePhotoCard } from './photos/draggable-photo-card';
 import { PhotoUploadForm } from './photos/photo-upload-form';
 import { RotatePhotoButton } from './photos/rotate-photo-button';
+import { getRequestLocale } from '@/lib/server-locale';
+import { getDictionary } from '@/i18n/dictionaries';
+import { getCategoryName } from '@/lib/category-i18n';
 
 export const dynamic = 'force-dynamic';
 
@@ -15,7 +18,9 @@ interface UnifiedListingPageProps {
 export default async function UnifiedListingPage({
   params,
 }: UnifiedListingPageProps) {
-  const { id } = await params;
+  const [{ id }, locale] = await Promise.all([params, getRequestLocale()]);
+  const dictionary = getDictionary(locale);
+  const text = dictionary.listingEditor;
   let listing;
 
   try {
@@ -28,7 +33,7 @@ export default async function UnifiedListingPage({
   }
 
   if (!listing) {
-    redirect('/login');
+    redirect(`/${locale}/login`);
   }
 
   const categories = await getCategories();
@@ -49,11 +54,11 @@ export default async function UnifiedListingPage({
           <div>
             <h1>
               {listing.status === 'draft'
-                ? 'Новое объявление'
-                : 'Редактирование объявления'}
+                ? text.newTitle
+                : text.editTitle}
             </h1>
             <p>
-              {listing.category.name} › {listing.title}
+              {getCategoryName(listing.category, locale)} › {listing.title}
             </p>
           </div>
         </header>
@@ -61,8 +66,8 @@ export default async function UnifiedListingPage({
         <div className="unified-listing-section">
           <div className="unified-listing-section-heading">
             <div>
-              <p className="listing-photos-step">1. Основная информация</p>
-              <h2>Данные объявления</h2>
+              <p className="listing-photos-step">{text.mainStep}</p>
+              <h2>{text.details}</h2>
             </div>
           </div>
 
@@ -71,25 +76,26 @@ export default async function UnifiedListingPage({
             categories={categories}
             formId={listingFormId}
             publishAfterSave={listing.status === 'draft'}
+            locale={locale}
           />
         </div>
 
         <div className="unified-listing-section">
           <div className="unified-listing-section-heading">
             <div>
-              <p className="listing-photos-step">2. Внешний вид</p>
-              <h2>Фотографии</h2>
+              <p className="listing-photos-step">{text.appearanceStep}</p>
+              <h2>{text.photos}</h2>
             </div>
-            <strong>{images.length} из 10</strong>
+            <strong>{images.length} {text.ofTen}</strong>
           </div>
 
           <p className="unified-listing-help">
             {isJobListing
-              ? 'Фотографии необязательны. Можно показать рабочее место, логотип или примеры работ.'
-              : 'Первое фото будет обложкой объявления.'}
+              ? text.jobPhotoHelp
+              : text.coverHelp}
           </p>
 
-          <div className="listing-photo-grid" aria-label="Фотографии объявления">
+          <div className="listing-photo-grid" aria-label={text.photosLabel}>
             {images.map((image, index) => (
               <DraggablePhotoCard
                 key={image.id}
@@ -104,7 +110,7 @@ export default async function UnifiedListingPage({
                   />
                   <img
                     src={image.url}
-                    alt={`Фотография ${index + 1}`}
+                    alt={`${text.photoAlt} ${index + 1}`}
                     width={320}
                     height={240}
                   />
@@ -120,7 +126,7 @@ export default async function UnifiedListingPage({
                   </span>
                 </div>
                 {index === 0 ? (
-                  <span className="photo-cover-label">Основное фото</span>
+                  <span className="photo-cover-label">{text.cover}</span>
                 ) : null}
               </DraggablePhotoCard>
             ))}
@@ -137,22 +143,22 @@ export default async function UnifiedListingPage({
           {images.length === 0 ? (
             <p className="unified-listing-help">
               {isJobListing
-                ? 'Фотография необязательна — можно сразу публиковать.'
-                : 'Добавьте хотя бы одну фотографию.'}
+                ? text.jobEmptyHelp
+                : text.emptyHelp}
             </p>
           ) : null}
         </div>
 
         <div className="unified-listing-section unified-listing-publish">
-          <p className="listing-photos-step">3. Публикация</p>
-          <h2>Всё готово?</h2>
+          <p className="listing-photos-step">{text.publishStep}</p>
+          <h2>{text.ready}</h2>
           <p>
-            После публикации объявление станет доступно посетителям UzMarket.
+            {text.publishHelp}
           </p>
 
           {listing.status === 'draft' && !canPublish ? (
             <p className="form-error">
-              Для обычного объявления добавьте хотя бы одну фотографию.
+              {text.photoRequired}
             </p>
           ) : null}
 
@@ -162,8 +168,8 @@ export default async function UnifiedListingPage({
             disabled={listing.status === 'draft' && !canPublish}
           >
             {listing.status === 'draft'
-              ? 'Разместить объявление'
-              : 'Сохранить изменения'}
+              ? text.publish
+              : dictionary.common.save}
           </button>
         </div>
       </section>
