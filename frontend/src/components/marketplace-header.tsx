@@ -1,6 +1,7 @@
 import { unstable_rethrow } from 'next/navigation';
 import { getCategories, getCurrentUser } from '@/lib/api/server';
 import type { AuthUser, Category } from '@/types/listing';
+import { getRequestLocale } from '@/lib/server-locale';
 import { CategoriesMenu } from './categories-menu';
 import { ProfileMenu } from './profile-menu';
 import { LanguageSwitcher } from './language-switcher';
@@ -50,6 +51,10 @@ function MessageIcon() {
 }
 
 export async function MarketplaceHeader() {
+  const locale = await getRequestLocale();
+  const text = locale === 'uz'
+    ? { business: 'Biznes uchun', work: 'Ish', help: 'Yordam', catalogs: 'Kataloglar', create: 'E’lon joylashtirish', mine: 'Mening e’lonlarim', favorites: 'Sevimlilar', notifications: 'Bildirishnomalar', messages: 'Xabarlar', login: 'Kirish', search: 'E’lonlar bo‘yicha qidirish', find: 'Topish', city: 'Toshkent', serviceNav: 'Xizmat navigatsiyasi', userNav: 'Foydalanuvchi menyusi' }
+    : { business: 'Для бизнеса', work: 'Работа', help: 'Помощь', catalogs: 'Каталоги', create: 'Разместить объявление', mine: 'Мои объявления', favorites: 'Избранное', notifications? : '', notifications: 'Уведомления', messages: 'Сообщения', login: 'Войти', search: 'Поиск по объявлениям', find: 'Найти', city: 'Ташкент', serviceNav: 'Служебная навигация', userNav: 'Меню пользователя' };
   let user: AuthUser | null = null;
   let categories: Category[] = [];
 
@@ -72,44 +77,44 @@ export async function MarketplaceHeader() {
         <div className="marketplace-header-row">
           <nav
             className="marketplace-service-links"
-            aria-label="Служебная навигация"
+            aria-label={text.serviceNav}
           >
-            <LocalizedLink href="/listings">Для бизнеса</LocalizedLink>
-            <LocalizedLink href="/rabota/vakansii">Работа</LocalizedLink>
-            <LocalizedLink href="/listings">Помощь</LocalizedLink>
-            <LocalizedLink href="/listings">Каталоги</LocalizedLink>
+            <LocalizedLink href="/listings">{text.business}</LocalizedLink>
+            <LocalizedLink href="/rabota/vakansii">{text.work}</LocalizedLink>
+            <LocalizedLink href="/listings">{text.help}</LocalizedLink>
+            <LocalizedLink href="/listings">{text.catalogs}</LocalizedLink>
           </nav>
 
           <nav
             className="marketplace-account-links"
-            aria-label="Меню пользователя"
+            aria-label={text.userNav}
           >
             <LocalizedLink
               href="/create-listing"
               className="marketplace-top-create"
             >
               <span aria-hidden="true">＋</span>
-              Разместить объявление
+              {text.create}
             </LocalizedLink>
-            <LocalizedLink href="/my-listings">Мои объявления</LocalizedLink>
+            <LocalizedLink href="/my-listings">{text.mine}</LocalizedLink>
             <LocalizedLink
               href="/favorites"
               className="marketplace-header-icon"
-              aria-label="Избранное"
+              aria-label={text.favorites}
             >
               <HeartIcon />
             </LocalizedLink>
             <button
               type="button"
               className="marketplace-header-icon"
-              aria-label="Уведомления"
+              aria-label={text.notifications}
             >
               <BellIcon />
             </button>
             <button
               type="button"
               className="marketplace-header-icon"
-              aria-label="Сообщения"
+              aria-label={text.messages}
             >
               <MessageIcon />
             </button>
@@ -117,7 +122,7 @@ export async function MarketplaceHeader() {
               <ProfileMenu user={user} />
             ) : (
               <LocalizedLink href="/login" className="marketplace-login-link">
-                Войти
+                {text.login}
               </LocalizedLink>
             )}
             <LanguageSwitcher />
@@ -150,15 +155,15 @@ export async function MarketplaceHeader() {
             <input
               type="search"
               name="search"
-              placeholder="Поиск по объявлениям"
-              aria-label="Поиск по объявлениям"
+              placeholder={text.search}
+              aria-label={text.search}
             />
-            <button type="submit">Найти</button>
+            <button type="submit">{text.find}</button>
           </form>
 
           <LocalizedLink href="/listings" className="marketplace-location">
             <PinIcon />
-            <span>Ташкент</span>
+            <span>{text.city}</span>
           </LocalizedLink>
         </div>
       </div>
