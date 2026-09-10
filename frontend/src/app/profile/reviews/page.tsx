@@ -25,8 +25,8 @@ export default async function ReviewsPage({
 
   const view = params.view === 'written' ? 'written' : 'received';
   const text = locale === 'uz'
-    ? { back: 'Shaxsiy kabinet', title: 'Sharhlar va reyting', ratingLabel: 'Hozircha reyting yo‘q', noRatings: 'Hozircha baholar yo‘q', received: 'Men haqimdagi sharhlar', written: 'Men yozgan sharhlar' }
-    : { back: 'Личный кабинет', title: 'Отзывы и рейтинг', ratingLabel: 'Рейтинг пока отсутствует', noRatings: 'Пока нет оценок', received: 'Отзывы обо мне', written: 'Мои отзывы' };
+    ? { back: 'Shaxsiy kabinet', title: 'Sharhlar va reyting', ratingLabel: 'Hozircha reyting yo‘q', noRatings: 'Hozircha baholar yo‘q', received: 'Men haqimdagi sharhlar', written: 'Men yozgan sharhlar', receivedEmpty: 'Siz haqingizda hozircha sharhlar yo‘q', writtenEmpty: 'Siz hozircha sharh yozmagansiz', receivedHelp: 'Boshqa foydalanuvchilarning baholari va sharhlari shu yerda paydo bo‘ladi.', writtenHelp: 'Boshqa foydalanuvchilarga yozgan sharhlaringiz shu yerda bo‘ladi.', tabsLabel: 'Sharhlar bo‘limlari' }
+    : { back: 'Личный кабинет', title: 'Отзывы и рейтинг', ratingLabel: 'Рейтинг пока отсутствует', noRatings: 'Пока нет оценок', received: 'Отзывы обо мне', written: 'Мои отзывы', receivedEmpty: 'У вас пока нет отзывов', writtenEmpty: 'Вы пока не оставляли отзывов', receivedHelp: 'Здесь появятся оценки и отзывы других пользователей.', writtenHelp: 'Здесь будут отзывы, которые вы оставите другим пользователям.', tabsLabel: 'Разделы отзывов' };
 
   return (
     <AccountShell active="reviews">
@@ -46,7 +46,7 @@ export default async function ReviewsPage({
           </div>
         </div>
 
-        <nav className="reviews-tabs" aria-label="Разделы отзывов">
+        <nav className="reviews-tabs" aria-label={text.tabsLabel}>
           <LocalizedLink
             href="/profile/reviews?view=received"
             className={view === 'received' ? 'is-active' : undefined}
@@ -64,14 +64,10 @@ export default async function ReviewsPage({
         <div className="reviews-empty">
           <span aria-hidden="true">★</span>
           <h2>
-            {view === 'received'
-              ? 'У вас пока нет отзывов'
-              : 'Вы пока не оставляли отзывов'}
+            {view === 'received' ? text.receivedEmpty : text.writtenEmpty}
           </h2>
           <p>
-            {view === 'received'
-              ? 'Здесь появятся оценки и отзывы других пользователей.'
-              : 'Здесь будут отзывы, которые вы оставите другим пользователям.'}
+            {view === 'received' ? text.receivedHelp : text.writtenHelp}
           </p>
         </div>
         </section>
