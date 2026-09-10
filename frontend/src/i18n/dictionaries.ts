@@ -578,6 +578,18 @@ export const categoryNamesUz: Record<string, string> = {
   'Красота, фитнес и спорт': 'Go‘zallik, fitnes va sport',
   'Другие сферы': 'Boshqa sohalar',
   'Одежда, обувь, аксессуары': 'Kiyim, poyabzal va aksessuarlar',
+  'Тракторы': 'Traktorlar',
+  'Экскаваторы': 'Ekskavatorlar',
+  'Катера': 'Katerlar',
+  'Мини-тракторы и мототракторы': 'Mini traktorlar va mototraktorlar',
+  'Яхты': 'Yaxtalar',
+  'Бульдозеры': 'Buldozerlar',
+  'Гидроциклы': 'Gidrosikllar',
+  'Комбайны': 'Kombaynlar',
+  'Мотоблоки и культиваторы': 'Motobloklar va kultivatorlar',
+  'Грузовой транспорт': 'Yuk transporti',
+  'Специальная техника': 'Maxsus texnika',
+  'Сельскохозяйственная техника': 'Qishloq xo‘jaligi texnikasi',
 };
 
 export type Dictionary = typeof ru | typeof uz;
