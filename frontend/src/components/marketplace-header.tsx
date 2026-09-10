@@ -1,10 +1,10 @@
-import Link from 'next/link';
 import { unstable_rethrow } from 'next/navigation';
 import { getCategories, getCurrentUser } from '@/lib/api/server';
 import type { AuthUser, Category } from '@/types/listing';
 import { CategoriesMenu } from './categories-menu';
 import { ProfileMenu } from './profile-menu';
 import { LanguageSwitcher } from './language-switcher';
+import { LocalizedLink } from './localized-link';
 
 function SearchIcon() {
   return (
@@ -74,31 +74,31 @@ export async function MarketplaceHeader() {
             className="marketplace-service-links"
             aria-label="Служебная навигация"
           >
-            <Link href="/listings">Для бизнеса</Link>
-            <Link href="/rabota/vakansii">Работа</Link>
-            <Link href="/listings">Помощь</Link>
-            <Link href="/listings">Каталоги</Link>
+            <LocalizedLink href="/listings">Для бизнеса</LocalizedLink>
+            <LocalizedLink href="/rabota/vakansii">Работа</LocalizedLink>
+            <LocalizedLink href="/listings">Помощь</LocalizedLink>
+            <LocalizedLink href="/listings">Каталоги</LocalizedLink>
           </nav>
 
           <nav
             className="marketplace-account-links"
             aria-label="Меню пользователя"
           >
-            <Link
+            <LocalizedLink
               href="/create-listing"
               className="marketplace-top-create"
             >
               <span aria-hidden="true">＋</span>
               Разместить объявление
-            </Link>
-            <Link href="/my-listings">Мои объявления</Link>
-            <Link
+            </LocalizedLink>
+            <LocalizedLink href="/my-listings">Мои объявления</LocalizedLink>
+            <LocalizedLink
               href="/favorites"
               className="marketplace-header-icon"
               aria-label="Избранное"
             >
               <HeartIcon />
-            </Link>
+            </LocalizedLink>
             <button
               type="button"
               className="marketplace-header-icon"
@@ -116,9 +116,9 @@ export async function MarketplaceHeader() {
             {user ? (
               <ProfileMenu user={user} />
             ) : (
-              <Link href="/login" className="marketplace-login-link">
+              <LocalizedLink href="/login" className="marketplace-login-link">
                 Войти
-              </Link>
+              </LocalizedLink>
             )}
             <LanguageSwitcher />
           </nav>
@@ -127,7 +127,7 @@ export async function MarketplaceHeader() {
 
       <div className="marketplace-header-main">
         <div className="marketplace-header-row marketplace-header-main-row">
-          <Link href="/" className="marketplace-logo" aria-label="UzMarket">
+          <LocalizedLink href="/" className="marketplace-logo" aria-label="UzMarket">
             <span className="marketplace-logo-mark" aria-hidden="true">
               <i />
               <i />
@@ -135,7 +135,7 @@ export async function MarketplaceHeader() {
             <span className="marketplace-logo-word">
               <strong>Uz</strong>Market
             </span>
-          </Link>
+          </LocalizedLink>
 
           <CategoriesMenu categories={categories} />
 
@@ -156,10 +156,10 @@ export async function MarketplaceHeader() {
             <button type="submit">Найти</button>
           </form>
 
-          <Link href="/listings" className="marketplace-location">
+          <LocalizedLink href="/listings" className="marketplace-location">
             <PinIcon />
             <span>Ташкент</span>
-          </Link>
+          </LocalizedLink>
         </div>
       </div>
     </header>
