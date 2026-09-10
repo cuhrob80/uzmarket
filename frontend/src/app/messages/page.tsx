@@ -20,7 +20,7 @@ export default async function MessagesPage() {
       };
 
   if (!user) {
-    redirect('/login?returnTo=/messages');
+    redirect(`/${locale}/login?returnTo=/${locale}/messages`);
   }
 
   return (
