@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import type { ReactNode } from 'react';
 import { localeFromPathname, withLocale } from '@/lib/locale-path';
+import { getDictionary } from '@/i18n/dictionaries';
 
 export type AccountSection =
   | 'listings'
@@ -17,22 +18,23 @@ interface AccountShellProps {
 }
 
 const items = [
-  { key: 'home', href: '/', icon: '⌂', ru: 'Главное', uz: 'Bosh sahifa' },
-  { key: 'listings', href: '/my-listings', icon: '▣', ru: 'Мои объявления', uz: 'Mening e’lonlarim' },
-  { key: 'messages', href: '/messages', icon: '◯', ru: 'Сообщения', uz: 'Xabarlar' },
-  { key: 'reviews', href: '/profile/reviews', icon: '☆', ru: 'Отзывы и рейтинг', uz: 'Sharhlar va reyting' },
-  { key: 'profile', href: '/profile', icon: '⚙', ru: 'Профиль и настройки', uz: 'Profil va sozlamalar' },
+  { key: 'home', href: '/', icon: '⌂' },
+  { key: 'listings', href: '/my-listings', icon: '▣' },
+  { key: 'messages', href: '/messages', icon: '◯' },
+  { key: 'reviews', href: '/profile/reviews', icon: '☆' },
+  { key: 'profile', href: '/profile', icon: '⚙' },
 ] as const;
 
 export function AccountShell({ active, children }: AccountShellProps) {
   const pathname = usePathname();
   const locale = localeFromPathname(pathname);
+  const text = getDictionary(locale).account;
 
   return (
     <div className="account-dashboard">
       <aside
         className="account-sidebar"
-        aria-label={locale === 'uz' ? 'Shaxsiy kabinet' : 'Личный кабинет'}
+        aria-label={text.navigation}
       >
         {items.map((item) => (
           <Link
@@ -42,7 +44,7 @@ export function AccountShell({ active, children }: AccountShellProps) {
             aria-current={item.key === active ? 'page' : undefined}
           >
             <span aria-hidden="true">{item.icon}</span>
-            <span>{item[locale]}</span>
+            <span>{text[item.key]}</span>
           </Link>
         ))}
       </aside>
