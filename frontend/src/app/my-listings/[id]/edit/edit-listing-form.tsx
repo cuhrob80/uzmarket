@@ -5,6 +5,9 @@ import type {
   Category,
   Listing,
 } from '@/types/listing';
+import type { SiteLocale } from '@/lib/locale-path';
+import { getDictionary } from '@/i18n/dictionaries';
+import { getCategoryName } from '@/lib/category-i18n';
 import {
   editListingAction,
   type EditListingState,
@@ -15,6 +18,7 @@ interface EditListingFormProps {
   categories: Category[];
   formId?: string;
   publishAfterSave?: boolean;
+  locale: SiteLocale;
 }
 
 const initialState: EditListingState = {
@@ -27,7 +31,9 @@ export function EditListingForm({
   categories,
   formId,
   publishAfterSave = false,
+  locale,
 }: EditListingFormProps) {
+  const text = getDictionary(locale).listingEditor;
   const action = editListingAction.bind(
     null,
     listing.id,
@@ -51,7 +57,7 @@ export function EditListingForm({
       />
 
       <label>
-        Категория
+        {text.category}
 
         <select
           name="categoryId"
@@ -63,14 +69,14 @@ export function EditListingForm({
               key={category.id}
               value={category.id}
             >
-              {category.name}
+              {getCategoryName(category, locale)}
             </option>
           ))}
         </select>
       </label>
 
       <label>
-        Название
+        {text.name}
 
         <input
           type="text"
@@ -83,7 +89,7 @@ export function EditListingForm({
       </label>
 
       <label>
-        Описание
+        {text.description}
 
         <textarea
           name="description"
@@ -97,7 +103,7 @@ export function EditListingForm({
 
       <div className="price-row">
         <label>
-          Цена
+          {text.price}
 
           <input
             type="number"
@@ -110,7 +116,7 @@ export function EditListingForm({
         </label>
 
         <label>
-          Валюта
+          {text.currency}
 
           <select
             name="currency"
@@ -123,14 +129,14 @@ export function EditListingForm({
       </div>
 
       <label>
-        Местоположение
+        {text.location}
 
         <input
           type="text"
           name="location"
           defaultValue={listing.location ?? ''}
           maxLength={200}
-          placeholder="Например, Ташкент"
+          placeholder={text.locationExample}
         />
       </label>
 
