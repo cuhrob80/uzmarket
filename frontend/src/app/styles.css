@@ -4782,3 +4782,68 @@ p { margin: 0; font-size: 1.125rem; }
     padding: 28px 20px 22px;
   }
 }
+
+
+/* Shared account pages */
+
+.account-content-page {
+  display: block;
+  width: 100%;
+  min-width: 0;
+  min-height: calc(100vh - 120px);
+}
+
+.messages-page {
+  padding: 42px 34px 72px;
+  background: #f7f8fa;
+}
+
+.messages-placeholder {
+  display: grid;
+  width: min(100%, 760px);
+  max-width: 760px;
+  min-height: 360px;
+  margin: 0 auto;
+  padding: 36px;
+  place-items: center;
+  align-content: center;
+  border: 1px solid #e1e6ed;
+  border-radius: 18px;
+  background: #fff;
+  box-shadow: 0 10px 30px rgb(16 24 40 / 6%);
+  gap: 10px;
+  text-align: center;
+}
+
+.messages-placeholder > span {
+  display: grid;
+  width: 72px;
+  height: 72px;
+  place-items: center;
+  border-radius: 50%;
+  background: #eaf8f1;
+  color: #079455;
+  font-size: 2.2rem;
+}
+
+.messages-placeholder h1,
+.messages-placeholder p,
+.messages-placeholder small {
+  margin: 0;
+}
+
+.messages-placeholder p,
+.messages-placeholder small {
+  color: #667085;
+}
+
+@media (max-width: 760px) {
+  .messages-page {
+    padding: 26px 14px 48px;
+  }
+
+  .messages-placeholder {
+    min-height: 300px;
+    padding: 24px 18px;
+  }
+}
