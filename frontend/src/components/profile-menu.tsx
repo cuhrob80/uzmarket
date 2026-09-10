@@ -1,9 +1,9 @@
 'use client';
 
-import Link from 'next/link';
 import { useEffect, useRef } from 'react';
 import { logoutAction } from '@/app/profile/actions';
 import type { AuthUser } from '@/types/listing';
+import { LocalizedLink } from './localized-link';
 
 export function ProfileMenu({ user }: { user: AuthUser }) {
   const menuRef = useRef<HTMLDetailsElement>(null);
@@ -58,10 +58,10 @@ export function ProfileMenu({ user }: { user: AuthUser }) {
         )}
       </summary>
       <nav aria-label="Личный кабинет" onClick={closeMenu}>
-        <Link href="/profile">Личный кабинет</Link>
-        <Link href="/my-listings">Мои объявления</Link>
-        <Link href="/profile/reviews">Отзывы и рейтинг</Link>
-        <Link href="/profile">Настройки профиля</Link>
+        <LocalizedLink href="/profile">Личный кабинет</LocalizedLink>
+        <LocalizedLink href="/my-listings">Мои объявления</LocalizedLink>
+        <LocalizedLink href="/profile/reviews">Отзывы и рейтинг</LocalizedLink>
+        <LocalizedLink href="/profile">Настройки профиля</LocalizedLink>
         <form action={logoutAction}>
           <button type="submit">Выйти</button>
         </form>
