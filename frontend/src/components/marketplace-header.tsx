@@ -54,7 +54,7 @@ export async function MarketplaceHeader() {
   const locale = await getRequestLocale();
   const text = locale === 'uz'
     ? { business: 'Biznes uchun', work: 'Ish', help: 'Yordam', catalogs: 'Kataloglar', create: 'E’lon joylashtirish', mine: 'Mening e’lonlarim', favorites: 'Sevimlilar', notifications: 'Bildirishnomalar', messages: 'Xabarlar', login: 'Kirish', search: 'E’lonlar bo‘yicha qidirish', find: 'Topish', city: 'Toshkent', serviceNav: 'Xizmat navigatsiyasi', userNav: 'Foydalanuvchi menyusi' }
-    : { business: 'Для бизнеса', work: 'Работа', help: 'Помощь', catalogs: 'Каталоги', create: 'Разместить объявление', mine: 'Мои объявления', favorites: 'Избранное', notifications? : '', notifications: 'Уведомления', messages: 'Сообщения', login: 'Войти', search: 'Поиск по объявлениям', find: 'Найти', city: 'Ташкент', serviceNav: 'Служебная навигация', userNav: 'Меню пользователя' };
+    : { business: 'Для бизнеса', work: 'Работа', help: 'Помощь', catalogs: 'Каталоги', create: 'Разместить объявление', mine: 'Мои объявления', favorites: 'Избранное', notifications: 'Уведомления', messages: 'Сообщения', login: 'Войти', search: 'Поиск по объявлениям', find: 'Найти', city: 'Ташкент', serviceNav: 'Служебная навигация', userNav: 'Меню пользователя' };
   let user: AuthUser | null = null;
   let categories: Category[] = [];
 
