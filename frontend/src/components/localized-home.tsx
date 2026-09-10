@@ -1,4 +1,5 @@
-import Link from 'next/link';
+import { LocalizedLink } from './localized-link';
+import { getDictionary } from '@/i18n/dictionaries';
 import { getCategories, getListings } from '@/lib/api/server';
 import { getListingPublicPath } from '@/lib/listing-url';
 import { getCategoryName } from '@/lib/category-i18n';
@@ -6,41 +7,6 @@ import type { Listing } from '@/types/listing';
 import styles from './localized-home.module.css';
 
 export type HomeLocale = 'ru' | 'uz';
-
-const copy = {
-  ru: {
-    eyebrow: 'Маркетплейс Узбекистана',
-    title: 'Покупайте и продавайте с UzMarket',
-    subtitle: 'Тысячи объявлений рядом с вами',
-    primary: 'Перейти к объявлениям',
-    secondaryTitle: 'Всё для вашего дома',
-    secondaryText: 'Мебель, техника, декор и многое другое',
-    secondaryAction: 'Смотреть категории',
-    categories: 'Популярные категории',
-    allListings: 'Все объявления',
-    recent: 'Свежие объявления',
-    viewAll: 'Смотреть все',
-    emptyTitle: 'Пока нет объявлений',
-    emptyText: 'Новые объявления появятся здесь.',
-    noPhoto: 'Нет фото',
-  },
-  uz: {
-    eyebrow: 'O‘zbekiston marketpleysi',
-    title: 'UzMarket bilan sotib oling va soting',
-    subtitle: 'Yoningizdagi minglab e’lonlar',
-    primary: 'E’lonlarga o‘tish',
-    secondaryTitle: 'Uyingiz uchun hamma narsa',
-    secondaryText: 'Mebel, texnika, bezak va boshqa mahsulotlar',
-    secondaryAction: 'Kategoriyalarni ko‘rish',
-    categories: 'Ommabop kategoriyalar',
-    allListings: 'Barcha e’lonlar',
-    recent: 'Yangi e’lonlar',
-    viewAll: 'Barchasini ko‘rish',
-    emptyTitle: 'Hozircha e’lonlar yo‘q',
-    emptyText: 'Yangi e’lonlar shu yerda paydo bo‘ladi.',
-    noPhoto: 'Rasm yo‘q',
-  },
-} as const;
 
 function formatPrice(listing: Listing, locale: HomeLocale): string {
   const value = Number(listing.price);
@@ -52,7 +18,8 @@ function formatPrice(listing: Listing, locale: HomeLocale): string {
 }
 
 export async function LocalizedHome({ locale }: { locale: HomeLocale }) {
-  const text = copy[locale];
+  const dictionary = getDictionary(locale);
+  const text = dictionary.home;
   const [categories, listings] = await Promise.all([
     getCategories(),
     getListings({ page: 1, limit: 8 }),
@@ -73,7 +40,7 @@ export async function LocalizedHome({ locale }: { locale: HomeLocale }) {
             <p>{text.eyebrow}</p>
             <h1 id="home-title">{text.title}</h1>
             <span>{text.subtitle}</span>
-            <Link href="/listings">{text.primary} <b aria-hidden="true">→</b></Link>
+            <LocalizedLink href="/listings">{text.primary} <b aria-hidden="true">→</b></LocalizedLink>
           </div>
           <div className={styles.heroScene} aria-hidden="true">
             <span className={styles.sofa} />
@@ -85,7 +52,7 @@ export async function LocalizedHome({ locale }: { locale: HomeLocale }) {
         <div className={styles.heroSide}>
           <h2>{text.secondaryTitle}</h2>
           <p>{text.secondaryText}</p>
-          <Link href="#home-categories">{text.secondaryAction} →</Link>
+          <LocalizedLink href="#home-categories">{text.secondaryAction} →</LocalizedLink>
           <span className={styles.chair} aria-hidden="true" />
         </div>
       </section>
@@ -93,17 +60,17 @@ export async function LocalizedHome({ locale }: { locale: HomeLocale }) {
       <section id="home-categories" className={styles.section}>
         <div className={styles.sectionHeader}>
           <h2>{text.categories}</h2>
-          <Link href="/listings">{text.allListings}</Link>
+          <LocalizedLink href="/listings">{text.allListings}</LocalizedLink>
         </div>
         <div className={styles.categories}>
           {rootCategories.map((category, index) => (
-            <Link key={category.id} href={`/category/${encodeURIComponent(category.slug)}`}>
+            <LocalizedLink key={category.id} href={`/category/${encodeURIComponent(category.slug)}`}>
               <span className={styles.categoryIcon} aria-hidden="true">
                 {['🚙', '🏢', '💼', '🛋️', '📱', '👕', '🛠️', '⚽'][index] ?? '•'}
               </span>
               <strong>{getCategoryName(category, locale)}</strong>
               <span aria-hidden="true">›</span>
-            </Link>
+            </LocalizedLink>
           ))}
         </div>
       </section>
@@ -111,7 +78,7 @@ export async function LocalizedHome({ locale }: { locale: HomeLocale }) {
       <section className={styles.section}>
         <div className={styles.sectionHeader}>
           <h2>{text.recent}</h2>
-          <Link href="/listings">{text.viewAll}</Link>
+          <LocalizedLink href="/listings">{text.viewAll}</LocalizedLink>
         </div>
         {listings.items.length === 0 ? (
           <div className={styles.empty}>
@@ -123,18 +90,18 @@ export async function LocalizedHome({ locale }: { locale: HomeLocale }) {
             {listings.items.map((listing) => {
               const image = [...listing.images].sort((a, b) => a.sortOrder - b.sortOrder)[0];
               return (
-                <Link key={listing.id} href={getListingPublicPath(listing)} className={styles.card}>
+                <LocalizedLink key={listing.id} href={getListingPublicPath(listing)} className={styles.card}>
                   <div className={styles.cardImage}>
                     {image ? (
                       <img src={image.url} alt={listing.title} width={320} height={240} />
                     ) : (
-                      <span>{text.noPhoto}</span>
+                      <span>{dictionary.common.noPhoto}</span>
                     )}
                   </div>
                   <h3>{listing.title}</h3>
                   <strong>{formatPrice(listing, locale)}</strong>
                   <p>{listing.location || getCategoryName(listing.category, locale)}</p>
-                </Link>
+                </LocalizedLink>
               );
             })}
           </div>
