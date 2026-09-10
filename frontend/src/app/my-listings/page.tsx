@@ -95,7 +95,7 @@ export default async function MyListingsPage({
           <LocalizedLink href="/create-listing">{text.create}</LocalizedLink>
         </header>
 
-        <nav className="account-status-tabs" aria-label={text.tabs}>
+        <nav className="account-status-tabs" aria-label={text.tabsLabel}>
           {statusTabs.map((tab) => (
             <LocalizedLink
               key={tab.value}
