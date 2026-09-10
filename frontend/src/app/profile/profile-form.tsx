@@ -9,6 +9,7 @@ import {
 import { usePathname } from 'next/navigation';
 import type { AuthUser } from '@/types/listing';
 import { localeFromPathname } from '@/lib/locale-path';
+import { getDictionary } from '@/i18n/dictionaries';
 import {
   updateProfileAction,
   type ProfileActionState,
@@ -21,15 +22,8 @@ const initialState: ProfileActionState = {
 
 export function ProfileForm({ user }: { user: AuthUser }) {
   const locale = localeFromPathname(usePathname());
-  const text = locale === 'uz'
-    ? {
-        avatarAlt: 'Profil rasmi', photo: 'Rasmni o‘zgartirish', format: 'JPG, PNG yoki WEBP · 5 MB gacha',
-        name: 'Ism', phone: 'Telefon', email: 'Elektron pochta', saving: 'Saqlanmoqda…', save: 'O‘zgarishlarni saqlash',
-      }
-    : {
-        avatarAlt: 'Аватар профиля', photo: 'Изменить фото', format: 'JPG, PNG или WEBP · до 5 МБ',
-        name: 'Имя', phone: 'Телефон', email: 'Электронная почта', saving: 'Сохраняем…', save: 'Сохранить изменения',
-      };
+  const dictionary = getDictionary(locale);
+  const text = dictionary.profile;
   const [state, formAction, pending] = useActionState(
     updateProfileAction,
     initialState,
@@ -129,7 +123,7 @@ export function ProfileForm({ user }: { user: AuthUser }) {
       ) : null}
 
       <button type="submit" disabled={pending}>
-        {pending ? text.saving : text.save}
+        {pending ? dictionary.common.saving : dictionary.common.save}
       </button>
     </form>
   );
