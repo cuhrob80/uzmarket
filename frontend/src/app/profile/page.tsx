@@ -10,7 +10,7 @@ export default async function ProfilePage() {
   const [user, locale] = await Promise.all([getCurrentUser(), getRequestLocale()]);
 
   if (!user) {
-    redirect('/login');
+    redirect(`/${locale}/login?returnTo=/${locale}/profile`);
   }
 
   return (
