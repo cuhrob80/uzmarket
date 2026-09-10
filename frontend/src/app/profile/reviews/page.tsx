@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
 import { getCurrentUser } from '@/lib/api/server';
+import { AccountShell } from '@/components/account-shell';
 
 export const dynamic = 'force-dynamic';
 
@@ -23,8 +24,9 @@ export default async function ReviewsPage({
   const view = params.view === 'written' ? 'written' : 'received';
 
   return (
-    <main className="profile-page">
-      <section className="profile-container reviews-container">
+    <AccountShell active="reviews">
+      <main className="profile-page account-content-page">
+        <section className="profile-container reviews-container">
         <div className="reviews-heading">
           <div>
             <Link href="/profile" className="reviews-back">
@@ -67,7 +69,8 @@ export default async function ReviewsPage({
               : 'Здесь будут отзывы, которые вы оставите другим пользователям.'}
           </p>
         </div>
-      </section>
-    </main>
+        </section>
+      </main>
+    </AccountShell>
   );
 }
