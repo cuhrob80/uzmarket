@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState, useTransition } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
 import { localeFromPathname } from '@/lib/locale-path';
+import { getDictionary } from '@/i18n/dictionaries';
 import {
   manageListingAction,
   type ListingMenuOperation,
@@ -24,9 +25,7 @@ export function ListingActionsMenu({
   const containerRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
   const locale = localeFromPathname(usePathname());
-  const text = locale === 'uz'
-    ? { confirm: 'E’lon butunlay o‘chirilsinmi? Bu amalni bekor qilib bo‘lmaydi.', other: 'Boshqa amallar', cancelReview: 'Tekshiruvni bekor qilish', unpublish: 'Nashrdan olish', sold: 'Sotildi / yakunlash', archive: 'Arxivga ko‘chirish', restore: 'Tiklash', permanentDelete: 'Butunlay o‘chirish', remove: 'O‘chirish', pending: 'Bajarilmoqda…' }
-    : { confirm: 'Удалить объявление навсегда? Это действие нельзя отменить.', other: 'Другие действия', cancelReview: 'Отменить проверку', unpublish: 'Снять с публикации', sold: 'Продать / завершить', archive: 'Переместить в архив', restore: 'Восстановить', permanentDelete: 'Удалить навсегда', remove: 'Удалить', pending: 'Выполняется…' };
+  const text = getDictionary(locale).listingActions;
 
   useEffect(() => {
     if (!isOpen) {
