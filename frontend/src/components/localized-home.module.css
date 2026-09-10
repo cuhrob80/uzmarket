@@ -11,6 +11,12 @@
 
 .hero {
   display: grid;
+  width: 100%;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
   grid-template-columns: minmax(0, 2fr) minmax(310px, 1fr);
   gap: 24px;
 }
@@ -169,7 +175,13 @@
 }
 
 .section {
+  width: 100%;
   margin-top: 34px;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
 }
 
 .sectionHeader {
