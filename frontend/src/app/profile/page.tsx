@@ -3,6 +3,7 @@ import { getCurrentUser } from '@/lib/api/server';
 import { ProfileForm } from './profile-form';
 import { AccountShell } from '@/components/account-shell';
 import { getRequestLocale } from '@/lib/server-locale';
+import { getDictionary } from '@/i18n/dictionaries';
 
 export const dynamic = 'force-dynamic';
 
@@ -17,7 +18,7 @@ export default async function ProfilePage() {
     <AccountShell active="profile">
       <main className="profile-page account-content-page">
         <section className="profile-container">
-          <h1>{locale === 'uz' ? 'Profil sozlamalari' : 'Настройки профиля'}</h1>
+          <h1>{getDictionary(locale).profile.title}</h1>
           <ProfileForm user={user} />
         </section>
       </main>
