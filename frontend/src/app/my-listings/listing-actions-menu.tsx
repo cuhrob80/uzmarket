@@ -1,7 +1,8 @@
 'use client';
 
 import { useEffect, useRef, useState, useTransition } from 'react';
-import { useRouter } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
+import { localeFromPathname } from '@/lib/locale-path';
 import {
   manageListingAction,
   type ListingMenuOperation,
@@ -22,6 +23,10 @@ export function ListingActionsMenu({
   const [isPending, startTransition] = useTransition();
   const containerRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
+  const locale = localeFromPathname(usePathname());
+  const text = locale === 'uz'
+    ? { confirm: 'E’lon butunlay o‘chirilsinmi? Bu amalni bekor qilib bo‘lmaydi.', other: 'Boshqa amallar', cancelReview: 'Tekshiruvni bekor qilish', unpublish: 'Nashrdan olish', sold: 'Sotildi / yakunlash', archive: 'Arxivga ko‘chirish', restore: 'Tiklash', permanentDelete: 'Butunlay o‘chirish', remove: 'O‘chirish', pending: 'Bajarilmoqda…' }
+    : { confirm: text.confirm, other: 'Другие действия', cancelReview: 'Отменить проверку', unpublish: 'Снять с публикации', sold: 'Продать / завершить', archive: 'Переместить в архив', restore: 'Восстановить', permanentDelete: 'Удалить навсегда', remove: 'Удалить', pending: 'Выполняется…' };
 
   useEffect(() => {
     if (!isOpen) {
@@ -80,7 +85,7 @@ export function ListingActionsMenu({
       <button
         type="button"
         className="listing-actions-trigger"
-        aria-label="Другие действия"
+        aria-label={text.other}
         aria-haspopup="menu"
         aria-expanded={isOpen}
         onClick={() => {
@@ -102,7 +107,7 @@ export function ListingActionsMenu({
                   disabled={isPending}
                   onClick={() => runAction('unpublish')}
                 >
-                  Отменить проверку
+                  {text.cancelReview}
                 </button>
               ) : (
                 <button
@@ -111,7 +116,7 @@ export function ListingActionsMenu({
                   disabled={isPending}
                   onClick={() => runAction('unpublish')}
                 >
-                  Снять с публикации
+                  {text.unpublish}
                 </button>
               )}
               {status === 'active' ? (
@@ -121,7 +126,7 @@ export function ListingActionsMenu({
                   disabled={isPending}
                   onClick={() => runAction('sold')}
                 >
-                  Продать / завершить
+                  {text.sold}
                 </button>
               ) : null}
             </>
@@ -136,7 +141,7 @@ export function ListingActionsMenu({
               disabled={isPending}
               onClick={() => runAction('archive')}
             >
-              Переместить в архив
+              {text.archive}
             </button>
           ) : null}
 
@@ -147,7 +152,7 @@ export function ListingActionsMenu({
               disabled={isPending}
               onClick={() => runAction('restore')}
             >
-              Восстановить
+              {text.restore}
             </button>
           ) : null}
 
@@ -159,7 +164,7 @@ export function ListingActionsMenu({
               disabled={isPending}
               onClick={() => runAction('permanentDelete', true)}
             >
-              Удалить навсегда
+              {text.permanentDelete}
             </button>
           ) : (
             <button
@@ -169,12 +174,12 @@ export function ListingActionsMenu({
               disabled={isPending}
               onClick={() => runAction('delete')}
             >
-              Удалить
+              {text.remove}
             </button>
           )}
 
           {isPending ? (
-            <span className="listing-actions-progress">Выполняется…</span>
+            <span className="listing-actions-progress">{text.pending}</span>
           ) : null}
           {error ? (
             <span className="listing-actions-error" role="alert">
