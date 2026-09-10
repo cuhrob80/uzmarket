@@ -16,7 +16,7 @@ const ru = {
     create: 'Разместить объявление',
     myListings: 'Мои объявления',
     favorites: 'Избранное',
-    notifications: 'Уведом amoureuxления',
+    notifications: 'Уведомления',
     messages: 'Сообщения',
     login: 'Войти',
     search: 'Поиск по объявлениям',
@@ -69,7 +69,7 @@ const ru = {
   },
 } as const;
 
-const uz: typeof ru = {
+const uz = {
   common: {
     find: 'Topish',
     noPhoto: 'Rasm yo‘q',
@@ -136,9 +136,9 @@ const uz: typeof ru = {
     phone: 'Telefon',
     email: 'Elektron pochta',
   },
-};
+} as const;
 
-export type Dictionary = typeof ru;
+export type Dictionary = typeof ru | typeof uz;
 
 export function getDictionary(locale: SiteLocale): Dictionary {
   return locale === 'uz' ? uz : ru;
