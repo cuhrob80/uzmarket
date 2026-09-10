@@ -26,7 +26,7 @@ export function ListingActionsMenu({
   const locale = localeFromPathname(usePathname());
   const text = locale === 'uz'
     ? { confirm: 'E’lon butunlay o‘chirilsinmi? Bu amalni bekor qilib bo‘lmaydi.', other: 'Boshqa amallar', cancelReview: 'Tekshiruvni bekor qilish', unpublish: 'Nashrdan olish', sold: 'Sotildi / yakunlash', archive: 'Arxivga ko‘chirish', restore: 'Tiklash', permanentDelete: 'Butunlay o‘chirish', remove: 'O‘chirish', pending: 'Bajarilmoqda…' }
-    : { confirm: text.confirm, other: 'Другие действия', cancelReview: 'Отменить проверку', unpublish: 'Снять с публикации', sold: 'Продать / завершить', archive: 'Переместить в архив', restore: 'Восстановить', permanentDelete: 'Удалить навсегда', remove: 'Удалить', pending: 'Выполняется…' };
+    : { confirm: 'Удалить объявление навсегда? Это действие нельзя отменить.', other: 'Другие действия', cancelReview: 'Отменить проверку', unpublish: 'Снять с публикации', sold: 'Продать / завершить', archive: 'Переместить в архив', restore: 'Восстановить', permanentDelete: 'Удалить навсегда', remove: 'Удалить', pending: 'Выполняется…' };
 
   useEffect(() => {
     if (!isOpen) {
@@ -59,9 +59,7 @@ export function ListingActionsMenu({
   ) => {
     if (
       needsConfirmation &&
-      !window.confirm(
-        'Удалить объявление навсегда? Это действие нельзя отменить.',
-      )
+      !window.confirm(text.confirm)
     ) {
       return;
     }
