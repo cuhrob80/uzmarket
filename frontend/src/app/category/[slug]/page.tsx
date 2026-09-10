@@ -240,7 +240,7 @@ function CategoryHub({
           aria-label={text.sections}
         >
           {children.map((child, index) => (
-            <Link
+            <LocalizedLink
               key={child.id}
               href={`/category/${encodeURIComponent(child.slug)}`}
               className={`transport-category-card ${
@@ -293,6 +293,7 @@ export default async function CategoryPage({
     throw error;
   }
 
+  const categoryName = getCategoryName(category, locale);
   const categories = await getCategories();
   const parentCategory =
     categories.find((item) => item.id === category.parentId) ?? null;
@@ -324,8 +325,8 @@ export default async function CategoryPage({
         parentCategory={parentCategory}
       />
       <section className="catalog-container">
-        <nav className="transport-breadcrumbs" aria-label="Хлебные крошки">
-          <LocalizedLink href="/">Главная</LocalizedLink>
+        <nav className="transport-breadcrumbs" aria-label={text.breadcrumbs}>
+          <LocalizedLink href="/">{text.home}</LocalizedLink>
           <span aria-hidden="true">→</span>
           {parentCategory ? (
             <>
@@ -357,7 +358,7 @@ export default async function CategoryPage({
               const image = listing.images[0];
 
               return (
-                <Link
+                <LocalizedLink
                   key={listing.id}
                   href={getListingPublicPath(listing)}
                   className="catalog-card"
