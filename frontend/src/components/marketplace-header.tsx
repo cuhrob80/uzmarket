@@ -2,6 +2,7 @@ import { unstable_rethrow } from 'next/navigation';
 import { getCategories, getCurrentUser } from '@/lib/api/server';
 import type { AuthUser, Category } from '@/types/listing';
 import { getRequestLocale } from '@/lib/server-locale';
+import { getDictionary } from '@/i18n/dictionaries';
 import { CategoriesMenu } from './categories-menu';
 import { ProfileMenu } from './profile-menu';
 import { LanguageSwitcher } from './language-switcher';
@@ -52,9 +53,7 @@ function MessageIcon() {
 
 export async function MarketplaceHeader() {
   const locale = await getRequestLocale();
-  const text = locale === 'uz'
-    ? { business: 'Biznes uchun', work: 'Ish', help: 'Yordam', catalogs: 'Kataloglar', create: 'E’lon joylashtirish', mine: 'Mening e’lonlarim', favorites: 'Sevimlilar', notifications: 'Bildirishnomalar', messages: 'Xabarlar', login: 'Kirish', search: 'E’lonlar bo‘yicha qidirish', find: 'Topish', city: 'Toshkent', serviceNav: 'Xizmat navigatsiyasi', userNav: 'Foydalanuvchi menyusi' }
-    : { business: 'Для бизнеса', work: 'Работа', help: 'Помощь', catalogs: 'Каталоги', create: 'Разместить объявление', mine: 'Мои объявления', favorites: 'Избранное', notifications: 'Уведомления', messages: 'Сообщения', login: 'Войти', search: 'Поиск по объявлениям', find: 'Найти', city: 'Ташкент', serviceNav: 'Служебная навигация', userNav: 'Меню пользователя' };
+  const text = getDictionary(locale).header;
   let user: AuthUser | null = null;
   let categories: Category[] = [];
 
