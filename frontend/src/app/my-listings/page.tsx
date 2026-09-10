@@ -4,38 +4,19 @@ import { ListingActionsMenu } from './listing-actions-menu';
 import { AccountShell } from '@/components/account-shell';
 import { LocalizedLink } from '@/components/localized-link';
 import { getRequestLocale } from '@/lib/server-locale';
+import { getDictionary } from '@/i18n/dictionaries';
 import type { SiteLocale } from '@/lib/locale-path';
 import type { Listing, ListingStatus } from '@/types/listing';
 
 export const dynamic = 'force-dynamic';
 
-const statusLabels: Record<SiteLocale, Record<ListingStatus, string>> = {
-  ru: {
-  draft: 'Черновик',
-  pending: 'На проверке',
-  active: 'Активно',
-  rejected: 'Требует исправления',
-  unpublished: 'Не опубликовано',
-  sold: 'В архиве',
-  archived: 'В архиве',
-  deleted: 'Удалено',
-  },
-  uz: {
-    draft: 'Qoralama', pending: 'Tekshiruvda', active: 'Faol', rejected: 'Tuzatish kerak',
-    unpublished: 'E’lon qilinmagan', sold: 'Arxivda', archived: 'Arxivda', deleted: 'O‘chirilgan',
-  },
-};
-
-const statusTabsRu: Array<{
-  value: ListingStatus;
-  label: string;
-}> = [
-  { value: 'active', label: 'Активные' },
-  { value: 'rejected', label: 'С ошибками' },
-  { value: 'unpublished', label: 'Неопубликованные' },
-  { value: 'draft', label: 'Черновики' },
-  { value: 'archived', label: 'Архив' },
-  { value: 'deleted', label: 'Удалённые' },
+const statusTabValues: ListingStatus[] = [
+  'active',
+  'rejected',
+  'unpublished',
+  'draft',
+  'archived',
+  'deleted',
 ];
 
 function formatPrice(listing: Listing, locale: SiteLocale): string {
@@ -72,16 +53,12 @@ export default async function MyListingsPage({
   searchParams,
 }: MyListingsPageProps) {
   const [params, locale] = await Promise.all([searchParams, getRequestLocale()]);
-  const statusTabs = locale === 'uz'
-    ? [
-        { value: 'active', label: 'Faol' }, { value: 'rejected', label: 'Xatolar bilan' },
-        { value: 'unpublished', label: 'E’lon qilinmagan' }, { value: 'draft', label: 'Qoralamalar' },
-        { value: 'archived', label: 'Arxiv' }, { value: 'deleted', label: 'O‘chirilgan' },
-      ] satisfies Array<{ value: ListingStatus; label: string }>
-    : statusTabsRu;
-  const text = locale === 'uz'
-    ? { title: 'Mening e’lonlarim', create: 'E’lon joylashtirish', tabs: 'E’lon holatlari', search: 'O‘z e’lonlarimdan qidirish', find: 'Topish', empty: 'Bu bo‘limda e’lonlar yo‘q', changeSearch: 'Qidiruv so‘rovini o‘zgartirib ko‘ring.', createHelp: 'Yangi e’lon yarating yoki boshqa bo‘limni tanlang.', noPhoto: 'Rasm yo‘q', checking: 'E’loningiz tekshirilmoqda', fix: 'E’lonni tuzating va qayta yuboring', placed: 'Joylashtirilgan', updated: 'Yangilangan', views: 'Ko‘rishlar', favorites: 'Sevimlilarda', edit: 'Tahrirlash' }
-    : { title: 'Мои объявления', create: 'Подать объявление', tabs: 'Статусы объявлений', search: 'Поиск по своим объявлениям', find: 'Найти', empty: 'В этом разделе объявлений нет', changeSearch: 'Попробуйте изменить поисковый запрос.', createHelp: 'Создайте новое объявление или выберите другой раздел.', noPhoto: 'Нет фото', checking: 'Ваше объявление проверяется', fix: 'Исправьте объявление и отправьте его повторно', placed: 'Размещено', updated: 'Обновлено', views: 'Просмотры', favorites: 'В избранном', edit: 'Редактировать' };
+  const dictionary = getDictionary(locale);
+  const text = dictionary.myListings;
+  const statusTabs = statusTabValues.map((value) => ({
+    value,
+    label: text.tabs[value],
+  }));
   const activeStatus = statusTabs.some(
     (tab) => tab.value === params.status,
   )
@@ -149,7 +126,7 @@ export default async function MyListingsPage({
               placeholder={text.search}
             />
           </label>
-          <button type="submit">{text.find}</button>
+          <button type="submit">{dictionary.common.find}</button>
         </form>
 
         {result.items.length === 0 ? (
@@ -179,7 +156,7 @@ export default async function MyListingsPage({
                         height={135}
                       />
                     ) : (
-                      <span>{text.noPhoto}</span>
+                      <span>{dictionary.common.noPhoto}</span>
                     )}
                   </div>
 
@@ -197,7 +174,7 @@ export default async function MyListingsPage({
                         listing.status
                       }
                     >
-                      {statusLabels[locale][listing.status]}
+                      {text.statuses[listing.status]}
                     </span>
                     {listing.status === 'pending' ? (
                       <p className="account-moderation-message">
@@ -236,7 +213,7 @@ export default async function MyListingsPage({
                       <LocalizedLink
                         href={`/my-listings/${listing.id}/edit`}
                       >
-                        {text.edit}
+                        {dictionary.common.edit}
                       </LocalizedLink>
                     )}
                     <ListingActionsMenu
