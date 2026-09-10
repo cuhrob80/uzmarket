@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { getCategories, getListings } from '@/lib/api/server';
 import { getListingPublicPath } from '@/lib/listing-url';
+import { getCategoryName } from '@/lib/category-i18n';
 import type { Listing } from '@/types/listing';
 import styles from './localized-home.module.css';
 
@@ -100,7 +101,7 @@ export async function LocalizedHome({ locale }: { locale: HomeLocale }) {
               <span className={styles.categoryIcon} aria-hidden="true">
                 {['🚙', '🏢', '💼', '🛋️', '📱', '👕', '🛠️', '⚽'][index] ?? '•'}
               </span>
-              <strong>{category.name}</strong>
+              <strong>{getCategoryName(category, locale)}</strong>
               <span aria-hidden="true">›</span>
             </Link>
           ))}
@@ -132,7 +133,7 @@ export async function LocalizedHome({ locale }: { locale: HomeLocale }) {
                   </div>
                   <h3>{listing.title}</h3>
                   <strong>{formatPrice(listing, locale)}</strong>
-                  <p>{listing.location || listing.category.name}</p>
+                  <p>{listing.location || getCategoryName(listing.category, locale)}</p>
                 </Link>
               );
             })}
