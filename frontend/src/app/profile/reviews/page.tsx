@@ -20,7 +20,7 @@ export default async function ReviewsPage({
   ]);
 
   if (!user) {
-    redirect('/login');
+    redirect(`/${locale}/login?returnTo=/${locale}/profile/reviews`);
   }
 
   const view = params.view === 'written' ? 'written' : 'received';
