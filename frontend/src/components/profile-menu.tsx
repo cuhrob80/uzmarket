@@ -3,6 +3,7 @@
 import { useEffect, useRef } from 'react';
 import { usePathname } from 'next/navigation';
 import { localeFromPathname } from '@/lib/locale-path';
+import { getDictionary } from '@/i18n/dictionaries';
 import { logoutAction } from '@/app/profile/actions';
 import type { AuthUser } from '@/types/listing';
 import { LocalizedLink } from './localized-link';
@@ -10,9 +11,7 @@ import { LocalizedLink } from './localized-link';
 export function ProfileMenu({ user }: { user: AuthUser }) {
   const menuRef = useRef<HTMLDetailsElement>(null);
   const locale = localeFromPathname(usePathname());
-  const text = locale === 'uz'
-    ? { account: 'Shaxsiy kabinet', listings: 'Mening e’lonlarim', reviews: 'Sharhlar va reyting', settings: 'Profil sozlamalari', logout: 'Chiqish' }
-    : { account: 'Личный кабинет', listings: 'Мои объявления', reviews: 'Отзывы и рейтинг', settings: 'Настройки профиля', logout: 'Выйти' };
+  const text = getDictionary(locale).profileMenu;
   const initials =
     user.displayName.trim().slice(0, 2).toUpperCase() || 'UZ';
 
@@ -55,7 +54,7 @@ export function ProfileMenu({ user }: { user: AuthUser }) {
     <details ref={menuRef} className="marketplace-profile-menu">
       <summary
         className="marketplace-avatar"
-        aria-label="Открыть личный кабинет"
+        aria-label={text.open}
       >
         {user.avatarUrl ? (
           <img src={user.avatarUrl} alt="" />
@@ -63,7 +62,7 @@ export function ProfileMenu({ user }: { user: AuthUser }) {
           <span>{initials}</span>
         )}
       </summary>
-      <nav aria-label="Личный кабинет" onClick={closeMenu}>
+      <nav aria-label={text.navigation} onClick={closeMenu}>
         <LocalizedLink href="/profile">{text.account}</LocalizedLink>
         <LocalizedLink href="/my-listings">{text.listings}</LocalizedLink>
         <LocalizedLink href="/profile/reviews">{text.reviews}</LocalizedLink>
