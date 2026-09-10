@@ -44,10 +44,10 @@ export function CategoriesMenu({
     : {
         button: 'Все категории',
         navigation: 'Категории',
-        noGroups: '{text.noGroups}',
-        viewCategory: '{text.viewCategory}',
-        noCategories: '{text.noCategories}',
-        viewAll: '{text.viewAll}',
+        noGroups: 'В этой категории пока нет разделов.',
+        viewCategory: 'Смотреть категорию',
+        noCategories: 'Пока нет категорий.',
+        viewAll: 'Смотреть все объявления',
       };
   const activeCategories = useMemo(
     () =>
@@ -135,13 +135,13 @@ export function CategoriesMenu({
           <i />
           <i />
         </span>
-              {text.button}
-            </summary>
+        {text.button}
+      </summary>
 
       <div className="marketplace-categories-overlay" aria-hidden="true" />
 
       <div className="marketplace-megamenu">
-        <aside aria-label="Главные категории">
+        <aside aria-label={text.navigation}>
           {rootCategories.map((category) => (
             <button
               key={category.id}
@@ -192,7 +192,7 @@ export function CategoriesMenu({
                         className="marketplace-megamenu-group"
                         onClick={closeMenu}
                       >
-                        {group.name} ›
+                        {getCategoryName(group, locale)} ›
                       </Link>
                       {children.map((child) => (
                         <Link
@@ -203,7 +203,7 @@ export function CategoriesMenu({
                           }
                           onClick={closeMenu}
                         >
-                          {child.name}
+                          {getCategoryName(child, locale)}
                         </Link>
                       ))}
                     </section>
@@ -213,7 +213,7 @@ export function CategoriesMenu({
 
               {groups.length === 0 ? (
                 <div className="marketplace-megamenu-empty">
-                  <p>В этом разделе пока нет подкатегорий.</p>
+                  <p>{text.noGroups}</p>
                   <Link
                     href={
                       '/category/' +
@@ -221,16 +221,16 @@ export function CategoriesMenu({
                     }
                     onClick={closeMenu}
                   >
-                    Смотреть объявления
+                    {text.viewCategory}
                   </Link>
                 </div>
               ) : null}
             </>
           ) : (
             <div className="marketplace-megamenu-empty">
-              <p>Категории пока не добавлены.</p>
+              <p>{text.noCategories}</p>
               <Link href="/listings" onClick={closeMenu}>
-                Смотреть все объявления
+                {text.viewAll}
               </Link>
             </div>
           )}
