@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import {
   useEffect,
   useMemo,
@@ -8,6 +9,7 @@ import {
   useState,
 } from 'react';
 import type { Category } from '@/types/listing';
+import { getCategoryName, type UiLocale } from '@/lib/category-i18n';
 
 function getCategoryIcon(category: Category): string {
   const value = (category.slug + ' ' + category.name).toLowerCase();
@@ -28,6 +30,25 @@ export function CategoriesMenu({
   categories: Category[];
 }) {
   const menuRef = useRef<HTMLDetailsElement>(null);
+  const pathname = usePathname();
+  const locale: UiLocale = pathname === '/uz' || pathname.startsWith('/uz/') ? 'uz' : 'ru';
+  const text = locale === 'uz'
+    ? {
+        button: 'Barcha kategoriyalar',
+        navigation: 'Kategoriyalar',
+        noGroups: 'Bu kategoriyada hozircha bo‘limlar yo‘q.',
+        viewCategory: 'Kategoriyani ko‘rish',
+        noCategories: 'Hozircha kategoriyalar yo‘q.',
+        viewAll: 'Barcha e’lonlarni ko‘rish',
+      }
+    : {
+        button: 'Все категории',
+        navigation: 'Категории',
+        noGroups: '{text.noGroups}',
+        viewCategory: '{text.viewCategory}',
+        noCategories: '{text.noCategories}',
+        viewAll: '{text.viewAll}',
+      };
   const activeCategories = useMemo(
     () =>
       categories
@@ -114,8 +135,8 @@ export function CategoriesMenu({
           <i />
           <i />
         </span>
-        Все категории
-      </summary>
+              {text.button}
+            </summary>
 
       <div className="marketplace-categories-overlay" aria-hidden="true" />
 
@@ -135,7 +156,7 @@ export function CategoriesMenu({
               <span aria-hidden="true">
                 {getCategoryIcon(category)}
               </span>
-              <strong>{category.name}</strong>
+              <strong>{getCategoryName(category, locale)}</strong>
               <i aria-hidden="true">›</i>
             </button>
           ))}
@@ -152,7 +173,7 @@ export function CategoriesMenu({
                 className="marketplace-megamenu-title"
                 onClick={closeMenu}
               >
-                {selectedRoot.name} ›
+                {getCategoryName(selectedRoot, locale)} ›
               </Link>
 
               <div className="marketplace-megamenu-groups">
