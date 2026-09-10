@@ -1,10 +1,13 @@
-import Link from 'next/link';
 import {
   getCategories,
   getFavoriteListingIds,
   getListings,
 } from '@/lib/api/server';
 import { FavoriteButton } from '@/components/favorite-button';
+import { LocalizedLink } from '@/components/localized-link';
+import { getRequestLocale } from '@/lib/server-locale';
+import { getCategoryName } from '@/lib/category-i18n';
+import type { SiteLocale } from '@/lib/locale-path';
 import { getListingPublicPath } from '@/lib/listing-url';
 import type { Listing } from '@/types/listing';
 
@@ -22,14 +25,14 @@ interface ListingsPageProps {
   }>;
 }
 
-function formatPrice(listing: Listing): string {
+function formatPrice(listing: Listing, locale: SiteLocale): string {
   const value = Number(listing.price);
 
   if (!Number.isFinite(value)) {
     return `${listing.price} ${listing.currency}`;
   }
 
-  return `${new Intl.NumberFormat('ru-RU', {
+  return `${new Intl.NumberFormat(locale === 'uz' ? 'uz-UZ' : 'ru-RU', {
     maximumFractionDigits: 2,
   }).format(value)} ${listing.currency}`;
 }
@@ -37,7 +40,10 @@ function formatPrice(listing: Listing): string {
 export default async function ListingsPage({
   searchParams,
 }: ListingsPageProps) {
-  const params = await searchParams;
+  const [params, locale] = await Promise.all([searchParams, getRequestLocale()]);
+  const text = locale === 'uz'
+    ? { title: 'E’lonlar', found: 'Topildi', search: 'E’lonlarni qidirish', allCategories: 'Barcha kategoriyalar', minPrice: 'Narx: dan', maxPrice: 'Narx: gacha', currency: 'Istalgan valyuta', location: 'Shahar yoki tuman', find: 'Topish', empty: 'E’lonlar topilmadi', change: 'Qidiruv parametrlarini o‘zgartirib ko‘ring.', noPhoto: 'Rasm yo‘q', pagination: 'Sahifalar bo‘yicha navigatsiya', back: 'Orqaga', page: 'Sahifa', of: 'dan', forward: 'Oldinga' }
+    : { title: 'Объявления', found: 'Найдено', search: 'Поиск объявлений', allCategories: 'Все категории', minPrice: 'Цена от', maxPrice: 'Цена до', currency: 'Любая валюта', location: 'Город или район', find: 'Найти', empty: 'Объявления не найдены', change: 'Попробуйте изменить параметры поиска.', noPhoto: 'Нет фото', pagination: 'Навигация по страницам', back: 'Назад', page: 'Страница', of: 'из', forward: 'Вперёд' };
 
   const parsedPage = Number(params.page);
   const page =
@@ -132,15 +138,15 @@ export default async function ListingsPage({
     <main className="catalog-page">
       <section className="catalog-container">
         <header className="catalog-header">
-          <h1>Объявления</h1>
+          <h1>{text.title}</h1>
 
           <p>
-            Найдено: {result.total}
+            {text.found}: {result.total}
           </p>
         </header>
 
         <form
-          action="/listings"
+          action={`/${locale}/listings`}
           method="get"
           className="catalog-filters"
         >
@@ -148,7 +154,7 @@ export default async function ListingsPage({
             type="search"
             name="search"
             defaultValue={search}
-            placeholder="Поиск объявлений"
+            placeholder={text.search}
           />
 
           <select
@@ -156,7 +162,7 @@ export default async function ListingsPage({
             defaultValue={categoryId}
           >
             <option value="">
-              Все категории
+              {text.allCategories}
             </option>
 
             {categories.map((category) => (
@@ -164,7 +170,7 @@ export default async function ListingsPage({
                 key={category.id}
                 value={category.id}
               >
-                {category.name}
+                {getCategoryName(category, locale)}
               </option>
             ))}
           </select>
@@ -175,7 +181,7 @@ export default async function ListingsPage({
             min="0"
             step="any"
             defaultValue={minPriceValue}
-            placeholder="Цена от"
+            placeholder={text.minPrice}
           />
 
           <input
@@ -184,7 +190,7 @@ export default async function ListingsPage({
             min="0"
             step="any"
             defaultValue={maxPriceValue}
-            placeholder="Цена до"
+            placeholder={text.maxPrice}
           />
 
           <select
@@ -192,7 +198,7 @@ export default async function ListingsPage({
             defaultValue={currency}
           >
             <option value="">
-              Любая валюта
+              {text.currency}
             </option>
             <option value="UZS">
               UZS
@@ -206,19 +212,19 @@ export default async function ListingsPage({
             type="search"
             name="location"
             defaultValue={location}
-            placeholder="Город или район"
+            placeholder={text.location}
           />
 
           <button type="submit">
-            Найти
+            {text.find}
           </button>
         </form>
 
         {result.items.length === 0 ? (
           <div className="empty-state">
-            <h2>Объявления не найдены</h2>
+            <h2>{text.empty}</h2>
             <p>
-              Попробуйте изменить параметры поиска.
+              {text.change}
             </p>
           </div>
         ) : (
@@ -228,7 +234,7 @@ export default async function ListingsPage({
 
               return (
                 <article className="catalog-card" key={listing.id}>
-                  <Link
+                  <LocalizedLink
                     href={getListingPublicPath(listing)}
                     className="catalog-card-link"
                   >
@@ -241,7 +247,7 @@ export default async function ListingsPage({
                           height={240}
                         />
                       ) : (
-                        <span>Нет фото</span>
+                        <span>{text.noPhoto}</span>
                       )}
                     </div>
 
@@ -249,17 +255,17 @@ export default async function ListingsPage({
                       <h2>{listing.title}</h2>
 
                       <p className="catalog-card-price">
-                        {formatPrice(listing)}
+                        {formatPrice(listing, locale)}
                       </p>
 
                       <p className="catalog-card-meta">
-                        {listing.category.name}
+                        {getCategoryName(listing.category, locale)}
                         {listing.location
                           ? ` · ${listing.location}`
                           : ''}
                       </p>
                     </div>
-                  </Link>
+                  </LocalizedLink>
                   <FavoriteButton
                     listingId={listing.id}
                     initialFavorite={favoriteIdSet.has(listing.id)}
@@ -275,24 +281,24 @@ export default async function ListingsPage({
         {totalPages > 1 ? (
           <nav
             className="catalog-pagination"
-            aria-label="Навигация по страницам"
+            aria-label={text.pagination}
           >
             {page > 1 ? (
-              <Link href={createPageHref(page - 1)}>
-                ← Назад
-              </Link>
+              <LocalizedLink href={createPageHref(page - 1)}>
+                ← {text.back}
+              </LocalizedLink>
             ) : (
               <span />
             )}
 
             <span>
-              Страница {page} из {totalPages}
+              {text.page} {page} {text.of} {totalPages}
             </span>
 
             {page < totalPages ? (
-              <Link href={createPageHref(page + 1)}>
-                Вперёд →
-              </Link>
+              <LocalizedLink href={createPageHref(page + 1)}>
+                {text.forward} →
+              </LocalizedLink>
             ) : (
               <span />
             )}
