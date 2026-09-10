@@ -1,4 +1,9 @@
 .home {
+  display: block;
+  width: 100%;
+  min-height: auto;
+  place-items: initial;
+  box-sizing: border-box;
   max-width: 1480px;
   margin: 0 auto;
   padding: 28px 24px 72px;
