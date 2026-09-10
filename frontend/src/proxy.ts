@@ -31,6 +31,9 @@ export function proxy(request: NextRequest) {
 
     const rewritten = request.nextUrl.clone();
     rewritten.pathname = '/' + segments.slice(1).join('/');
+    // Keep RU and UZ as different internal router-cache entries.
+    // Without this marker, Next.js can reuse an RSC response from the other locale.
+    rewritten.searchParams.set('__locale', locale);
 
     return NextResponse.rewrite(rewritten, {
       request: { headers: requestHeaders },
