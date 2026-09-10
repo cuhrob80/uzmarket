@@ -1,6 +1,5 @@
 'use client';
 
-import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import styles from './language-switcher.module.css';
 
@@ -20,7 +19,7 @@ export function LanguageSwitcher() {
 
   return (
     <nav className={styles.switcher} aria-label="Выбор языка">
-      <Link
+      <a
         href={localeHref(pathname, 'ru')}
         lang="ru"
         hrefLang="ru"
@@ -28,8 +27,8 @@ export function LanguageSwitcher() {
         aria-current={active === 'ru' ? 'page' : undefined}
       >
         RU
-      </Link>
-      <Link
+      </a>
+      <a
         href={localeHref(pathname, 'uz')}
         lang="uz"
         hrefLang="uz"
@@ -37,7 +36,7 @@ export function LanguageSwitcher() {
         aria-current={active === 'uz' ? 'page' : undefined}
       >
         UZ
-      </Link>
+      </a>
     </nav>
   );
 }
