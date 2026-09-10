@@ -1,22 +1,26 @@
-import Link from 'next/link';
 import { getCategories, getListings } from '@/lib/api/server';
 import { getListingPublicPath } from '@/lib/listing-url';
 import type { Listing, ListingJobType } from '@/types/listing';
 import { JobCategoryIcon } from '@/components/job-category-icon';
+import { LocalizedLink } from '@/components/localized-link';
+import { getRequestLocale } from '@/lib/server-locale';
+import { getDictionary } from '@/i18n/dictionaries';
+import { getCategoryName } from '@/lib/category-i18n';
+import type { SiteLocale } from '@/lib/locale-path';
 
 interface JobsSearchPageProps {
   jobType: ListingJobType;
   categoryId?: string;
 }
 
-function formatPrice(listing: Listing): string {
+function formatPrice(listing: Listing, locale: SiteLocale): string {
   const value = Number(listing.price);
 
   if (!Number.isFinite(value)) {
     return `${listing.price} ${listing.currency}`;
   }
 
-  return `${new Intl.NumberFormat('ru-RU', {
+  return `${new Intl.NumberFormat(locale === 'uz' ? 'uz-UZ' : 'ru-RU', {
     maximumFractionDigits: 2,
   }).format(value)} ${listing.currency}`;
 }
@@ -25,6 +29,9 @@ export async function JobsSearchPage({
   jobType,
   categoryId,
 }: JobsSearchPageProps) {
+  const locale = await getRequestLocale();
+  const dictionary = getDictionary(locale);
+  const text = dictionary.jobsSearch;
   const categories = await getCategories();
   const jobsRoot = categories.find((category) => category.slug === 'jobs');
   const jobCategories = categories
@@ -47,62 +54,62 @@ export async function JobsSearchPage({
   return (
     <main className="jobs-search-page">
       <div className="jobs-search-container">
-        <nav className="transport-breadcrumbs" aria-label="Хлебные крошки">
-          <Link href="/">Главная</Link>
+        <nav className="transport-breadcrumbs" aria-label={text.breadcrumbs}>
+          <LocalizedLink href="/">{text.home}</LocalizedLink>
           <span aria-hidden="true">→</span>
-          <Link href="/category/jobs">Работа</Link>
+          <LocalizedLink href="/category/jobs">{text.work}</LocalizedLink>
           <span aria-hidden="true">→</span>
-          <span>{isVacancy ? 'Вакансии' : 'Резюме'}</span>
+          <span>{isVacancy ? text.vacancies : text.resumes}</span>
         </nav>
 
         <header className="jobs-search-heading">
-          <p className="transport-eyebrow">Работа в Узбекистане</p>
+          <p className="transport-eyebrow">{text.eyebrow}</p>
           <h1>
             {isVacancy
-              ? 'Найдите подходящую работу'
-              : 'Найдите подходящего сотрудника'}
+              ? text.vacancyTitle
+              : text.resumeTitle}
           </h1>
           <p>
             {isVacancy
-              ? 'Выберите направление и посмотрите вакансии работодателей.'
-              : 'Выберите направление и посмотрите резюме специалистов.'}
+              ? text.vacancySubtitle
+              : text.resumeSubtitle}
           </p>
         </header>
 
-        <nav className="jobs-mode-tabs" aria-label="Вакансии и резюме">
-          <Link
+        <nav className="jobs-mode-tabs" aria-label={text.tabs}>
+          <LocalizedLink
             href="/rabota/vakansii"
             aria-current={isVacancy ? 'page' : undefined}
           >
-            Найти работу
-          </Link>
-          <Link
+            {text.findJob}
+          </LocalizedLink>
+          <LocalizedLink
             href="/rabota/rezume"
             aria-current={!isVacancy ? 'page' : undefined}
           >
-            Найти сотрудника
-          </Link>
+            {text.findEmployee}
+          </LocalizedLink>
         </nav>
 
         <div className="jobs-content-layout">
           <section
             className="jobs-direction-panel"
-            aria-label="Направления работы"
+            aria-label={text.directions}
           >
-            <h2>Выберите направление</h2>
+            <h2>{text.chooseDirection}</h2>
             <div className="jobs-direction-grid">
-              <Link
+              <LocalizedLink
                 href={activePath}
                 className={!selectedCategoryId ? 'is-active' : undefined}
               >
                 <span className="jobs-all-directions-icon" aria-hidden="true">
                   ⠿
                 </span>
-                <span>Все направления</span>
+                <span>{text.allDirections}</span>
                 <span className="jobs-direction-arrow" aria-hidden="true">›</span>
-              </Link>
+              </LocalizedLink>
               {jobCategories.map((category) => (
-                <Link
+                <LocalizedLink
                   key={category.id}
                   href={`${activePath}?categoryId=${encodeURIComponent(category.id)}`}
                   className={
@@ -110,34 +117,33 @@ export async function JobsSearchPage({
                   }
                 >
                   <JobCategoryIcon slug={category.slug} />
-                  <span>{category.name}</span>
+                  <span>{getCategoryName(category, locale)}</span>
                   <span className="jobs-direction-arrow" aria-hidden="true">›</span>
-                </Link>
+                </LocalizedLink>
               ))}
             </div>
           </section>
 
           <section className="jobs-results">
-            <div className="jobs-filters-preview" aria-label="Будущие фильтры">
+            <div className="jobs-filters-preview" aria-label={text.futureFilters}>
               <div className="jobs-filters-note">
-                <strong>Фильтры добавим позже</strong>
+                <strong>{text.filtersLater}</strong>
                 <span>
-                  Здесь можно будет искать по местоположению, профессии,
-                  зарплате и графику.
+                  {text.filtersHelp}
                 </span>
               </div>
               <div className="jobs-filter-placeholders" aria-hidden="true">
-                <span>Местоположение</span>
-                <span>Профессия</span>
-                <span>Зарплата</span>
-                <span>График</span>
+                <span>{text.location}</span>
+                <span>{text.profession}</span>
+                <span>{text.salary}</span>
+                <span>{text.schedule}</span>
               </div>
             </div>
 
             <div className="jobs-results-header">
               <div>
-                <h2>{isVacancy ? 'Вакансии' : 'Резюме'}</h2>
-                <span>{result.total} объявлений</span>
+                <h2>{isVacancy ? text.vacancies : text.resumes}</h2>
+                <span>{result.total} {text.listings}</span>
               </div>
             </div>
 
@@ -146,17 +152,17 @@ export async function JobsSearchPage({
                 <div className="jobs-empty-icon" aria-hidden="true">⌕</div>
                 <h2>
                   {isVacancy
-                    ? 'Вакансий пока нет'
-                    : 'Резюме пока нет'}
+                    ? text.noVacancies
+                    : text.noResumes}
                 </h2>
                 <p>
                   {isVacancy
-                    ? 'Выберите другое направление или разместите первую вакансию.'
-                    : 'Выберите другое направление или разместите первое резюме.'}
+                    ? text.vacancyEmpty
+                    : text.resumeEmpty}
                 </p>
-                <Link href="/create-listing">
-                  {isVacancy ? 'Подать вакансию' : 'Разместить резюме'}
-                </Link>
+                <LocalizedLink href="/create-listing">
+                  {isVacancy ? text.postVacancy : text.postResume}
+                </LocalizedLink>
               </div>
             ) : (
               <div className="jobs-listing-grid">
@@ -164,7 +170,7 @@ export async function JobsSearchPage({
                   const image = listing.images[0];
 
                   return (
-                    <Link
+                    <LocalizedLink
                       key={listing.id}
                       href={getListingPublicPath(listing)}
                       className="catalog-card"
@@ -178,19 +184,19 @@ export async function JobsSearchPage({
                             height={240}
                           />
                         ) : (
-                          <span>Нет фото</span>
+                          <span>{dictionary.common.noPhoto}</span>
                         )}
                       </div>
                       <div className="catalog-card-content">
                         <h2>{listing.title}</h2>
                         <p className="catalog-card-price">
-                          {formatPrice(listing)}
+                          {formatPrice(listing, locale)}
                         </p>
                         <p className="catalog-card-meta">
-                          {listing.location ?? 'Узбекистан'}
+                          {listing.location ?? text.country}
                         </p>
                       </div>
-                    </Link>
+                    </LocalizedLink>
                   );
                 })}
               </div>
