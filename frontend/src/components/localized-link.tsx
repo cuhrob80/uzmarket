@@ -10,4 +10,15 @@ type Props = LinkProps &
     children: ReactNode;
   };
 
-export function LocalizedLink({ href, ...props}:Props){ return null as any; }
+export function LocalizedLink({ href, children, ...props }: Props) {
+  const pathname = usePathname();
+  const locale = localeFromPathname(pathname);
+  const localizedHref =
+    typeof href === 'string' ? withLocale(href, locale) : href;
+
+  return (
+    <Link href={localizedHref} {...props}>
+      {children}
+    </Link>
+  );
+}
