@@ -20,15 +20,17 @@ export function proxy(request: NextRequest) {
   const locale = segments[0];
 
   if (SUPPORTED_LOCALES.has(locale)) {
+    const requestHeaders = new Headers(request.headers);
+    requestHeaders.set('x-ui-locale', locale);
+
     if (segments.length === 1) {
-      return NextResponse.next();
+      return NextResponse.next({
+        request: { headers: requestHeaders },
+      });
     }
 
     const rewritten = request.nextUrl.clone();
     rewritten.pathname = '/' + segments.slice(1).join('/');
-
-    const requestHeaders = new Headers(request.headers);
-    requestHeaders.set('x-ui-locale', locale);
 
     return NextResponse.rewrite(rewritten, {
       request: { headers: requestHeaders },
