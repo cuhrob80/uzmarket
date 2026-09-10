@@ -10,14 +10,14 @@ import type { Listing, ListingStatus } from '@/types/listing';
 
 export const dynamic = 'force-dynamic';
 
-const statusTabValues: ListingStatus[] = [
+const statusTabValues = [
   'active',
   'rejected',
   'unpublished',
   'draft',
   'archived',
   'deleted',
-];
+] as const satisfies readonly ListingStatus[];
 
 function formatPrice(listing: Listing, locale: SiteLocale): string {
   const value = Number(listing.price);
