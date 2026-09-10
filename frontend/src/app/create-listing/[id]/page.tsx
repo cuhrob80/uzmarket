@@ -8,6 +8,7 @@ import { RotatePhotoButton } from './photos/rotate-photo-button';
 import { getRequestLocale } from '@/lib/server-locale';
 import { getDictionary } from '@/i18n/dictionaries';
 import { getCategoryName } from '@/lib/category-i18n';
+import { LocalizedLink } from '@/components/localized-link';
 
 export const dynamic = 'force-dynamic';
 
@@ -50,7 +51,14 @@ export default async function UnifiedListingPage({
     <main className="listing-photos-page">
       <section className="listing-photos-container unified-listing-container">
         <header className="listing-photos-header">
-          <p className="listing-editor-back" aria-hidden="true">←</p>
+          <LocalizedLink
+            href="/my-listings"
+            className="listing-editor-back"
+            aria-label={text.back}
+            title={text.back}
+          >
+            ←
+          </LocalizedLink>
           <div>
             <h1>
               {listing.status === 'draft'
