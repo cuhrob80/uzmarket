@@ -1,11 +1,23 @@
 import { redirect } from 'next/navigation';
 import { AccountShell } from '@/components/account-shell';
 import { getCurrentUser } from '@/lib/api/server';
+import { getRequestLocale } from '@/lib/server-locale';
 
 export const dynamic = 'force-dynamic';
 
 export default async function MessagesPage() {
-  const user = await getCurrentUser();
+  const [user, locale] = await Promise.all([getCurrentUser(), getRequestLocale()]);
+  const text = locale === 'uz'
+    ? {
+        title: 'Xabarlar',
+        description: 'Bu yerda xaridorlar va sotuvchilar bilan yozishmalar saqlanadi.',
+        note: 'Xabarlar bo‘limi keyingi bosqichda ulanadi.',
+      }
+    : {
+        title: 'Сообщения',
+        description: 'Здесь будут храниться переписки с покупателями и продавцами.',
+        note: 'Раздел сообщений подключим следующим этапом.',
+      };
 
   if (!user) {
     redirect('/login?returnTo=/messages');
@@ -16,11 +28,11 @@ export default async function MessagesPage() {
       <main className="account-content-page messages-page">
         <section className="messages-placeholder">
           <span aria-hidden="true">◯</span>
-          <h1>Сообщения</h1>
+          <h1>{text.title}</h1>
           <p>
-            Здесь будут храниться переписки с покупателями и продавцами.
+            {text.description}
           </p>
-          <small>Раздел сообщений подключим следующим этапом.</small>
+          <small>{text.note}</small>
         </section>
       </main>
     </AccountShell>
