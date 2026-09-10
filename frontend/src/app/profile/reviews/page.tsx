@@ -3,6 +3,7 @@ import { getCurrentUser } from '@/lib/api/server';
 import { AccountShell } from '@/components/account-shell';
 import { LocalizedLink } from '@/components/localized-link';
 import { getRequestLocale } from '@/lib/server-locale';
+import { getDictionary } from '@/i18n/dictionaries';
 
 export const dynamic = 'force-dynamic';
 
@@ -24,9 +25,7 @@ export default async function ReviewsPage({
   }
 
   const view = params.view === 'written' ? 'written' : 'received';
-  const text = locale === 'uz'
-    ? { back: 'Shaxsiy kabinet', title: 'Sharhlar va reyting', ratingLabel: 'Hozircha reyting yo‘q', noRatings: 'Hozircha baholar yo‘q', received: 'Men haqimdagi sharhlar', written: 'Men yozgan sharhlar', receivedEmpty: 'Siz haqingizda hozircha sharhlar yo‘q', writtenEmpty: 'Siz hozircha sharh yozmagansiz', receivedHelp: 'Boshqa foydalanuvchilarning baholari va sharhlari shu yerda paydo bo‘ladi.', writtenHelp: 'Boshqa foydalanuvchilarga yozgan sharhlaringiz shu yerda bo‘ladi.', tabsLabel: 'Sharhlar bo‘limlari' }
-    : { back: 'Личный кабинет', title: 'Отзывы и рейтинг', ratingLabel: 'Рейтинг пока отсутствует', noRatings: 'Пока нет оценок', received: 'Отзывы обо мне', written: 'Мои отзывы', receivedEmpty: 'У вас пока нет отзывов', writtenEmpty: 'Вы пока не оставляли отзывов', receivedHelp: 'Здесь появятся оценки и отзывы других пользователей.', writtenHelp: 'Здесь будут отзывы, которые вы оставите другим пользователям.', tabsLabel: 'Разделы отзывов' };
+  const text = getDictionary(locale).reviewsPage;
 
   return (
     <AccountShell active="reviews">
