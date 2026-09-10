@@ -46,7 +46,7 @@ function formatPrice(listing: Listing, locale: SiteLocale): string {
   }
 
   const currencyLabel =
-    listing.currency === 'UZS' ? 'сум' : listing.currency;
+    listing.currency === 'UZS' ? (locale === 'uz' ? 'so‘m' : 'сум') : listing.currency;
 
   return `${new Intl.NumberFormat(locale === 'uz' ? 'uz-UZ' : 'ru-RU', {
     maximumFractionDigits: 2,
@@ -81,7 +81,7 @@ export default async function MyListingsPage({
     : statusTabsRu;
   const text = locale === 'uz'
     ? { title: 'Mening e’lonlarim', create: 'E’lon joylashtirish', tabs: 'E’lon holatlari', search: 'O‘z e’lonlarimdan qidirish', find: 'Topish', empty: 'Bu bo‘limda e’lonlar yo‘q', changeSearch: 'Qidiruv so‘rovini o‘zgartirib ko‘ring.', createHelp: 'Yangi e’lon yarating yoki boshqa bo‘limni tanlang.', noPhoto: 'Rasm yo‘q', checking: 'E’loningiz tekshirilmoqda', fix: 'E’lonni tuzating va qayta yuboring', placed: 'Joylashtirilgan', updated: 'Yangilangan', views: 'Ko‘rishlar', favorites: 'Sevimlilarda', edit: 'Tahrirlash' }
-    : { title: 'Мои объявления', create: 'Подать объявление', tabs: 'Статусы объявлений', search: 'Поиск по своим объявлениям', find: 'Найти', empty: 'В этом разделе объявлений нет', changeSearch: 'Попробуйте изменить поисковый запрос.', createHelp: 'Создайте новое объявление или выберите другой раздел.', noPhoto: 'Нет фото', checking: '{text.checking}', fix: text.fix, placed: 'Размещено', updated: 'Обновлено', views: 'Просмотры', favorites: 'В избранном', edit: 'Редактировать' };
+    : { title: 'Мои объявления', create: 'Подать объявление', tabs: 'Статусы объявлений', search: 'Поиск по своим объявлениям', find: 'Найти', empty: 'В этом разделе объявлений нет', changeSearch: 'Попробуйте изменить поисковый запрос.', createHelp: 'Создайте новое объявление или выберите другой раздел.', noPhoto: 'Нет фото', checking: 'Ваше объявление проверяется', fix: 'Исправьте объявление и отправьте его повторно', placed: 'Размещено', updated: 'Обновлено', views: 'Просмотры', favorites: 'В избранном', edit: 'Редактировать' };
   const activeStatus = statusTabs.some(
     (tab) => tab.value === params.status,
   )
@@ -138,7 +138,7 @@ export default async function MyListingsPage({
           ))}
         </nav>
 
-        <form action="/my-listings" className="account-listings-search">
+        <form action={`/${locale}/my-listings`} className="account-listings-search">
           <input type="hidden" name="status" value={activeStatus} />
           <label>
             <span aria-hidden="true">⌕</span>
@@ -161,7 +161,7 @@ export default async function MyListingsPage({
                 ? text.changeSearch
                 : text.createHelp}
             </p>
-            <LocalizedLink href="/create-listing">Подать объявление</LocalizedLink>
+            <LocalizedLink href="/create-listing">{text.create}</LocalizedLink>
           </section>
         ) : (
           <div className="account-listing-list">
@@ -201,13 +201,12 @@ export default async function MyListingsPage({
                     </span>
                     {listing.status === 'pending' ? (
                       <p className="account-moderation-message">
-                        Ваше объявление проверяется
+                        {text.checking}
                       </p>
                     ) : null}
                     {listing.status === 'rejected' ? (
                       <p className="account-moderation-message is-error">
-                        {listing.moderationNote ||
-                          'Исправьте объявление и отправьте его повторно'}
+                        {listing.moderationNote || text.fix}
                       </p>
                     ) : null}
                     <small>
