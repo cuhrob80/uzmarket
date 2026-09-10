@@ -95,7 +95,7 @@ export async function MarketplaceHeader() {
               <span aria-hidden="true">＋</span>
               {text.create}
             </LocalizedLink>
-            <LocalizedLink href="/my-listings">{text.mine}</LocalizedLink>
+            <LocalizedLink href="/my-listings">{text.myListings}</LocalizedLink>
             <LocalizedLink
               href="/favorites"
               className="marketplace-header-icon"
