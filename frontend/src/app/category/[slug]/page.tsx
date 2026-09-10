@@ -1,5 +1,4 @@
 import type { Metadata } from 'next';
-import Link from 'next/link';
 import Image from 'next/image';
 import { notFound } from 'next/navigation';
 import {
@@ -13,6 +12,11 @@ import type { Category, Listing } from '@/types/listing';
 import { TransportCategoryIcon } from '@/components/transport-category-icon';
 import { JobCategoryIcon } from '@/components/job-category-icon';
 import { absoluteUrl, getCategorySeo, getCategoryUrl } from '@/lib/seo';
+import { LocalizedLink } from '@/components/localized-link';
+import { getRequestLocale } from '@/lib/server-locale';
+import { getDictionary } from '@/i18n/dictionaries';
+import { getCategoryName } from '@/lib/category-i18n';
+import type { SiteLocale } from '@/lib/locale-path';
 
 export const dynamic = 'force-dynamic';
 
@@ -92,14 +96,14 @@ const categoryImages: Record<string, string> = {
   'real-estate-garages-parking': '/images/categories/real-estate/garages-parking.webp',
 };
 
-function formatPrice(listing: Listing): string {
+function formatPrice(listing: Listing, locale: SiteLocale): string {
   const value = Number(listing.price);
 
   if (!Number.isFinite(value)) {
     return `${listing.price} ${listing.currency}`;
   }
 
-  return `${new Intl.NumberFormat('ru-RU', {
+  return `${new Intl.NumberFormat(locale === 'uz' ? 'uz-UZ' : 'ru-RU', {
     maximumFractionDigits: 2,
   }).format(value)} ${listing.currency}`;
 }
@@ -172,11 +176,16 @@ function CategoryHub({
   category,
   parentCategory,
   children,
+  locale,
 }: {
   category: Category;
   parentCategory: Category | null;
   children: Category[];
+  locale: SiteLocale;
 }) {
+  const text = getDictionary(locale).categoryPage;
+  const categoryName = getCategoryName(category, locale);
+
   return (
     <main className="transport-page">
       <CategoryStructuredData
@@ -184,51 +193,51 @@ function CategoryHub({
         parentCategory={parentCategory}
       />
       <div className="transport-container">
-        <nav className="transport-breadcrumbs" aria-label="Хлебные крошки">
-          <Link href="/">Главная</Link>
+        <nav className="transport-breadcrumbs" aria-label={text.breadcrumbs}>
+          <LocalizedLink href="/">{text.home}</LocalizedLink>
           <span aria-hidden="true">→</span>
-          <span>{category.name}</span>
+          <span>{categoryName}</span>
         </nav>
 
         <div className="transport-title-row">
           <div>
-            <p className="transport-eyebrow">Категории UzMarket</p>
-            <h1>{category.name}</h1>
+            <p className="transport-eyebrow">{text.eyebrow}</p>
+            <h1>{categoryName}</h1>
             <p className="transport-subtitle">
               {category.slug === 'jobs'
-                ? 'Вакансии и резюме по всему Узбекистану'
-                : 'Выберите нужный раздел, чтобы посмотреть объявления'}
+                ? text.jobsSubtitle
+                : text.subtitle}
             </p>
           </div>
 
           <span className="transport-category-count">
-            {children.length} категорий
+            {children.length} {text.categoriesCount}
           </span>
         </div>
 
         {category.slug === 'jobs' ? (
-          <nav className="jobs-audience-cards" aria-label="Выберите раздел работы">
-            <Link href="/rabota/vakansii">
+          <nav className="jobs-audience-cards" aria-label={text.jobsNavigation}>
+            <LocalizedLink href="/rabota/vakansii">
               <span>
-                <strong>Найти работу</strong>
-                <small>Смотреть вакансии работодателей</small>
+                <strong>{text.findJob}</strong>
+                <small>{text.findJobHelp}</small>
               </span>
               <span aria-hidden="true">→</span>
-            </Link>
-            <Link href="/rabota/rezume">
+            </LocalizedLink>
+            <LocalizedLink href="/rabota/rezume">
               <span>
-                <strong>Найти сотрудника</strong>
-                <small>Смотреть резюме специалистов</small>
+                <strong>{text.findEmployee}</strong>
+                <small>{text.findEmployeeHelp}</small>
               </span>
               <span aria-hidden="true">→</span>
-            </Link>
+            </LocalizedLink>
           </nav>
         ) : null}
 
         <section
           id={category.slug === 'jobs' ? 'job-categories' : undefined}
           className="transport-category-grid"
-          aria-label="Разделы категории"
+          aria-label={text.sections}
         >
           {children.map((child, index) => (
             <Link
@@ -249,16 +258,16 @@ function CategoryHub({
                 {categoryImages[child.slug] ? (
                   <Image
                     src={categoryImages[child.slug]}
-                    alt={child.name}
+                    alt={getCategoryName(child, locale)}
                     fill
                     sizes="(max-width: 640px) 50vw, (max-width: 900px) 33vw, (max-width: 1180px) 25vw, 20vw"
                   />
                 ) : null}
               </span>
 
-              <span className="transport-category-name">{child.name}</span>
+              <span className="transport-category-name">{getCategoryName(child, locale)}</span>
               <span className="transport-category-arrow" aria-hidden="true">→</span>
-            </Link>
+            </LocalizedLink>
           ))}
         </section>
       </div>
@@ -269,7 +278,8 @@ function CategoryHub({
 export default async function CategoryPage({
   params,
 }: CategoryPageProps) {
-  const { slug } = await params;
+  const [{ slug }, locale] = await Promise.all([params, getRequestLocale()]);
+  const text = getDictionary(locale).categoryPage;
 
   let category: Category;
 
@@ -296,6 +306,7 @@ export default async function CategoryPage({
         category={category}
         parentCategory={parentCategory}
         children={childCategories}
+        locale={locale}
       />
     );
   }
@@ -314,31 +325,31 @@ export default async function CategoryPage({
       />
       <section className="catalog-container">
         <nav className="transport-breadcrumbs" aria-label="Хлебные крошки">
-          <Link href="/">Главная</Link>
+          <LocalizedLink href="/">Главная</LocalizedLink>
           <span aria-hidden="true">→</span>
           {parentCategory ? (
             <>
-              <Link href={`/category/${encodeURIComponent(parentCategory.slug)}`}>
-                {parentCategory.name}
-              </Link>
+              <LocalizedLink href={`/category/${encodeURIComponent(parentCategory.slug)}`}>
+                {getCategoryName(parentCategory, locale)}
+              </LocalizedLink>
               <span aria-hidden="true">→</span>
             </>
           ) : null}
-          <span>{category.name}</span>
+          <span>{categoryName}</span>
         </nav>
         <header className="catalog-header">
           <div>
-            <p className="catalog-category-label">Категория</p>
-            <h1>{category.name}</h1>
+            <p className="catalog-category-label">{text.category}</p>
+            <h1>{categoryName}</h1>
           </div>
 
-          <Link href="/listings">Все объявления</Link>
+          <LocalizedLink href="/listings">{text.allListings}</LocalizedLink>
         </header>
 
         {listings.items.length === 0 ? (
           <div className="empty-state">
-            <h2>Объявлений пока нет</h2>
-            <p>В этой категории пока нет активных объявлений.</p>
+            <h2>{text.empty}</h2>
+            <p>{text.emptyHelp}</p>
           </div>
         ) : (
           <div className="catalog-grid">
@@ -360,18 +371,18 @@ export default async function CategoryPage({
                         height={240}
                       />
                     ) : (
-                      <span>Нет фото</span>
+                      <span>{getDictionary(locale).common.noPhoto}</span>
                     )}
                   </div>
 
                   <div className="catalog-card-content">
                     <h2>{listing.title}</h2>
-                    <p className="catalog-card-price">{formatPrice(listing)}</p>
+                    <p className="catalog-card-price">{formatPrice(listing, locale)}</p>
                     <p className="catalog-card-meta">
-                      {listing.location ?? 'Узбекистан'}
+                      {listing.location ?? text.country}
                     </p>
                   </div>
-                </Link>
+                </LocalizedLink>
               );
             })}
           </div>
