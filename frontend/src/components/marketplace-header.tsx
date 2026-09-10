@@ -4,6 +4,7 @@ import { getCategories, getCurrentUser } from '@/lib/api/server';
 import type { AuthUser, Category } from '@/types/listing';
 import { CategoriesMenu } from './categories-menu';
 import { ProfileMenu } from './profile-menu';
+import { LanguageSwitcher } from './language-switcher';
 
 function SearchIcon() {
   return (
@@ -119,6 +120,7 @@ export async function MarketplaceHeader() {
                 Войти
               </Link>
             )}
+            <LanguageSwitcher />
           </nav>
         </div>
       </div>
