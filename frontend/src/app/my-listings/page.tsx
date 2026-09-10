@@ -100,7 +100,7 @@ export default async function MyListingsPage({
   ]);
 
   if (!result || countResults.some((item) => item === null)) {
-    redirect('/login');
+    redirect(`/${locale}/login?returnTo=/${locale}/my-listings`);
   }
 
   const counts = Object.fromEntries(
