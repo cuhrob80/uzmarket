@@ -1,0 +1,33 @@
+.switcher {
+  display: inline-grid;
+  grid-template-columns: 1fr 1fr;
+  padding: 3px;
+  border: 1px solid #dce3e7;
+  border-radius: 14px;
+  background: #fff;
+}
+
+.switcher a {
+  min-width: 42px;
+  padding: 8px 10px;
+  border-radius: 10px;
+  color: #111c35;
+  font-size: 14px;
+  font-weight: 800;
+  line-height: 1;
+  text-align: center;
+  text-decoration: none;
+}
+
+.switcher a.active {
+  background: #009b5a;
+  color: #fff;
+}
+
+@media (max-width: 700px) {
+  .switcher a {
+    min-width: 35px;
+    padding: 7px;
+    font-size: 12px;
+  }
+}
