@@ -2,6 +2,7 @@ import Link from 'next/link';
 import { redirect } from 'next/navigation';
 import { getMyListings } from '@/lib/api/server';
 import { ListingActionsMenu } from './listing-actions-menu';
+import { AccountShell } from '@/components/account-shell';
 import type { Listing, ListingStatus } from '@/types/listing';
 
 export const dynamic = 'force-dynamic';
@@ -92,21 +93,7 @@ export default async function MyListingsPage({
   ) as Record<ListingStatus, number>;
 
   return (
-    <div className="account-dashboard">
-      <aside className="account-sidebar" aria-label="Личный кабинет">
-        <Link href="/profile">⌂ <span>Главное</span></Link>
-        <Link href="/my-listings" className="is-active">
-          ▣ <span>Мои объявления</span>
-        </Link>
-        <span className="is-disabled">◯ <span>Сообщения</span></span>
-        <Link href="/profile/reviews">
-          ☆ <span>Отзывы и рейтинг</span>
-        </Link>
-        <Link href="/profile">
-          ⚙ <span>Профиль и настройки</span>
-        </Link>
-      </aside>
-
+    <AccountShell active="listings">
       <main className="account-listings">
         <header className="account-listings-heading">
           <h1>Мои объявления</h1>
@@ -246,6 +233,6 @@ export default async function MyListingsPage({
           </div>
         )}
       </main>
-    </div>
+    </AccountShell>
   );
 }
