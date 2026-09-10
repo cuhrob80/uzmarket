@@ -1,13 +1,16 @@
-import Link from 'next/link';
 import { redirect } from 'next/navigation';
 import { getMyListings } from '@/lib/api/server';
 import { ListingActionsMenu } from './listing-actions-menu';
 import { AccountShell } from '@/components/account-shell';
+import { LocalizedLink } from '@/components/localized-link';
+import { getRequestLocale } from '@/lib/server-locale';
+import type { SiteLocale } from '@/lib/locale-path';
 import type { Listing, ListingStatus } from '@/types/listing';
 
 export const dynamic = 'force-dynamic';
 
-const statusLabels: Record<ListingStatus, string> = {
+const statusLabels: Record<SiteLocale, Record<ListingStatus, string>> = {
+  ru: {
   draft: 'Черновик',
   pending: 'На проверке',
   active: 'Активно',
@@ -16,9 +19,14 @@ const statusLabels: Record<ListingStatus, string> = {
   sold: 'В архиве',
   archived: 'В архиве',
   deleted: 'Удалено',
+  },
+  uz: {
+    draft: 'Qoralama', pending: 'Tekshiruvda', active: 'Faol', rejected: 'Tuzatish kerak',
+    unpublished: 'E’lon qilinmagan', sold: 'Arxivda', archived: 'Arxivda', deleted: 'O‘chirilgan',
+  },
 };
 
-const statusTabs: Array<{
+const statusTabsRu: Array<{
   value: ListingStatus;
   label: string;
 }> = [
@@ -30,7 +38,7 @@ const statusTabs: Array<{
   { value: 'deleted', label: 'Удалённые' },
 ];
 
-function formatPrice(listing: Listing): string {
+function formatPrice(listing: Listing, locale: SiteLocale): string {
   const value = Number(listing.price);
 
   if (!Number.isFinite(value)) {
@@ -40,13 +48,13 @@ function formatPrice(listing: Listing): string {
   const currencyLabel =
     listing.currency === 'UZS' ? 'сум' : listing.currency;
 
-  return `${new Intl.NumberFormat('ru-RU', {
+  return `${new Intl.NumberFormat(locale === 'uz' ? 'uz-UZ' : 'ru-RU', {
     maximumFractionDigits: 2,
   }).format(value)} ${currencyLabel}`;
 }
 
-function formatDate(value: string): string {
-  return new Intl.DateTimeFormat('ru-RU', {
+function formatDate(value: string, locale: SiteLocale): string {
+  return new Intl.DateTimeFormat(locale === 'uz' ? 'uz-UZ' : 'ru-RU', {
     day: 'numeric',
     month: 'long',
     year: 'numeric',
@@ -63,7 +71,17 @@ interface MyListingsPageProps {
 export default async function MyListingsPage({
   searchParams,
 }: MyListingsPageProps) {
-  const params = await searchParams;
+  const [params, locale] = await Promise.all([searchParams, getRequestLocale()]);
+  const statusTabs = locale === 'uz'
+    ? [
+        { value: 'active', label: 'Faol' }, { value: 'rejected', label: 'Xatolar bilan' },
+        { value: 'unpublished', label: 'E’lon qilinmagan' }, { value: 'draft', label: 'Qoralamalar' },
+        { value: 'archived', label: 'Arxiv' }, { value: 'deleted', label: 'O‘chirilgan' },
+      ] satisfies Array<{ value: ListingStatus; label: string }>
+    : statusTabsRu;
+  const text = locale === 'uz'
+    ? { title: 'Mening e’lonlarim', create: 'E’lon joylashtirish', tabs: 'E’lon holatlari', search: 'O‘z e’lonlarimdan qidirish', find: 'Topish', empty: 'Bu bo‘limda e’lonlar yo‘q', changeSearch: 'Qidiruv so‘rovini o‘zgartirib ko‘ring.', createHelp: 'Yangi e’lon yarating yoki boshqa bo‘limni tanlang.', noPhoto: 'Rasm yo‘q', checking: 'E’loningiz tekshirilmoqda', fix: 'E’lonni tuzating va qayta yuboring', placed: 'Joylashtirilgan', updated: 'Yangilangan', views: 'Ko‘rishlar', favorites: 'Sevimlilarda', edit: 'Tahrirlash' }
+    : { title: 'Мои объявления', create: 'Подать объявление', tabs: 'Статусы объявлений', search: 'Поиск по своим объявлениям', find: 'Найти', empty: 'В этом разделе объявлений нет', changeSearch: 'Попробуйте изменить поисковый запрос.', createHelp: 'Создайте новое объявление или выберите другой раздел.', noPhoto: 'Нет фото', checking: '{text.checking}', fix: text.fix, placed: 'Размещено', updated: 'Обновлено', views: 'Просмотры', favorites: 'В избранном', edit: 'Редактировать' };
   const activeStatus = statusTabs.some(
     (tab) => tab.value === params.status,
   )
@@ -96,13 +114,13 @@ export default async function MyListingsPage({
     <AccountShell active="listings">
       <main className="account-listings">
         <header className="account-listings-heading">
-          <h1>Мои объявления</h1>
-          <Link href="/create-listing">Подать объявление</Link>
+          <h1>{text.title}</h1>
+          <LocalizedLink href="/create-listing">{text.create}</LocalizedLink>
         </header>
 
-        <nav className="account-status-tabs" aria-label="Статусы объявлений">
+        <nav className="account-status-tabs" aria-label={text.tabs}>
           {statusTabs.map((tab) => (
-            <Link
+            <LocalizedLink
               key={tab.value}
               href={
                 '/my-listings?status=' +
@@ -116,7 +134,7 @@ export default async function MyListingsPage({
               }
             >
               {tab.label} <sup>{counts[tab.value]}</sup>
-            </Link>
+            </LocalizedLink>
           ))}
         </nav>
 
@@ -128,22 +146,22 @@ export default async function MyListingsPage({
               type="search"
               name="search"
               defaultValue={search}
-              placeholder="Поиск по своим объявлениям"
+              placeholder={text.search}
             />
           </label>
-          <button type="submit">Найти</button>
+          <button type="submit">{text.find}</button>
         </form>
 
         {result.items.length === 0 ? (
           <section className="account-listings-empty">
             <span aria-hidden="true">＋</span>
-            <h2>В этом разделе объявлений нет</h2>
+            <h2>{text.empty}</h2>
             <p>
               {search
-                ? 'Попробуйте изменить поисковый запрос.'
-                : 'Создайте новое объявление или выберите другой раздел.'}
+                ? text.changeSearch
+                : text.createHelp}
             </p>
-            <Link href="/create-listing">Подать объявление</Link>
+            <LocalizedLink href="/create-listing">Подать объявление</LocalizedLink>
           </section>
         ) : (
           <div className="account-listing-list">
@@ -161,14 +179,14 @@ export default async function MyListingsPage({
                         height={135}
                       />
                     ) : (
-                      <span>Нет фото</span>
+                      <span>{text.noPhoto}</span>
                     )}
                   </div>
 
                   <div className="account-listing-info">
                     <div>
                       <h2>{listing.title}</h2>
-                      <strong>{formatPrice(listing)}</strong>
+                      <strong>{formatPrice(listing, locale)}</strong>
                     </div>
                     {listing.location ? (
                       <p>⌖ {listing.location}</p>
@@ -179,7 +197,7 @@ export default async function MyListingsPage({
                         listing.status
                       }
                     >
-                      {statusLabels[listing.status]}
+                      {statusLabels[locale][listing.status]}
                     </span>
                     {listing.status === 'pending' ? (
                       <p className="account-moderation-message">
@@ -193,20 +211,20 @@ export default async function MyListingsPage({
                       </p>
                     ) : null}
                     <small>
-                      Размещено {formatDate(listing.createdAt)}
+                      {text.placed} {formatDate(listing.createdAt, locale)}
                       {listing.updatedAt !== listing.createdAt
-                        ? ` · Обновлено ${formatDate(listing.updatedAt)}`
+                        ? ` · ${text.updated} ${formatDate(listing.updatedAt, locale)}`
                         : ''}
                     </small>
                   </div>
 
                   <dl className="account-listing-stats">
                     <div>
-                      <dt>◉ Просмотры</dt>
+                      <dt>◉ {text.views}</dt>
                       <dd>0</dd>
                     </div>
                     <div>
-                      <dt>♡ В избранном</dt>
+                      <dt>♡ {text.favorites}</dt>
                       <dd>{listing.favoriteCount}</dd>
                     </div>
                   </dl>
@@ -216,11 +234,11 @@ export default async function MyListingsPage({
                       listing.status === 'active' ||
                       listing.status === 'rejected' ||
                       listing.status === 'unpublished') && (
-                      <Link
+                      <LocalizedLink
                         href={`/my-listings/${listing.id}/edit`}
                       >
-                        Редактировать
-                      </Link>
+                        {text.edit}
+                      </LocalizedLink>
                     )}
                     <ListingActionsMenu
                       listingId={listing.id}
