@@ -33,7 +33,7 @@ const copy = {
     secondaryAction: 'Kategoriyalarni ko‘rish',
     categories: 'Ommabop kategoriyalar',
     allListings: 'Barcha e’lonlar',
-    recent: 'Yangi e’lonlonlar',
+    recent: 'Yangi e’lonlar',
     viewAll: 'Barchasini ko‘rish',
     emptyTitle: 'Hozircha e’lonlar yo‘q',
     emptyText: 'Yangi e’lonlar shu yerda paydo bo‘ladi.',
