@@ -75,6 +75,7 @@ const ru = {
     emptyText: 'Новые объявления появятся здесь.',
   },
   listingEditor: {
+    back: 'Назад к моим объявлениям',
     newTitle: 'Новое объявление',
     editTitle: 'Редактирование объявления',
     mainStep: '1. Основная информация',
@@ -260,6 +261,7 @@ const uz = {
     emptyText: 'Yangi e’lonlar shu yerda paydo bo‘ladi.',
   },
   listingEditor: {
+    back: 'Mening e’lonlarimga qaytish',
     newTitle: 'Yangi e’lon',
     editTitle: 'E’lonni tahrirlash',
     mainStep: '1. Asosiy ma’lumot',
