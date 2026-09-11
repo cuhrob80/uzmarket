@@ -3796,20 +3796,20 @@ p { margin: 0; font-size: 1.125rem; }
 }
 
 .marketplace-megamenu-groups {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(180px, 1fr));
-  align-items: start;
-  gap: 34px 38px;
+  columns: 3 220px;
+  column-gap: 38px;
 }
 
 .marketplace-megamenu-groups > section {
   display: grid;
-  width: auto;
+  width: 100%;
   min-width: 0;
   max-width: none;
+  margin: 0 0 28px;
   padding: 0;
+  break-inside: avoid;
   align-content: start;
-  gap: 10px;
+  gap: 8px;
   border: 0;
   border-radius: 0;
   background: transparent;
@@ -3867,7 +3867,7 @@ p { margin: 0; font-size: 1.125rem; }
   }
 
   .marketplace-megamenu-groups {
-    grid-template-columns: repeat(2, minmax(160px, 1fr));
+    columns: 2 190px;
   }
 }
 
@@ -3917,8 +3917,7 @@ p { margin: 0; font-size: 1.125rem; }
   }
 
   .marketplace-megamenu-groups {
-    grid-template-columns: 1fr;
-    gap: 26px;
+    columns: 1;
   }
 }
 
