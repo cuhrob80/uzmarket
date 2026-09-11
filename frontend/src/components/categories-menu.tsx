@@ -179,7 +179,7 @@ export function CategoriesMenu({
                       >
                         {getCategoryName(group, locale)} ›
                       </LocalizedLink>
-                      {children.map((child) => (
+                      {children.slice(0, 5).map((child) => (
                         <LocalizedLink
                           key={child.id}
                           href={
@@ -191,6 +191,18 @@ export function CategoriesMenu({
                           {getCategoryName(child, locale)}
                         </LocalizedLink>
                       ))}
+                      {children.length > 5 ? (
+                        <LocalizedLink
+                          href={
+                            '/category/' +
+                            encodeURIComponent(group.slug)
+                          }
+                          className="marketplace-megamenu-more"
+                          onClick={closeMenu}
+                        >
+                          {text.more} {children.length - 5}
+                        </LocalizedLink>
+                      ) : null}
                     </section>
                   );
                 })}
