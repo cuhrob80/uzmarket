@@ -55,6 +55,7 @@ export function CategoriesMenu({
   const [selectedRootId, setSelectedRootId] = useState(
     rootCategories[0]?.id ?? '',
   );
+  const [expandedGroupIds, setExpandedGroupIds] = useState<string[]>([]);
 
   useEffect(() => {
     if (
@@ -136,7 +137,10 @@ export function CategoriesMenu({
                   ? 'is-active'
                   : undefined
               }
-              onClick={() => setSelectedRootId(category.id)}
+              onClick={() => {
+                setSelectedRootId(category.id);
+                setExpandedGroupIds([]);
+              }}
             >
               <span aria-hidden="true">
                 {getCategoryIcon(category)}
@@ -166,6 +170,10 @@ export function CategoriesMenu({
                   const children = activeCategories.filter(
                     (category) => category.parentId === group.id,
                   );
+                  const isExpanded = expandedGroupIds.includes(group.id);
+                  const visibleChildren = isExpanded
+                    ? children
+                    : children.slice(0, 5);
 
                   return (
                     <section key={group.id}>
@@ -179,7 +187,7 @@ export function CategoriesMenu({
                       >
                         {getCategoryName(group, locale)} ›
                       </LocalizedLink>
-                      {children.slice(0, 5).map((child) => (
+                      {visibleChildren.map((child) => (
                         <LocalizedLink
                           key={child.id}
                           href={
@@ -191,17 +199,19 @@ export function CategoriesMenu({
                           {getCategoryName(child, locale)}
                         </LocalizedLink>
                       ))}
-                      {children.length > 5 ? (
-                        <LocalizedLink
-                          href={
-                            '/category/' +
-                            encodeURIComponent(group.slug)
-                          }
+                      {children.length > 5 && !isExpanded ? (
+                        <button
+                          type="button"
                           className="marketplace-megamenu-more"
-                          onClick={closeMenu}
+                          onClick={() =>
+                            setExpandedGroupIds((current) => [
+                              ...current,
+                              group.id,
+                            ])
+                          }
                         >
                           {text.more} {children.length - 5}
-                        </LocalizedLink>
+                        </button>
                       ) : null}
                     </section>
                   );
