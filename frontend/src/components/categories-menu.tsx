@@ -124,7 +124,12 @@ export function CategoriesMenu({
         {text.button}
       </summary>
 
-      <div className="marketplace-categories-overlay" aria-hidden="true" />
+      <button
+        type="button"
+        className="marketplace-categories-overlay"
+        aria-label={text.close}
+        onClick={closeMenu}
+      />
 
       <div className="marketplace-megamenu">
         <aside aria-label={text.navigation}>
