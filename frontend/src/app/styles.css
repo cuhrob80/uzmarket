@@ -3828,6 +3828,23 @@ p { margin: 0; font-size: 1.125rem; }
   color: #079455;
 }
 
+.marketplace-megamenu-more {
+  width: fit-content;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: #354052;
+  font: inherit;
+  font-size: 0.95rem;
+  line-height: 1.35;
+  text-align: left;
+  cursor: pointer;
+}
+
+.marketplace-megamenu-more:hover {
+  color: #079455;
+}
+
 .marketplace-megamenu-groups .marketplace-megamenu-group {
   margin-bottom: 3px;
   color: #172033;
