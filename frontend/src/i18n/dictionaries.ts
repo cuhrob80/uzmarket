@@ -33,6 +33,7 @@ const ru = {
     noCategories: 'Пока нет категорий.',
     viewAll: 'Смотреть все объявления',
     more: 'Ещё',
+    close: 'Закрыть меню категорий',
   },
   account: {
     navigation: 'Личный кабинет',
@@ -273,6 +274,7 @@ const uz = {
     noCategories: 'Hozircha kategoriyalar yo‘q.',
     viewAll: 'Barcha e’lonlarni ko‘rish',
     more: 'Yana',
+    close: 'Kategoriyalar menyusini yopish',
   },
   account: {
     navigation: 'Shaxsiy kabinet',
