@@ -3703,8 +3703,8 @@ p { margin: 0; font-size: 1.125rem; }
 .marketplace-categories-overlay {
   position: fixed;
   z-index: 110;
-  inset: 120px 0 0;
-  background: rgb(16 24 40 / 48%);
+  inset: 0;
+  background: rgb(16 24 40 / 40%);
 }
 
 .marketplace-megamenu {
@@ -3851,10 +3851,6 @@ p { margin: 0; font-size: 1.125rem; }
 }
 
 @media (max-width: 980px) {
-  .marketplace-categories-overlay {
-    inset-block-start: 156px;
-  }
-
   .marketplace-megamenu {
     top: 168px;
     width: calc(100vw - 20px);
@@ -3874,10 +3870,6 @@ p { margin: 0; font-size: 1.125rem; }
 }
 
 @media (max-width: 640px) {
-  .marketplace-categories-overlay {
-    inset-block-start: 148px;
-  }
-
   .marketplace-megamenu {
     top: 156px;
     width: calc(100vw - 12px);
